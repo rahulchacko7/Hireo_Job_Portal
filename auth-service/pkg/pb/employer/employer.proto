@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package employer;
+
+option go_package = "./pkg/pb/employer";
+
+service Employer {
+    rpc EmployerSignup(EmployerSignupRequest) returns (EmployerSignupResponse) {};
+    rpc EmployerLogin(EmployerLoginRequest) returns (EmployerLoginResponse) {};
+}
+
+message EmployerSignupRequest {
+    string company_name = 1;
+    string industry = 2;
+    int32 company_size = 3;
+    string website = 4;
+    string headquarters_address = 5;
+    string about_company = 6;
+    string contact_email = 7;
+    uint32 contact_phone_number = 8;
+    string password = 9;
+}
+
+message EmployerSignupResponse {
+    int64 status = 1;
+    EmployerDetails employer_details = 2;
+    string token = 3;
+}
+
+message EmployerDetails {
+    uint64 id = 1;
+    string company_name = 2;
+    string industry = 3;
+    int32 company_size = 4;
+    string website = 5;
+    string headquarters_address = 6;
+    string about_company = 7;
+    string contact_email = 8;
+    uint32 contact_phone_number = 9;
+}
+
+message EmployerLoginRequest {
+    string email = 1;
+    string password = 2;
+}
+
+message EmployerLoginResponse {
+    int64 status = 1;
+    EmployerDetails employer_details = 2;
+    string token = 3;
+}

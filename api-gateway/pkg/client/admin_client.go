@@ -2,8 +2,8 @@ package client
 
 import (
 	interfaces "HireoGateWay/pkg/client/interface"
-	pb "HireoGateWay/pkg/pb/admin"
 	"HireoGateWay/pkg/config"
+	pb "HireoGateWay/pkg/pb/admin"
 	"HireoGateWay/pkg/utils/models"
 	"context"
 	"fmt"
@@ -17,7 +17,7 @@ type adminClient struct {
 
 func NewAdminClient(cfg config.Config) interfaces.AdminClient {
 
-	grpcConnection, err := grpc.Dial(cfg.HireoAdmin, grpc.WithInsecure())
+	grpcConnection, err := grpc.Dial(cfg.HireoAuth, grpc.WithInsecure())
 	if err != nil {
 		fmt.Println("Could not connect", err)
 	}

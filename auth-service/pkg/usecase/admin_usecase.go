@@ -66,13 +66,13 @@ func (ad *adminUseCase) LoginHandler(admin models.AdminLogin) (*domain.TokenAdmi
 	if err != nil {
 		return &domain.TokenAdmin{}, err
 	}
-	// compare password from database and that provided from admins
+	
 	err = bcrypt.CompareHashAndPassword([]byte(admindeatils.Password), []byte(admin.Password))
 	if err != nil {
 		return &domain.TokenAdmin{}, errors.New("password not matching")
 	}
 	var adminDetailsResponse models.AdminDetailsResponse
-	//  copy all details except password and sent it back to the front end
+	
 	err = copier.Copy(&adminDetailsResponse, &admindeatils)
 	if err != nil {
 		return &domain.TokenAdmin{}, err

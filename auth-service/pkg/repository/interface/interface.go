@@ -10,3 +10,9 @@ type AdminRepository interface {
 	FindAdminByEmail(admin models.AdminLogin) (models.AdminSignUp, error)
 	CheckAdminExistsByEmail(email string) (*domain.Admin, error)
 }
+
+type EmployerRepository interface {
+	EmployerSignUp(employerDetails models.EmployerSignUp) (models.EmployerDetailsResponse, error)
+	FindEmployerByEmail(employer models.EmployerLogin) (models.EmployerSignUp, error)
+	CheckEmployerExistsByEmail(email string) (*domain.Employer, error)
+}

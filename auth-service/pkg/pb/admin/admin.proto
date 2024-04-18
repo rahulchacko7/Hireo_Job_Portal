@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package admin;
 
-option go_package = "./pkg/pb";
+option go_package = "./pkg/pb/admin";
 
 service Admin{
     rpc AdminSignup(AdminSignupRequest) returns(AdminSignupResponse){};

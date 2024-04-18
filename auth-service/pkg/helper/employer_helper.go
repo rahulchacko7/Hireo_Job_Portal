@@ -1,32 +1,41 @@
 package helper
 
 import (
-	"HireoGateWay/pkg/utils/models"
+	"Auth/pkg/utils/models"
+	"errors"
 	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type authCustomClaimsEmployer struct {
-	Company_name string `json:"company_name"`
-	Industry     string `json:"industry"`
-	Email        string `json:"email"`
+	CompanyName string `json:"company_name"`
+	Email       string `json:"email"`
 	jwt.StandardClaims
+}
+
+func EmployerPasswordHash(password string) (string, error) {
+	hashPassword, err := bcrypt.GenerateFromPassword([]byte(password), 10)
+	if err != nil {
+		return "", errors.New("internal server error")
+	}
+	hash := string(hashPassword)
+	return hash, nil
 }
 
 func GenerateTokenEmployer(employer models.EmployerDetailsResponse) (string, error) {
 	claims := &authCustomClaimsEmployer{
-		Company_name: employer.Company_name,
-		Industry:     employer.Industry,
-		Email:        employer.Contact_email,
+		CompanyName: employer.CompanyName,
+		Email:       employer.ContactEmail,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour * 48).Unix(),
 			IssuedAt:  time.Now().Unix(),
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString([]byte("123456789"))
+	tokenString, err := token.SignedString([]byte("your_signing_key")) // Update with your signing key
 	if err != nil {
 		fmt.Println("Error is", err)
 		return "", err
@@ -40,7 +49,7 @@ func ValidateTokenEmployer(tokenString string) (*authCustomClaimsEmployer, error
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte("123456789"), nil
+		return []byte("your_signing_key"), nil // Update with your signing key
 	})
 
 	if err != nil {

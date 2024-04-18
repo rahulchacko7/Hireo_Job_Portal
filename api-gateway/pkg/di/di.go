@@ -12,7 +12,10 @@ func InitializeAPI(cfg config.Config) (*server.ServerHTTP, error) {
 	adminClient := client.NewAdminClient(cfg)
 	adminHandler := handler.NewAdminHandler(adminClient)
 
-	serverHTTP := server.NewServerHTTP(adminHandler)
+	employerClient := client.NewEmployerClient(cfg)
+	employerHandler := handler.NewEmployerHandler(employerClient)
+
+	serverHTTP := server.NewServerHTTP(adminHandler, employerHandler)
 
 	return serverHTTP, nil
 }

@@ -4,7 +4,7 @@ import "github.com/spf13/viper"
 
 type Config struct {
 	Port       string `mapstructure:"PORT"`
-	HireoAdmin string `mapstructure:"Hireo_Admin"`
+	HireoAuth string `mapstructure:"Hireo_Auth"`
 }
 
 var envs = []string{
