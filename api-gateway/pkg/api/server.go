@@ -11,16 +11,23 @@ type ServerHTTP struct {
 	engine *gin.Engine
 }
 
-func NewServerHTTP(adminHandler *handler.AdminHandler, employerHandler *handler.EmployerHandler) *ServerHTTP {
+func NewServerHTTP(adminHandler *handler.AdminHandler, employerHandler *handler.EmployerHandler, jobSeekerHandler *handler.JobSeekerHandler) *ServerHTTP {
 
 	router := gin.New()
 
 	router.Use(gin.Logger())
 
+	// Route for admin auth
 	router.POST("/admin/login", adminHandler.LoginHandler)
 	router.POST("/admin/signup", adminHandler.AdminSignUp)
+
+	// Route for employer auth
 	router.POST("/employer/signup", employerHandler.EmployerSignUp)
 	router.POST("/employer/login", employerHandler.EmployerLogin)
+
+	// Route for job seeker auth
+	router.POST("/job-seeker/signup", jobSeekerHandler.JobSeekerSignUp)
+	router.POST("/job-seeker/login", jobSeekerHandler.JobSeekerLogin)
 
 	return &ServerHTTP{engine: router}
 }
