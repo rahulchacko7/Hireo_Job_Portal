@@ -7,6 +7,7 @@ import (
 	"Auth/pkg/config"
 	pb "Auth/pkg/pb/admin"
 	pbemployer "Auth/pkg/pb/employer"
+	pbjobseeker "Auth/pkg/pb/jobseeker"
 
 	"google.golang.org/grpc"
 )
@@ -16,7 +17,7 @@ type Server struct {
 	listener net.Listener
 }
 
-func NewGRPCServer(cfg config.Config, adminServer pb.AdminServer, employerServer pbemployer.EmployerServer) (*Server, error) {
+func NewGRPCServer(cfg config.Config, adminServer pb.AdminServer, employerServer pbemployer.EmployerServer, jobseekerServer pbjobseeker.JobSeekerServer) (*Server, error) {
 	lis, err := net.Listen("tcp", cfg.Port)
 	if err != nil {
 		return nil, err
@@ -25,6 +26,7 @@ func NewGRPCServer(cfg config.Config, adminServer pb.AdminServer, employerServer
 	newServer := grpc.NewServer()
 	pb.RegisterAdminServer(newServer, adminServer)
 	pbemployer.RegisterEmployerServer(newServer, employerServer)
+	pbjobseeker.RegisterJobSeekerServer(newServer, jobseekerServer)
 
 	return &Server{
 		server:   newServer,

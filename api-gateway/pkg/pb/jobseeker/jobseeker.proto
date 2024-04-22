@@ -8,30 +8,21 @@ service JobSeeker {
     rpc JobSeekerSignup(JobSeekerSignupRequest) returns (JobSeekerSignupResponse) {};
     rpc JobSeekerLogin(JobSeekerLoginRequest) returns (JobSeekerLoginResponse) {};
 }
+
 message JobSeekerSignupRequest {
     string email = 1;
     string password = 2;
     string first_name = 3;
     string last_name = 4;
     string phone_number = 5;
-    string address = 6;
-    string date_of_birth = 7;
-    string gender = 8;
-    string bio = 9;
-    map<string, string> social_media_links = 10;
-    repeated string skills = 11;
-    repeated Education education_history = 12;
-    repeated Experience work_experience = 13;
-    repeated string languages_spoken = 14;
-    repeated string interests = 15;
-    repeated Project projects = 16;
+    string date_of_birth = 6;
+    string gender = 7;
 }
 
 message JobSeekerSignupResponse {
     int64 status = 1;
     JobSeekerDetails job_seeker_details = 2;
     string token = 3;
-    string error = 4;
 }
 
 message JobSeekerDetails {
@@ -40,39 +31,8 @@ message JobSeekerDetails {
     string first_name = 3;
     string last_name = 4;
     string phone_number = 5;
-    string address = 6;
-    string date_of_birth = 7;
-    string gender = 8;
-    string bio = 9;
-    map<string, string> social_media_links = 10;
-    repeated string skills = 11;
-    repeated Education education_history = 12;
-    repeated Experience work_experience = 13;
-    repeated string languages_spoken = 14;
-    repeated string interests = 15;
-    repeated Project projects = 16;
-}
-
-message Education {
-    string degree = 1;
-    string university = 2;
-    string graduation_year = 3;
-}
-
-message Experience {
-    string company = 1;
-    string position = 2;
-    string start_date = 3;
-    string end_date = 4;
-    string description = 5;
-}
-
-message Project {
-    string name = 1;
-    string description = 2;
-    repeated string technologies_used = 3;
-    string start_date = 4;
-    string end_date = 5;
+    string date_of_birth = 6;
+    string gender = 7;
 }
 
 message JobSeekerLoginRequest {
@@ -84,5 +44,4 @@ message JobSeekerLoginResponse {
     int64 status = 1;
     JobSeekerDetails job_seeker_details = 2;
     string token = 3;
-    string error = 4;
 }

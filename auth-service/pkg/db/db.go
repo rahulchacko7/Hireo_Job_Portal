@@ -19,11 +19,15 @@ func ConnectDatabase(cfg config.Config) (*gorm.DB, error) {
 		return nil, dbErr
 	}
 
-	// Auto-migrate both Admin and Employer models
 	if err := db.AutoMigrate(&domain.Admin{}); err != nil {
 		return nil, err
 	}
+
 	if err := db.AutoMigrate(&domain.Employer{}); err != nil {
+		return nil, err
+	}
+
+	if err := db.AutoMigrate(&domain.JobSeeker{}); err != nil {
 		return nil, err
 	}
 

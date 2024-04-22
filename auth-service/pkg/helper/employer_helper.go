@@ -35,7 +35,7 @@ func GenerateTokenEmployer(employer models.EmployerDetailsResponse) (string, err
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString([]byte("your_signing_key")) // Update with your signing key
+	tokenString, err := token.SignedString([]byte("employerkey"))
 	if err != nil {
 		fmt.Println("Error is", err)
 		return "", err
@@ -49,7 +49,7 @@ func ValidateTokenEmployer(tokenString string) (*authCustomClaimsEmployer, error
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte("your_signing_key"), nil // Update with your signing key
+		return []byte("employerkey"), nil
 	})
 
 	if err != nil {

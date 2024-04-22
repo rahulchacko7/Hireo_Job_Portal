@@ -48,7 +48,7 @@ func (er *employerRepository) CheckEmployerExistsByEmail(email string) (*domain.
 
 func (er *employerRepository) FindEmployerByEmail(employer models.EmployerLogin) (models.EmployerSignUp, error) {
 	var user models.EmployerSignUp
-	err := er.DB.Raw("SELECT * FROM employers WHERE email=? ", employer.Email).Scan(&user).Error
+	err := er.DB.Raw("SELECT * FROM employers WHERE Contact_email=? ", employer.Email).Scan(&user).Error
 	if err != nil {
 		return models.EmployerSignUp{}, errors.New("error checking user details")
 	}
