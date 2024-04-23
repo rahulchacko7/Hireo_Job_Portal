@@ -25,6 +25,7 @@ func PasswordHash(password string) (string, error) {
 	hash := string(hashPassword)
 	return hash, nil
 }
+
 func GenerateTokenAdmin(admin models.AdminDetailsResponse) (string, error) {
 	claims := &authCustomClaimsAdmin{
 		Firstname: admin.Firstname,

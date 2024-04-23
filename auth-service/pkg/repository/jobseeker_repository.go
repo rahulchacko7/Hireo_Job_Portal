@@ -47,7 +47,7 @@ func (jr *jobSeekerRepository) CheckJobSeekerExistsByEmail(email string) (*domai
 
 func (jr *jobSeekerRepository) FindJobSeekerByEmail(jobSeeker models.JobSeekerLogin) (models.JobSeekerSignUp, error) {
 	var user models.JobSeekerSignUp
-	err := jr.DB.Raw("SELECT * FROM job_seekers WHERE contact_email=? ", jobSeeker.Email).Scan(&user).Error
+	err := jr.DB.Raw("SELECT * FROM job_seekers WHERE email=? ", jobSeeker.Email).Scan(&user).Error
 	if err != nil {
 		return models.JobSeekerSignUp{}, errors.New("error checking user details")
 	}

@@ -6,6 +6,7 @@ type EmployerLogin struct {
 }
 
 type EmployerSignUp struct {
+	ID                  uint   `json:"id"`
 	CompanyName         string `json:"company_name"`
 	Industry            string `json:"industry"`
 	CompanySize         int    `json:"company_size"`

@@ -6,6 +6,7 @@ type JobSeekerLogin struct {
 }
 
 type JobSeekerSignUp struct {
+	ID          uint   `json:"id"`
 	Email       string `json:"email" binding:"required" validate:"required,email"`
 	Password    string `json:"password" binding:"required" validate:"min=6,max=20"`
 	FirstName   string `json:"first_name"`
