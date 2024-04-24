@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion7
 const (
 	Employer_EmployerSignup_FullMethodName = "/employer.Employer/EmployerSignup"
 	Employer_EmployerLogin_FullMethodName  = "/employer.Employer/EmployerLogin"
+	Employer_PostJobOpening_FullMethodName = "/employer.Employer/PostJobOpening"
 )
 
 // EmployerClient is the client API for Employer service.
@@ -29,6 +30,7 @@ const (
 type EmployerClient interface {
 	EmployerSignup(ctx context.Context, in *EmployerSignupRequest, opts ...grpc.CallOption) (*EmployerSignupResponse, error)
 	EmployerLogin(ctx context.Context, in *EmployerLoginInRequest, opts ...grpc.CallOption) (*EmployerLoginResponse, error)
+	PostJobOpening(ctx context.Context, in *PostJobOpeningRequest, opts ...grpc.CallOption) (*PostJobOpeningResponse, error)
 }
 
 type employerClient struct {
@@ -57,12 +59,22 @@ func (c *employerClient) EmployerLogin(ctx context.Context, in *EmployerLoginInR
 	return out, nil
 }
 
+func (c *employerClient) PostJobOpening(ctx context.Context, in *PostJobOpeningRequest, opts ...grpc.CallOption) (*PostJobOpeningResponse, error) {
+	out := new(PostJobOpeningResponse)
+	err := c.cc.Invoke(ctx, Employer_PostJobOpening_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // EmployerServer is the server API for Employer service.
 // All implementations must embed UnimplementedEmployerServer
 // for forward compatibility
 type EmployerServer interface {
 	EmployerSignup(context.Context, *EmployerSignupRequest) (*EmployerSignupResponse, error)
 	EmployerLogin(context.Context, *EmployerLoginInRequest) (*EmployerLoginResponse, error)
+	PostJobOpening(context.Context, *PostJobOpeningRequest) (*PostJobOpeningResponse, error)
 	mustEmbedUnimplementedEmployerServer()
 }
 
@@ -75,6 +87,9 @@ func (UnimplementedEmployerServer) EmployerSignup(context.Context, *EmployerSign
 }
 func (UnimplementedEmployerServer) EmployerLogin(context.Context, *EmployerLoginInRequest) (*EmployerLoginResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method EmployerLogin not implemented")
+}
+func (UnimplementedEmployerServer) PostJobOpening(context.Context, *PostJobOpeningRequest) (*PostJobOpeningResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PostJobOpening not implemented")
 }
 func (UnimplementedEmployerServer) mustEmbedUnimplementedEmployerServer() {}
 
@@ -125,6 +140,24 @@ func _Employer_EmployerLogin_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Employer_PostJobOpening_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PostJobOpeningRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EmployerServer).PostJobOpening(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Employer_PostJobOpening_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EmployerServer).PostJobOpening(ctx, req.(*PostJobOpeningRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Employer_ServiceDesc is the grpc.ServiceDesc for Employer service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -139,6 +172,10 @@ var Employer_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "EmployerLogin",
 			Handler:    _Employer_EmployerLogin_Handler,
+		},
+		{
+			MethodName: "PostJobOpening",
+			Handler:    _Employer_PostJobOpening_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

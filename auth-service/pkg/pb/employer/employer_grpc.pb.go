@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion7
 const (
 	Employer_EmployerSignup_FullMethodName = "/employer.Employer/EmployerSignup"
 	Employer_EmployerLogin_FullMethodName  = "/employer.Employer/EmployerLogin"
+	Employer_PostJobOpening_FullMethodName = "/employer.Employer/PostJobOpening"
 )
 
 // EmployerClient is the client API for Employer service.
@@ -28,7 +29,8 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type EmployerClient interface {
 	EmployerSignup(ctx context.Context, in *EmployerSignupRequest, opts ...grpc.CallOption) (*EmployerSignupResponse, error)
-	EmployerLogin(ctx context.Context, in *EmployerLoginRequest, opts ...grpc.CallOption) (*EmployerLoginResponse, error)
+	EmployerLogin(ctx context.Context, in *EmployerLoginInRequest, opts ...grpc.CallOption) (*EmployerLoginResponse, error)
+	PostJobOpening(ctx context.Context, in *PostJobOpeningRequest, opts ...grpc.CallOption) (*PostJobOpeningResponse, error)
 }
 
 type employerClient struct {
@@ -48,9 +50,18 @@ func (c *employerClient) EmployerSignup(ctx context.Context, in *EmployerSignupR
 	return out, nil
 }
 
-func (c *employerClient) EmployerLogin(ctx context.Context, in *EmployerLoginRequest, opts ...grpc.CallOption) (*EmployerLoginResponse, error) {
+func (c *employerClient) EmployerLogin(ctx context.Context, in *EmployerLoginInRequest, opts ...grpc.CallOption) (*EmployerLoginResponse, error) {
 	out := new(EmployerLoginResponse)
 	err := c.cc.Invoke(ctx, Employer_EmployerLogin_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *employerClient) PostJobOpening(ctx context.Context, in *PostJobOpeningRequest, opts ...grpc.CallOption) (*PostJobOpeningResponse, error) {
+	out := new(PostJobOpeningResponse)
+	err := c.cc.Invoke(ctx, Employer_PostJobOpening_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +73,8 @@ func (c *employerClient) EmployerLogin(ctx context.Context, in *EmployerLoginReq
 // for forward compatibility
 type EmployerServer interface {
 	EmployerSignup(context.Context, *EmployerSignupRequest) (*EmployerSignupResponse, error)
-	EmployerLogin(context.Context, *EmployerLoginRequest) (*EmployerLoginResponse, error)
+	EmployerLogin(context.Context, *EmployerLoginInRequest) (*EmployerLoginResponse, error)
+	PostJobOpening(context.Context, *PostJobOpeningRequest) (*PostJobOpeningResponse, error)
 	mustEmbedUnimplementedEmployerServer()
 }
 
@@ -73,8 +85,11 @@ type UnimplementedEmployerServer struct {
 func (UnimplementedEmployerServer) EmployerSignup(context.Context, *EmployerSignupRequest) (*EmployerSignupResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method EmployerSignup not implemented")
 }
-func (UnimplementedEmployerServer) EmployerLogin(context.Context, *EmployerLoginRequest) (*EmployerLoginResponse, error) {
+func (UnimplementedEmployerServer) EmployerLogin(context.Context, *EmployerLoginInRequest) (*EmployerLoginResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method EmployerLogin not implemented")
+}
+func (UnimplementedEmployerServer) PostJobOpening(context.Context, *PostJobOpeningRequest) (*PostJobOpeningResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PostJobOpening not implemented")
 }
 func (UnimplementedEmployerServer) mustEmbedUnimplementedEmployerServer() {}
 
@@ -108,7 +123,7 @@ func _Employer_EmployerSignup_Handler(srv interface{}, ctx context.Context, dec 
 }
 
 func _Employer_EmployerLogin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(EmployerLoginRequest)
+	in := new(EmployerLoginInRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -120,7 +135,25 @@ func _Employer_EmployerLogin_Handler(srv interface{}, ctx context.Context, dec f
 		FullMethod: Employer_EmployerLogin_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(EmployerServer).EmployerLogin(ctx, req.(*EmployerLoginRequest))
+		return srv.(EmployerServer).EmployerLogin(ctx, req.(*EmployerLoginInRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Employer_PostJobOpening_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PostJobOpeningRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EmployerServer).PostJobOpening(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Employer_PostJobOpening_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EmployerServer).PostJobOpening(ctx, req.(*PostJobOpeningRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -139,6 +172,10 @@ var Employer_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "EmployerLogin",
 			Handler:    _Employer_EmployerLogin_Handler,
+		},
+		{
+			MethodName: "PostJobOpening",
+			Handler:    _Employer_PostJobOpening_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

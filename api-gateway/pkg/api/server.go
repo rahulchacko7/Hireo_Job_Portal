@@ -24,6 +24,7 @@ func NewServerHTTP(adminHandler *handler.AdminHandler, employerHandler *handler.
 	// Route for employer auth
 	router.POST("/employer/signup", employerHandler.EmployerSignUp)
 	router.POST("/employer/login", employerHandler.EmployerLogin)
+	router.POST("/employer/job-post", employerHandler.PostJobOpening)
 
 	// Route for job seeker auth
 	router.POST("/job-seeker/signup", jobSeekerHandler.JobSeekerSignUp)
