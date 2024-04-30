@@ -2,24 +2,32 @@ package helper
 
 import (
 	"HireoGateWay/pkg/utils/models"
+	"errors"
 	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type authCustomClaimsAdmin struct {
-	Firstname string `json:"firstname"`
-	Lastname  string `json:"lastname"`
-	Email     string `json:"email"`
+	Id    uint   `json:"id"`
+	Email string `json:"email"`
 	jwt.StandardClaims
+}
+
+func PasswordHash(password string) (string, error) {
+	hashPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", errors.New("failed to generate password hash")
+	}
+	return string(hashPassword), nil
 }
 
 func GenerateTokenAdmin(admin models.AdminDetailsResponse) (string, error) {
 	claims := &authCustomClaimsAdmin{
-		Firstname: admin.Firstname,
-		Lastname:  admin.Lastname,
-		Email:     admin.Email,
+		Id:    admin.ID,
+		Email: admin.Email,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour * 48).Unix(),
 			IssuedAt:  time.Now().Unix(),
@@ -28,10 +36,8 @@ func GenerateTokenAdmin(admin models.AdminDetailsResponse) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString([]byte("123456789"))
 	if err != nil {
-		fmt.Println("Error is", err)
-		return "", err
+		return "", fmt.Errorf("failed to generate token: %v", err)
 	}
-
 	return tokenString, nil
 }
 
@@ -42,13 +48,12 @@ func ValidateToken(tokenString string) (*authCustomClaimsAdmin, error) {
 		}
 		return []byte("123456789"), nil
 	})
-
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse token: %v", err)
 	}
-
-	if claims, ok := token.Claims.(*authCustomClaimsAdmin); ok && token.Valid {
-		return claims, nil
+	claims, ok := token.Claims.(*authCustomClaimsAdmin)
+	if !ok || !token.Valid {
+		return nil, errors.New("invalid token")
 	}
-	return nil, fmt.Errorf("invalid token")
+	return claims, nil
 }

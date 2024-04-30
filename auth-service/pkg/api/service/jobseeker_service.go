@@ -2,7 +2,7 @@
 package service
 
 import (
-	pb "Auth/pkg/pb/jobseeker"
+	pb "Auth/pkg/pb/auth"
 	interfaces "Auth/pkg/usecase/interface"
 	"Auth/pkg/utils/models"
 	"context"

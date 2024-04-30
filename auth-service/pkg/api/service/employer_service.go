@@ -2,7 +2,7 @@
 package service
 
 import (
-	pb "Auth/pkg/pb/employer"
+	pb "Auth/pkg/pb/auth"
 	interfaces "Auth/pkg/usecase/interface"
 	"Auth/pkg/utils/models"
 	"context"
@@ -49,7 +49,7 @@ func (es *EmployerServer) EmployerSignup(ctx context.Context, req *pb.EmployerSi
 		HeadquartersAddress: res.Employer.HeadquartersAddress,
 		AboutCompany:        res.Employer.AboutCompany,
 		ContactEmail:        res.Employer.ContactEmail,
-		ContactPhoneNumber:  uint32(res.Employer.ContactPhoneNumber),
+		ContactPhoneNumber:  uint64(res.Employer.ContactPhoneNumber),
 	}
 
 	return &pb.EmployerSignupResponse{
@@ -59,7 +59,7 @@ func (es *EmployerServer) EmployerSignup(ctx context.Context, req *pb.EmployerSi
 	}, nil
 }
 
-func (es *EmployerServer) EmployerLogin(ctx context.Context, req *pb.EmployerLoginRequest) (*pb.EmployerLoginResponse, error) {
+func (es *EmployerServer) EmployerLogin(ctx context.Context, req *pb.EmployerLoginInRequest) (*pb.EmployerLoginResponse, error) {
 	employerLogin := models.EmployerLogin{
 		Email:    req.Email,
 		Password: req.Password,
@@ -79,7 +79,7 @@ func (es *EmployerServer) EmployerLogin(ctx context.Context, req *pb.EmployerLog
 		HeadquartersAddress: employer.Employer.HeadquartersAddress,
 		AboutCompany:        employer.Employer.AboutCompany,
 		ContactEmail:        employer.Employer.ContactEmail,
-		ContactPhoneNumber:  uint32(employer.Employer.ContactPhoneNumber),
+		ContactPhoneNumber:  uint64(employer.Employer.ContactPhoneNumber),
 	}
 
 	return &pb.EmployerLoginResponse{

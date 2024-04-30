@@ -3,7 +3,7 @@ package client
 import (
 	interfaces "HireoGateWay/pkg/client/interface"
 	"HireoGateWay/pkg/config"
-	pb "HireoGateWay/pkg/pb/admin"
+	pb "HireoGateWay/pkg/pb/auth"
 	"HireoGateWay/pkg/utils/models"
 	"context"
 	"fmt"

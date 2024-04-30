@@ -3,12 +3,13 @@ package config
 import "github.com/spf13/viper"
 
 type Config struct {
-	Port       string `mapstructure:"PORT"`
+	Port      string `mapstructure:"PORT"`
 	HireoAuth string `mapstructure:"Hireo_Auth"`
+	HireoJob  string `mapstructure:"Hireo_Job"`
 }
 
 var envs = []string{
-	"PORT", "Hireo_Admin",
+	"PORT", "Hireo_Admin", "Hireo_Job",
 }
 
 func LoadConfig() (Config, error) {

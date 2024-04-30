@@ -1,7 +1,7 @@
 package service
 
 import (
-	pb "Auth/pkg/pb/admin"
+	pb "Auth/pkg/pb/auth"
 	interfaces "Auth/pkg/usecase/interface"
 	"Auth/pkg/utils/models"
 	"context"

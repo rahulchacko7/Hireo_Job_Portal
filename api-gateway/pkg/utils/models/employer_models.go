@@ -1,7 +1,5 @@
 package models
 
-import "time"
-
 type EmployerLogin struct {
 	Email    string `json:"email" binding:"required" validate:"required"`
 	Password string `json:"password" binding:"required" validate:"min=6,max=20"`
@@ -50,39 +48,4 @@ type Employer struct {
 type TokenEmployer struct {
 	Employer EmployerDetailsResponse
 	Token    string
-}
-
-type JobOpening struct {
-	Title               string    `json:"title"`
-	Description         string    `json:"description"`
-	Requirements        string    `json:"requirements"`
-	PostedOn            time.Time `json:"posted_on"`
-	TotalApplications   int       `json:"total_applications"`
-	CompanyName         string    `json:"company_name"`
-	PostedBy            Employer  `json:"posted_by"`
-	Location            string    `json:"location"`
-	EmploymentType      string    `json:"employment_type"`
-	SalaryRange         string    `json:"salary_range"`
-	SkillsRequired      []string  `json:"skills_required"`
-	ExperienceLevel     string    `json:"experience_level"`
-	EducationLevel      string    `json:"education_level"`
-	ApplicationDeadline time.Time `json:"application_deadline"`
-}
-
-type JobOpeningResponse struct {
-	ID                  uint      `json:"id"`
-	Title               string    `json:"title"`
-	Description         string    `json:"description"`
-	Requirements        string    `json:"requirements"`
-	PostedOn            time.Time `json:"posted_on"`
-	TotalApplications   int       `json:"total_applications"`
-	CompanyName         string    `json:"company_name"`
-	PostedBy            Employer  `json:"posted_by"`
-	Location            string    `json:"location"`
-	EmploymentType      string    `json:"employment_type"`
-	SalaryRange         string    `json:"salary_range"`
-	SkillsRequired      []string  `json:"skills_required"`
-	ExperienceLevel     string    `json:"experience_level"`
-	EducationLevel      string    `json:"education_level"`
-	ApplicationDeadline time.Time `json:"application_deadline"`
 }

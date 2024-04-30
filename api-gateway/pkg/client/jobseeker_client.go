@@ -6,7 +6,7 @@ import (
 
 	interfaces "HireoGateWay/pkg/client/interface"
 	"HireoGateWay/pkg/config"
-	pb "HireoGateWay/pkg/pb/jobseeker"
+	pb "HireoGateWay/pkg/pb/auth"
 	"HireoGateWay/pkg/utils/models"
 
 	"google.golang.org/grpc"

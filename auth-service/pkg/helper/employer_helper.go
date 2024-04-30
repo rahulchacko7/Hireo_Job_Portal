@@ -2,40 +2,31 @@ package helper
 
 import (
 	"Auth/pkg/utils/models"
-	"errors"
 	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type authCustomClaimsEmployer struct {
-	CompanyName string `json:"company_name"`
-	Email       string `json:"email"`
+	Id           uint   `json:"id"`
+	Company_name string `json:"company_name"`
+	Email        string `json:"email"`
 	jwt.StandardClaims
-}
-
-func EmployerPasswordHash(password string) (string, error) {
-	hashPassword, err := bcrypt.GenerateFromPassword([]byte(password), 10)
-	if err != nil {
-		return "", errors.New("internal server error")
-	}
-	hash := string(hashPassword)
-	return hash, nil
 }
 
 func GenerateTokenEmployer(employer models.EmployerDetailsResponse) (string, error) {
 	claims := &authCustomClaimsEmployer{
-		CompanyName: employer.CompanyName,
-		Email:       employer.ContactEmail,
+		Id:           employer.ID,
+		Company_name: employer.CompanyName,
+		Email:        employer.ContactEmail,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour * 48).Unix(),
 			IssuedAt:  time.Now().Unix(),
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString([]byte("employerkey"))
+	tokenString, err := token.SignedString([]byte("123456789"))
 	if err != nil {
 		fmt.Println("Error is", err)
 		return "", err
@@ -49,7 +40,7 @@ func ValidateTokenEmployer(tokenString string) (*authCustomClaimsEmployer, error
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte("employerkey"), nil
+		return []byte("123456789"), nil
 	})
 
 	if err != nil {

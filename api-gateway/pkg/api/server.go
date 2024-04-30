@@ -2,6 +2,7 @@ package server
 
 import (
 	"HireoGateWay/pkg/api/handler"
+	"HireoGateWay/pkg/api/middleware"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -11,7 +12,7 @@ type ServerHTTP struct {
 	engine *gin.Engine
 }
 
-func NewServerHTTP(adminHandler *handler.AdminHandler, employerHandler *handler.EmployerHandler, jobSeekerHandler *handler.JobSeekerHandler) *ServerHTTP {
+func NewServerHTTP(adminHandler *handler.AdminHandler, employerHandler *handler.EmployerHandler, jobSeekerHandler *handler.JobSeekerHandler, jobHandler *handler.JobHandler) *ServerHTTP {
 
 	router := gin.New()
 
@@ -24,8 +25,11 @@ func NewServerHTTP(adminHandler *handler.AdminHandler, employerHandler *handler.
 	// Route for employer auth
 	router.POST("/employer/signup", employerHandler.EmployerSignUp)
 	router.POST("/employer/login", employerHandler.EmployerLogin)
-	router.POST("/employer/job-post", employerHandler.PostJobOpening)
 
+	router.Use(middleware.EmployerAuthMiddleware())
+	{
+		router.POST("/employer/job-post", jobHandler.PostJobOpening)
+	}
 	// Route for job seeker auth
 	router.POST("/job-seeker/signup", jobSeekerHandler.JobSeekerSignUp)
 	router.POST("/job-seeker/login", jobSeekerHandler.JobSeekerLogin)

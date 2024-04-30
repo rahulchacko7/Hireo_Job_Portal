@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package job;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "./pkg/pb/job";
+
+// Service definition for Job service
+service Job {
+    rpc PostJob(JobOpeningRequest) returns (JobOpeningResponse) {};
+}
+
+// Request message for posting a job opening
+message JobOpeningRequest {
+    string title = 1;
+    string description = 2;
+    string requirements = 3;
+    int32 total_applications = 4;
+    int32 Employer_id  = 5;
+    string location = 6;
+    string employment_type = 7;
+    string salary = 8;
+    repeated string skills_required = 9;
+    string experience_level = 10;
+    string education_level = 11;
+    google.protobuf.Timestamp application_deadline = 12;
+}
+
+// Response message for posting a job opening
+message JobOpeningResponse {
+    uint64 id = 1;
+    string title = 2;
+    string description = 3;
+    string requirements = 4;
+    google.protobuf.Timestamp posted_on = 5;
+    int32 total_applications = 6;
+    int32 Employer_id  = 7;
+    string location = 8;
+    string employment_type = 9;
+    string salary = 10;
+    repeated string skills_required = 11;
+    string experience_level = 12;
+    string education_level = 13;
+    google.protobuf.Timestamp application_deadline = 14;
+}

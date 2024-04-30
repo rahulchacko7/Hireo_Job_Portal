@@ -9,16 +9,16 @@ import (
 )
 
 type authCustomClaimsEmployer struct {
+	Id           uint   `json:"id"`
 	Company_name string `json:"company_name"`
-	Industry     string `json:"industry"`
 	Email        string `json:"email"`
 	jwt.StandardClaims
 }
 
 func GenerateTokenEmployer(employer models.EmployerDetailsResponse) (string, error) {
 	claims := &authCustomClaimsEmployer{
+		Id:           employer.ID,
 		Company_name: employer.Company_name,
-		Industry:     employer.Industry,
 		Email:        employer.Contact_email,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour * 48).Unix(),

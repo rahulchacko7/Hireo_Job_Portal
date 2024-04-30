@@ -58,17 +58,3 @@ func (eh *EmployerHandler) EmployerSignUp(c *gin.Context) {
 	success := response.ClientResponse(http.StatusOK, "Employer created successfully", employer, nil)
 	c.JSON(http.StatusOK, success)
 }
-
-func (eh *EmployerHandler) PostJobOpening(c *gin.Context) {
-
-	var jobOpening models.JobOpening
-
-	if err := c.ShouldBindJSON(&jobOpening); err != nil {
-		errs := response.ClientResponse(http.StatusBadRequest, "Details not in correct format", nil, err.Error())
-		c.JSON(http.StatusBadRequest, errs)
-		return
-	}
-
-	
-
-}
