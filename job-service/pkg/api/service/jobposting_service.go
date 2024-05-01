@@ -20,25 +20,26 @@ func NewJobServer(useCase interfaces.JobUseCase) pb.JobServer {
 		jobUseCase: useCase,
 	}
 }
-
 func (js *JobServer) PostJob(ctx context.Context, req *pb.JobOpeningRequest) (*pb.JobOpeningResponse, error) {
+	// Extract EmployerID from context or request, assuming it's available in the request for now
+	employerID := int32(req.EmployerId)
+
 	jobDetails := models.JobOpening{
 		Title:               req.Title,
 		Description:         req.Description,
 		Requirements:        req.Requirements,
 		Location:            req.Location,
 		EmploymentType:      req.EmploymentType,
-		SalaryRange:         req.SalaryRange,
+		Salary:              req.Salary,
 		SkillsRequired:      req.SkillsRequired,
 		ExperienceLevel:     req.ExperienceLevel,
 		EducationLevel:      req.EducationLevel,
 		ApplicationDeadline: req.ApplicationDeadline.AsTime(),
-		PostedOn:            req.PostedOn.AsTime(),
 	}
 
 	fmt.Println("service", jobDetails)
 
-	res, err := js.jobUseCase.PostJob(jobDetails)
+	res, err := js.jobUseCase.PostJob(jobDetails, employerID)
 	if err != nil {
 		return nil, err
 	}
@@ -52,11 +53,12 @@ func (js *JobServer) PostJob(ctx context.Context, req *pb.JobOpeningRequest) (*p
 		PostedOn:            timestamppb.New(res.PostedOn),
 		Location:            res.Location,
 		EmploymentType:      res.EmploymentType,
-		SalaryRange:         res.SalaryRange,
+		Salary:              res.Salary,
 		SkillsRequired:      res.SkillsRequired,
 		ExperienceLevel:     res.ExperienceLevel,
 		EducationLevel:      res.EducationLevel,
 		ApplicationDeadline: timestamppb.New(res.ApplicationDeadline),
+		EmployerId:          int32(req.EmployerId), // Set the EmployerId field
 	}
 
 	return jobOpening, nil

@@ -4,6 +4,7 @@ import (
 	interfaces "HireoGateWay/pkg/client/interface"
 	"HireoGateWay/pkg/utils/models"
 	"HireoGateWay/pkg/utils/response"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -20,8 +21,22 @@ func NewJobHandler(jobClient interfaces.JobClient) *JobHandler {
 }
 func (jh *JobHandler) PostJobOpening(c *gin.Context) {
 	// Extract EmployerID from context
-	employerID, _ := c.Get("id")
-	employerIDInt, _ := employerID.(int)
+	employerID, ok := c.Get("id")
+	if !ok {
+		errs := response.ClientResponse(http.StatusBadRequest, "Invalid employer ID type", nil, nil)
+		c.JSON(http.StatusBadRequest, errs)
+		return
+	}
+
+	fmt.Println("id", employerID)
+
+	// Convert the extracted employerID to int32
+	employerIDInt, ok := employerID.(int32)
+	if !ok {
+		errs := response.ClientResponse(http.StatusBadRequest, "Invalid employer ID type", nil, nil)
+		c.JSON(http.StatusBadRequest, errs)
+		return
+	}
 
 	var jobOpening models.JobOpening
 	if err := c.ShouldBindJSON(&jobOpening); err != nil {
@@ -30,12 +45,15 @@ func (jh *JobHandler) PostJobOpening(c *gin.Context) {
 		return
 	}
 
-	if _, err := jh.GRPC_Client.PostJobOpening(jobOpening, employerIDInt); err != nil {
+	fmt.Println("id", employerIDInt, employerID)
+
+	JobOpening, err := jh.GRPC_Client.PostJobOpening(jobOpening, employerIDInt)
+	if err != nil {
 		errs := response.ClientResponse(http.StatusInternalServerError, "Failed to create job opening", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, errs)
 		return
 	}
 
-	response := response.ClientResponse(http.StatusCreated, "Job opening created successfully", nil, nil)
+	response := response.ClientResponse(http.StatusCreated, "Job opening created successfully", JobOpening, nil)
 	c.JSON(http.StatusCreated, response)
 }

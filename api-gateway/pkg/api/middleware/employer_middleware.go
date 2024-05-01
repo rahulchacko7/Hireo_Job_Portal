@@ -27,21 +27,23 @@ func EmployerAuthMiddleware() gin.HandlerFunc {
 			c.JSON(http.StatusUnauthorized, response)
 			c.Abort()
 			return
-
 		}
+
 		tokenpart := splitted[1]
 		tokenClaims, err := helper.ValidateTokenEmployer(tokenpart)
 		if err != nil {
-			response := response.ClientResponse(http.StatusUnauthorized, "Invalid Token  ", nil, err.Error())
+			response := response.ClientResponse(http.StatusUnauthorized, "Invalid Token", nil, err.Error())
 			c.JSON(http.StatusUnauthorized, response)
 			c.Abort()
 			return
-
 		}
-		c.Set("tokenClaims", tokenClaims)
+
+		// Ensure that the employer ID is correctly converted to int32
+		employerID := int32(tokenClaims.Id)
+
+		// Set the Employer ID in the context
+		c.Set("id", employerID)
 
 		c.Next()
-
 	}
-
 }

@@ -16,8 +16,8 @@ func NewJobUseCase(repository interfaces.JobRepository) services.JobUseCase {
 	}
 }
 
-func (ju *jobUseCase) PostJob(job models.JobOpening) (models.JobOpeningResponse, error) {
-	jobData, err := ju.jobRepository.PostJob(job)
+func (ju *jobUseCase) PostJob(job models.JobOpening, employerID int32) (models.JobOpeningResponse, error) {
+	jobData, err := ju.jobRepository.PostJob(job, int32(employerID))
 	if err != nil {
 		return models.JobOpeningResponse{}, err
 	}

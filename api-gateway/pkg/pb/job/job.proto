@@ -16,15 +16,14 @@ message JobOpeningRequest {
     string title = 1;
     string description = 2;
     string requirements = 3;
-    int32 total_applications = 4;
-    int32 Employer_id  = 5;
-    string location = 6;
-    string employment_type = 7;
-    string salary = 8;
-    repeated string skills_required = 9;
-    string experience_level = 10;
-    string education_level = 11;
-    google.protobuf.Timestamp application_deadline = 12;
+    int32 employer_id  = 4;
+    string location = 5;
+    string employment_type = 6;
+    string salary = 7;
+    string skills_required = 8;
+    string experience_level = 9;
+    string education_level = 10;
+    google.protobuf.Timestamp application_deadline = 11;
 }
 
 // Response message for posting a job opening
@@ -34,13 +33,12 @@ message JobOpeningResponse {
     string description = 3;
     string requirements = 4;
     google.protobuf.Timestamp posted_on = 5;
-    int32 total_applications = 6;
-    int32 Employer_id  = 7;
-    string location = 8;
-    string employment_type = 9;
-    string salary = 10;
-    repeated string skills_required = 11;
-    string experience_level = 12;
-    string education_level = 13;
-    google.protobuf.Timestamp application_deadline = 14;
+    int32 employer_id  = 6;
+    string location = 7;
+    string employment_type = 8;
+    string salary = 9;
+    string skills_required = 10;
+    string experience_level = 11;
+    string education_level = 12;
+    google.protobuf.Timestamp application_deadline = 13;
 }

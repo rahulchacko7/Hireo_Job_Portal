@@ -3,7 +3,7 @@ package interfaces
 import "HireoGateWay/pkg/utils/models"
 
 type JobClient interface {
-	PostJobOpening(jobDetails models.JobOpening, EmployerID int) (models.JobOpeningResponse, error)
+	PostJobOpening(jobDetails models.JobOpening, EmployerID int32) (models.JobOpeningResponse, error)
 
 	// // UpdateJobOpening updates an existing job opening.
 	// UpdateJobOpening(jobDetails models.JobOpening) (models.JobToken, error)

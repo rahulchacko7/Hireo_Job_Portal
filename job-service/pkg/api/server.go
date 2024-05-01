@@ -1,11 +1,10 @@
 package server
 
 import (
-	"fmt"
-	"net"
-
 	"Auth/pkg/config"
 	pb "Auth/pkg/pb/job"
+	"fmt"
+	"net"
 
 	"google.golang.org/grpc"
 )

@@ -3,6 +3,7 @@ package repository
 import (
 	interfaces "Auth/pkg/repository/interface"
 	"Auth/pkg/utils/models"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -16,18 +17,19 @@ func NewJobRepository(DB *gorm.DB) interfaces.JobRepository {
 		DB: DB,
 	}
 }
+func (jr *jobRepository) PostJob(jobDetails models.JobOpening, employerID int32) (models.JobOpeningResponse, error) {
+	// Get the current time for posted on
+	postedOn := time.Now()
 
-func (jr *jobRepository) PostJob(jobDetails models.JobOpening) (models.JobOpeningResponse, error) {
-	// Create a new domain.JobOpeningResponse object to hold the data
 	job := models.JobOpeningResponse{
 		Title:               jobDetails.Title,
 		Description:         jobDetails.Description,
 		Requirements:        jobDetails.Requirements,
-		PostedOn:            jobDetails.PostedOn,
-		CompanyName:         jobDetails.CompanyName,
+		PostedOn:            postedOn,
+		EmployerID:          int(employerID),
 		Location:            jobDetails.Location,
 		EmploymentType:      jobDetails.EmploymentType,
-		SalaryRange:         jobDetails.SalaryRange,
+		Salary:              jobDetails.Salary,
 		SkillsRequired:      jobDetails.SkillsRequired,
 		ExperienceLevel:     jobDetails.ExperienceLevel,
 		EducationLevel:      jobDetails.EducationLevel,
@@ -40,5 +42,19 @@ func (jr *jobRepository) PostJob(jobDetails models.JobOpening) (models.JobOpenin
 	}
 
 	// Return the created job
-	return job, nil
+	return models.JobOpeningResponse{
+		ID:                  jobDetails.ID,
+		Title:               jobDetails.Title,
+		Description:         jobDetails.Description,
+		Requirements:        jobDetails.Requirements,
+		PostedOn:            postedOn,
+		EmployerID:          int(employerID),
+		Location:            jobDetails.Location,
+		EmploymentType:      jobDetails.EmploymentType,
+		Salary:              jobDetails.Salary,
+		SkillsRequired:      jobDetails.SkillsRequired,
+		ExperienceLevel:     jobDetails.ExperienceLevel,
+		EducationLevel:      jobDetails.EducationLevel,
+		ApplicationDeadline: jobDetails.ApplicationDeadline,
+	}, nil
 }

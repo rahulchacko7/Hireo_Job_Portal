@@ -29,12 +29,11 @@ func NewJobClient(cfg config.Config) interfaces.JobClient {
 		Client: grpcClient,
 	}
 }
-
-// PostJobOpening posts a job opening.
-func (jc *jobClient) PostJobOpening(jobDetails models.JobOpening, EmployerID int) (models.JobOpeningResponse, error) {
-
+func (jc *jobClient) PostJobOpening(jobDetails models.JobOpening, EmployerID int32) (models.JobOpeningResponse, error) {
+	// Create a timestamp for the application deadline
 	applicationDeadline := timestamppb.New(jobDetails.ApplicationDeadline)
 
+	// Make the gRPC call to post the job opening
 	job, err := jc.Client.PostJob(context.Background(), &pb.JobOpeningRequest{
 		Title:               jobDetails.Title,
 		Description:         jobDetails.Description,
@@ -46,15 +45,17 @@ func (jc *jobClient) PostJobOpening(jobDetails models.JobOpening, EmployerID int
 		ExperienceLevel:     jobDetails.ExperienceLevel,
 		EducationLevel:      jobDetails.EducationLevel,
 		ApplicationDeadline: applicationDeadline,
-		EmployerID:          uint32(EmployerID), 
+		EmployerId:          EmployerID,
 	})
 	if err != nil {
-		return models.JobOpeningResponse{}, err
+		return models.JobOpeningResponse{}, fmt.Errorf("failed to post job opening: %v", err)
 	}
 
+	// Convert timestamp fields to Go time.Time
 	postedOnTime := job.PostedOn.AsTime()
 	applicationDeadlineTime := job.ApplicationDeadline.AsTime()
 
+	// Construct the response
 	return models.JobOpeningResponse{
 		ID:                  uint(job.Id),
 		Title:               job.Title,
@@ -68,6 +69,6 @@ func (jc *jobClient) PostJobOpening(jobDetails models.JobOpening, EmployerID int
 		ExperienceLevel:     job.ExperienceLevel,
 		EducationLevel:      job.EducationLevel,
 		ApplicationDeadline: applicationDeadlineTime,
-		EmployerID:          uint32(EmployerID),
+		//EmployerID:          EmployerID, // Uncomment this line if you need to set EmployerID
 	}, nil
 }

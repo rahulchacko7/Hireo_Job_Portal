@@ -16,17 +16,14 @@ message JobOpeningRequest {
     string title = 1;
     string description = 2;
     string requirements = 3;
-    google.protobuf.Timestamp posted_on = 4;
-    int32 total_applications = 5;
-    string company_name = 6;
-    Employer posted_by = 7;
-    string location = 8;
-    string employment_type = 9;
-    string salary_range = 10;
-    repeated string skills_required = 11;
-    string experience_level = 12;
-    string education_level = 13;
-    google.protobuf.Timestamp application_deadline = 14;
+    int32 employer_id  = 4;
+    string location = 5;
+    string employment_type = 6;
+    string salary = 7;
+    string skills_required = 8;
+    string experience_level = 9;
+    string education_level = 10;
+    google.protobuf.Timestamp application_deadline = 11;
 }
 
 // Response message for posting a job opening
@@ -36,28 +33,12 @@ message JobOpeningResponse {
     string description = 3;
     string requirements = 4;
     google.protobuf.Timestamp posted_on = 5;
-    int32 total_applications = 6;
-    string company_name = 7;
-    Employer posted_by = 8;
-    string location = 9;
-    string employment_type = 10;
-    string salary_range = 11;
-    repeated string skills_required = 12;
-    string experience_level = 13;
-    string education_level = 14;
-    google.protobuf.Timestamp application_deadline = 15;
-}
-
-// Employer represents an employer.
-message Employer {
-    uint64 id = 1;
-    string company_name = 2;
-    string industry = 3;
-    int32 company_size = 4;
-    string website = 5;
-    string headquarters_address = 6;
-    string about_company = 7;
-    string contact_email = 8;
-    uint64 contact_phone_number = 9;
-    string password = 10;
+    int32 employer_id  = 6;
+    string location = 7;
+    string employment_type = 8;
+    string salary = 9;
+    string skills_required = 10;
+    string experience_level = 11;
+    string education_level = 12;
+    google.protobuf.Timestamp application_deadline = 13;
 }

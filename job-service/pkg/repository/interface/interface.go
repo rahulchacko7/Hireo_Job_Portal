@@ -5,5 +5,5 @@ import (
 )
 
 type JobRepository interface {
-	PostJob(jobDetails models.JobOpening) (models.JobOpeningResponse, error)
+	PostJob(jobDetails models.JobOpening, employerID int32) (models.JobOpeningResponse, error)
 }
