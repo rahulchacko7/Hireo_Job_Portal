@@ -69,6 +69,6 @@ func (jc *jobClient) PostJobOpening(jobDetails models.JobOpening, EmployerID int
 		ExperienceLevel:     job.ExperienceLevel,
 		EducationLevel:      job.EducationLevel,
 		ApplicationDeadline: applicationDeadlineTime,
-		//EmployerID:          EmployerID, // Uncomment this line if you need to set EmployerID
+		EmployerID:          EmployerID, // Uncomment this line if you need to set EmployerID
 	}, nil
 }

@@ -24,7 +24,7 @@ type JobOpeningResponse struct {
 	Description         string    `json:"description"`
 	Requirements        string    `json:"requirements"`
 	PostedOn            time.Time `json:"posted_on"`
-	EmployerID          int       `json:"employer_id"`
+	EmployerID          int32     `json:"employer_id"`
 	Location            string    `json:"location"`
 	EmploymentType      string    `json:"employment_type"`
 	Salary              string    `json:"salary"`

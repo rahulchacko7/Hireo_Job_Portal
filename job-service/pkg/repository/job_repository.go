@@ -17,11 +17,13 @@ func NewJobRepository(DB *gorm.DB) interfaces.JobRepository {
 		DB: DB,
 	}
 }
+
 func (jr *jobRepository) PostJob(jobDetails models.JobOpening, employerID int32) (models.JobOpeningResponse, error) {
 	// Get the current time for posted on
 	postedOn := time.Now()
 
 	job := models.JobOpeningResponse{
+		ID:                  jobDetails.ID,
 		Title:               jobDetails.Title,
 		Description:         jobDetails.Description,
 		Requirements:        jobDetails.Requirements,
@@ -41,20 +43,6 @@ func (jr *jobRepository) PostJob(jobDetails models.JobOpening, employerID int32)
 		return models.JobOpeningResponse{}, err
 	}
 
-	// Return the created job
-	return models.JobOpeningResponse{
-		ID:                  jobDetails.ID,
-		Title:               jobDetails.Title,
-		Description:         jobDetails.Description,
-		Requirements:        jobDetails.Requirements,
-		PostedOn:            postedOn,
-		EmployerID:          int(employerID),
-		Location:            jobDetails.Location,
-		EmploymentType:      jobDetails.EmploymentType,
-		Salary:              jobDetails.Salary,
-		SkillsRequired:      jobDetails.SkillsRequired,
-		ExperienceLevel:     jobDetails.ExperienceLevel,
-		EducationLevel:      jobDetails.EducationLevel,
-		ApplicationDeadline: jobDetails.ApplicationDeadline,
-	}, nil
+	// Return the created job with the generated ID
+	return job, nil
 }
