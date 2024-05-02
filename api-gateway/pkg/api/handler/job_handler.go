@@ -57,3 +57,37 @@ func (jh *JobHandler) PostJobOpening(c *gin.Context) {
 	response := response.ClientResponse(http.StatusCreated, "Job opening created successfully", JobOpening, nil)
 	c.JSON(http.StatusCreated, response)
 }
+
+func (jh *JobHandler) GetAllJobs(c *gin.Context) {
+
+		// Extract EmployerID from context
+		employerID, ok := c.Get("id")
+		if !ok {
+			errs := response.ClientResponse(http.StatusBadRequest, "Invalid employer ID type", nil, nil)
+			c.JSON(http.StatusBadRequest, errs)
+			return
+		}
+	
+		fmt.Println("id", employerID)
+	
+		// Convert the extracted employerID to int32
+		employerIDInt, ok := employerID.(int32)
+		if !ok {
+			errs := response.ClientResponse(http.StatusBadRequest, "Invalid employer ID type", nil, nil)
+			c.JSON(http.StatusBadRequest, errs)
+			return
+		}
+	
+	// Retrieve all jobs from the repository
+	jobs, err := jh.GRPC_Client.GetAllJobs(employerIDInt)
+	if err != nil {
+		// Handle error if any
+		errs := response.ClientResponse(http.StatusInternalServerError, "Failed to fetch jobs", nil, err.Error())
+		c.JSON(http.StatusInternalServerError, errs)
+		return
+	}
+
+	// Return the list of jobs
+	response := response.ClientResponse(http.StatusOK, "Jobs retrieved successfully", jobs, nil)
+	c.JSON(http.StatusOK, response)
+}

@@ -21,6 +21,13 @@ func (ju *jobUseCase) PostJob(job models.JobOpening, employerID int32) (models.J
 	if err != nil {
 		return models.JobOpeningResponse{}, err
 	}
+	return jobData, nil
+}
 
+func (ju *jobUseCase) GetAllJobs(employerID int32) ([]models.AllJob, error) {
+	jobData, err := ju.jobRepository.GetAllJobs(employerID)
+	if err != nil {
+		return nil, err
+	}
 	return jobData, nil
 }

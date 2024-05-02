@@ -33,3 +33,10 @@ type JobOpeningResponse struct {
 	EducationLevel      string    `json:"education_level"`
 	ApplicationDeadline time.Time `json:"application_deadline"`
 }
+
+type AllJob struct {
+	ID                  uint      `json:"id"`
+	Title               string    `json:"title"`
+	ApplicationDeadline time.Time `json:"application_deadline"`
+	EmployerID          int32     `json:"employer_id"`
+}

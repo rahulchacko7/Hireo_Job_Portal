@@ -63,3 +63,27 @@ func (js *JobServer) PostJob(ctx context.Context, req *pb.JobOpeningRequest) (*p
 
 	return jobOpening, nil
 }
+func (js *JobServer) GetAllJobs(ctx context.Context, req *pb.GetAllJobsRequest) (*pb.GetAllJobsResponse, error) {
+	employerID := int32(req.EmployerIDInt)
+
+	// Call the use case to get all jobs
+	jobs, err := js.jobUseCase.GetAllJobs(employerID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert jobs to protobuf response format
+	var jobResponses []*pb.JobOpeningResponse
+	for _, job := range jobs {
+		jobResponse := &pb.JobOpeningResponse{
+			Id:                  uint64(job.ID),
+			Title:               job.Title,
+			ApplicationDeadline: timestamppb.New(job.ApplicationDeadline),
+			EmployerId:          job.EmployerID,
+		}
+		jobResponses = append(jobResponses, jobResponse)
+	}
+
+	// Create and return the response
+	return &pb.GetAllJobsResponse{Jobs: jobResponses}, nil
+}

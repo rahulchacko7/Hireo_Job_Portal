@@ -72,3 +72,27 @@ func (jc *jobClient) PostJobOpening(jobDetails models.JobOpening, EmployerID int
 		EmployerID:          EmployerID, // Uncomment this line if you need to set EmployerID
 	}, nil
 }
+
+func (jc *jobClient) GetAllJobs(employerIDInt int32) ([]models.AllJob, error) {
+	// Make the gRPC call to get all jobs
+	resp, err := jc.Client.GetAllJobs(context.Background(), &pb.GetAllJobsRequest{EmployerIDInt: employerIDInt})
+	if err != nil {
+		return nil, fmt.Errorf("failed to get all jobs: %v", err)
+	}
+
+	// Convert gRPC response to models.AllJob
+	var allJobs []models.AllJob
+	for _, job := range resp.Jobs {
+		// Convert timestamp fields to Go time.Time
+		applicationDeadlineTime := job.ApplicationDeadline.AsTime()
+
+		allJobs = append(allJobs, models.AllJob{
+			ID:                  uint(job.Id),
+			Title:               job.Title,
+			ApplicationDeadline: applicationDeadlineTime,
+			EmployerID:          employerIDInt, // Assuming the employer ID is the same for all jobs
+		})
+	}
+
+	return allJobs, nil
+}

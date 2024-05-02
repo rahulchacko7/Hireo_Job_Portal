@@ -46,3 +46,14 @@ func (jr *jobRepository) PostJob(jobDetails models.JobOpening, employerID int32)
 	// Return the created job with the generated ID
 	return job, nil
 }
+
+func (jr *jobRepository) GetAllJobs(employerID int32) ([]models.AllJob, error) {
+	var jobs []models.AllJob
+
+	// Execute select query to retrieve all jobs
+	if err := jr.DB.Model(&models.JobOpeningResponse{}).Select("id, title, application_deadline, employer_id").Find(&jobs).Error; err != nil {
+		return nil, err
+	}
+
+	return jobs, nil
+}

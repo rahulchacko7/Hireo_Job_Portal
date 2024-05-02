@@ -9,6 +9,7 @@ option go_package = "./pkg/pb/job";
 // Service definition for Job service
 service Job {
     rpc PostJob(JobOpeningRequest) returns (JobOpeningResponse) {};
+    rpc GetAllJobs(GetAllJobsRequest) returns (GetAllJobsResponse) {};
 }
 
 // Request message for posting a job opening
@@ -41,4 +42,12 @@ message JobOpeningResponse {
     string experience_level = 11;
     string education_level = 12;
     google.protobuf.Timestamp application_deadline = 13;
+}
+
+message GetAllJobsRequest {
+    int32 employerIDInt =1;
+}
+
+message GetAllJobsResponse {
+    repeated JobOpeningResponse jobs = 1;
 }
