@@ -96,3 +96,29 @@ func (jc *jobClient) GetAllJobs(employerIDInt int32) ([]models.AllJob, error) {
 
 	return allJobs, nil
 }
+
+func (jc *jobClient) GetAJob(employerIDInt, jobId int32) (models.JobOpeningResponse, error) {
+	resp, err := jc.Client.GetAJob(context.Background(), &pb.GetAJobRequest{EmployerIDInt: employerIDInt, JobId: jobId})
+	if err != nil {
+		return models.JobOpeningResponse{}, fmt.Errorf("failed to get job: %v", err)
+	}
+
+	postedOnTime := resp.PostedOn.AsTime()
+	applicationDeadlineTime := resp.ApplicationDeadline.AsTime()
+
+	return models.JobOpeningResponse{
+		ID:                  uint(resp.Id),
+		Title:               resp.Title,
+		Description:         resp.Description,
+		Requirements:        resp.Requirements,
+		PostedOn:            postedOnTime,
+		Location:            resp.Location,
+		EmploymentType:      resp.EmploymentType,
+		Salary:              resp.Salary,
+		SkillsRequired:      resp.SkillsRequired,
+		ExperienceLevel:     resp.ExperienceLevel,
+		EducationLevel:      resp.EducationLevel,
+		ApplicationDeadline: applicationDeadlineTime,
+		EmployerID:          employerIDInt,
+	}, nil
+}

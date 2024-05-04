@@ -31,3 +31,11 @@ func (ju *jobUseCase) GetAllJobs(employerID int32) ([]models.AllJob, error) {
 	}
 	return jobData, nil
 }
+
+func (ju *jobUseCase) GetAJob(employerID, jobId int32) (models.JobOpeningResponse, error) {
+	jobData, err := ju.jobRepository.GetAJob(employerID, jobId)
+	if err != nil {
+		return models.JobOpeningResponse{}, err
+	}
+	return jobData, nil
+}

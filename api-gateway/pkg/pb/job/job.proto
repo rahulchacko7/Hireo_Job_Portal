@@ -10,6 +10,7 @@ option go_package = "./pkg/pb/job";
 service Job {
     rpc PostJob(JobOpeningRequest) returns (JobOpeningResponse) {};
     rpc GetAllJobs(GetAllJobsRequest) returns (GetAllJobsResponse) {};
+    rpc GetAJob(GetAJobRequest) returns (JobOpeningResponse) {};
 }
 
 // Request message for posting a job opening
@@ -50,4 +51,9 @@ message GetAllJobsRequest {
 
 message GetAllJobsResponse {
     repeated JobOpeningResponse jobs = 1;
+}
+
+message GetAJobRequest {
+     int32 employerIDInt =1;
+     int32 jobId =2;
 }

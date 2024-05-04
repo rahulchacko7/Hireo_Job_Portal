@@ -57,3 +57,13 @@ func (jr *jobRepository) GetAllJobs(employerID int32) ([]models.AllJob, error) {
 
 	return jobs, nil
 }
+
+func (jr *jobRepository) GetAJob(employerID, jobId int32) (models.JobOpeningResponse, error) {
+	var job models.JobOpeningResponse
+
+	if err := jr.DB.Model(&models.JobOpeningResponse{}).Where("id = ? AND employer_id = ?", jobId, employerID).First(&job).Error; err != nil {
+		return models.JobOpeningResponse{}, err
+	}
+
+	return job, nil
+}

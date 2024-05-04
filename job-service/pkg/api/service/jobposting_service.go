@@ -63,6 +63,7 @@ func (js *JobServer) PostJob(ctx context.Context, req *pb.JobOpeningRequest) (*p
 
 	return jobOpening, nil
 }
+
 func (js *JobServer) GetAllJobs(ctx context.Context, req *pb.GetAllJobsRequest) (*pb.GetAllJobsResponse, error) {
 	employerID := int32(req.EmployerIDInt)
 
@@ -86,4 +87,32 @@ func (js *JobServer) GetAllJobs(ctx context.Context, req *pb.GetAllJobsRequest) 
 
 	// Create and return the response
 	return &pb.GetAllJobsResponse{Jobs: jobResponses}, nil
+}
+func (js *JobServer) GetAJob(ctx context.Context, req *pb.GetAJobRequest) (*pb.JobOpeningResponse, error) {
+	employerID := req.EmployerIDInt
+	jobId := req.JobId
+
+	res, err := js.jobUseCase.GetAJob(employerID, jobId)
+	if err != nil {
+		return nil, err
+	}
+
+	// Prepare the response
+	jobOpening := &pb.JobOpeningResponse{
+		Id:                  uint64(res.ID),
+		Title:               res.Title,
+		Description:         res.Description,
+		Requirements:        res.Requirements,
+		PostedOn:            timestamppb.New(res.PostedOn),
+		Location:            res.Location,
+		EmploymentType:      res.EmploymentType,
+		Salary:              res.Salary,
+		SkillsRequired:      res.SkillsRequired,
+		ExperienceLevel:     res.ExperienceLevel,
+		EducationLevel:      res.EducationLevel,
+		ApplicationDeadline: timestamppb.New(res.ApplicationDeadline),
+		EmployerId:          employerID, // Set the EmployerId field
+	}
+
+	return jobOpening, nil
 }
