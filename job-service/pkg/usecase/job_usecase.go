@@ -60,3 +60,23 @@ func (ju *jobUseCase) DeleteAJob(employerIDInt, jobID int32) error {
 
 	return nil
 }
+func (ju *jobUseCase) UpdateAJob(employerID int32, jobID int32, jobDetails models.JobOpening) (models.JobOpeningResponse, error) {
+	// Check if the job exists
+	isJobExist, err := ju.jobRepository.IsJobExist(jobID)
+	if err != nil {
+		return models.JobOpeningResponse{}, fmt.Errorf("failed to check if job exists: %v", err)
+	}
+
+	if !isJobExist {
+		return models.JobOpeningResponse{}, fmt.Errorf("job with ID %d does not exist", jobID)
+	}
+
+	// Call the repository method to update the job details
+	updatedJob, err := ju.jobRepository.UpdateAJob(employerID, jobID, jobDetails)
+	if err != nil {
+		return models.JobOpeningResponse{}, fmt.Errorf("failed to update job: %v", err)
+	}
+
+	// If the update is successful, return the updated job and nil error
+	return updatedJob, nil
+}

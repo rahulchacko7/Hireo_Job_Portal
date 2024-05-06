@@ -161,3 +161,45 @@ func (jh *JobHandler) DeleteAJob(c *gin.Context) {
 	response := response.ClientResponse(http.StatusOK, "Job Deleted successfully", nil, nil)
 	c.JSON(http.StatusOK, response)
 }
+
+func (jh *JobHandler) UpdateAJob(c *gin.Context) {
+
+	idStr := c.Query("id")
+	jobID, err := strconv.ParseInt(idStr, 10, 32)
+	if err != nil {
+		errs := response.ClientResponse(http.StatusBadRequest, "Invalid job ID", nil, err.Error())
+		c.JSON(http.StatusBadRequest, errs)
+		return
+	}
+
+	employerID, ok := c.Get("id")
+	if !ok {
+		errs := response.ClientResponse(http.StatusBadRequest, "Invalid employer ID type", nil, nil)
+		c.JSON(http.StatusBadRequest, errs)
+		return
+	}
+
+	employerIDInt, ok := employerID.(int32)
+	if !ok {
+		errs := response.ClientResponse(http.StatusBadRequest, "Invalid employer ID type", nil, nil)
+		c.JSON(http.StatusBadRequest, errs)
+		return
+	}
+
+	var jobOpening models.JobOpening
+	if err := c.ShouldBindJSON(&jobOpening); err != nil {
+		errs := response.ClientResponse(http.StatusBadRequest, "Details not in correct format", nil, err.Error())
+		c.JSON(http.StatusBadRequest, errs)
+		return
+	}
+
+	UpdateJobOpening, err := jh.GRPC_Client.UpdateAJob(employerIDInt, int32(jobID), jobOpening)
+	if err != nil {
+		errs := response.ClientResponse(http.StatusInternalServerError, "Failed to update job", nil, err.Error())
+		c.JSON(http.StatusInternalServerError, errs)
+		return
+	}
+
+	response := response.ClientResponse(http.StatusOK, "Job updated successfully", UpdateJobOpening, nil)
+	c.JSON(http.StatusOK, response)
+}

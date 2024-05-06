@@ -99,3 +99,33 @@ func (jr *jobRepository) DeleteAJob(employerIDInt, jobID int32) error {
 
 	return nil
 }
+
+func (jr *jobRepository) UpdateAJob(employerID int32, jobID int32, jobDetails models.JobOpening) (models.JobOpeningResponse, error) {
+	// Get the current time for posted on
+	postedOn := time.Now()
+
+	// Construct the updated job object
+	updatedJob := models.JobOpeningResponse{
+		ID:                  uint(jobID),
+		Title:               jobDetails.Title,
+		Description:         jobDetails.Description,
+		Requirements:        jobDetails.Requirements,
+		PostedOn:            postedOn,
+		EmployerID:          int(employerID),
+		Location:            jobDetails.Location,
+		EmploymentType:      jobDetails.EmploymentType,
+		Salary:              jobDetails.Salary,
+		SkillsRequired:      jobDetails.SkillsRequired,
+		ExperienceLevel:     jobDetails.ExperienceLevel,
+		EducationLevel:      jobDetails.EducationLevel,
+		ApplicationDeadline: jobDetails.ApplicationDeadline,
+	}
+
+	// Update the job in the database
+	if err := jr.DB.Model(&models.JobOpeningResponse{}).Where("id = ?", jobID).Updates(updatedJob).Error; err != nil {
+		return models.JobOpeningResponse{}, err
+	}
+
+	// Return the updated job
+	return updatedJob, nil
+}

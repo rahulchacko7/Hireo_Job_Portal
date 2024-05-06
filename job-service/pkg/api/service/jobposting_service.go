@@ -131,3 +131,47 @@ func (js *JobServer) DeleteAJob(ctx context.Context, req *pb.DeleteAJobRequest) 
 
 	return &emptypb.Empty{}, nil
 }
+
+func (js *JobServer) UpdateAJob(ctx context.Context, req *pb.UpdateAJobRequest) (*pb.UpdateAJobResponse, error) {
+	employerID := req.EmployerIDInt
+	jobID := req.JobId
+
+	jobDetails := models.JobOpening{
+		Title:               req.Title,
+		Description:         req.Description,
+		Requirements:        req.Requirements,
+		Location:            req.Location,
+		EmploymentType:      req.EmploymentType,
+		Salary:              req.Salary,
+		SkillsRequired:      req.SkillsRequired,
+		ExperienceLevel:     req.ExperienceLevel,
+		EducationLevel:      req.EducationLevel,
+		ApplicationDeadline: req.ApplicationDeadline.AsTime(),
+	}
+
+	fmt.Println("service", jobDetails)
+
+	res, err := js.jobUseCase.UpdateAJob(employerID, jobID, jobDetails)
+	if err != nil {
+		return nil, err
+	}
+
+	// Prepare the response
+	updateResponse := &pb.UpdateAJobResponse{
+		Id:                  uint64(res.ID),
+		Title:               res.Title,
+		Description:         res.Description,
+		Requirements:        res.Requirements,
+		PostedOn:            timestamppb.New(res.PostedOn),
+		Location:            res.Location,
+		EmploymentType:      res.EmploymentType,
+		Salary:              res.Salary,
+		SkillsRequired:      res.SkillsRequired,
+		ExperienceLevel:     res.ExperienceLevel,
+		EducationLevel:      res.EducationLevel,
+		ApplicationDeadline: timestamppb.New(res.ApplicationDeadline),
+		EmployerId:          employerID, // Set the EmployerId field
+	}
+
+	return updateResponse, nil
+}

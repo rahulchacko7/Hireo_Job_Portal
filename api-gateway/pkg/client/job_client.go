@@ -130,3 +130,50 @@ func (jc *jobClient) DeleteAJob(employerIDInt, jobID int32) error {
 	}
 	return nil
 }
+
+func (jc *jobClient) UpdateAJob(employerIDInt int32, jobID int32, jobDetails models.JobOpening) (models.JobOpeningResponse, error) {
+
+	// Create a timestamp for the application deadline
+	applicationDeadline := timestamppb.New(jobDetails.ApplicationDeadline)
+
+	// Make the gRPC call to post the job opening
+	job, err := jc.Client.UpdateAJob(context.Background(), &pb.UpdateAJobRequest{
+		Title:               jobDetails.Title,
+		Description:         jobDetails.Description,
+		Requirements:        jobDetails.Requirements,
+		Location:            jobDetails.Location,
+		EmploymentType:      jobDetails.EmploymentType,
+		Salary:              jobDetails.Salary,
+		SkillsRequired:      jobDetails.SkillsRequired,
+		ExperienceLevel:     jobDetails.ExperienceLevel,
+		EducationLevel:      jobDetails.EducationLevel,
+		ApplicationDeadline: applicationDeadline,
+		EmployerId:          employerIDInt,
+		JobId:               jobID,
+	})
+	if err != nil {
+		return models.JobOpeningResponse{}, fmt.Errorf("failed to post job opening: %v", err)
+	}
+
+	// Convert timestamp fields to Go time.Time
+	postedOnTime := job.PostedOn.AsTime()
+	applicationDeadlineTime := job.ApplicationDeadline.AsTime()
+
+	// Construct the response
+	return models.JobOpeningResponse{
+		ID:                  uint(job.Id),
+		Title:               job.Title,
+		Description:         job.Description,
+		Requirements:        job.Requirements,
+		PostedOn:            postedOnTime,
+		Location:            job.Location,
+		EmploymentType:      job.EmploymentType,
+		Salary:              job.Salary,
+		SkillsRequired:      job.SkillsRequired,
+		ExperienceLevel:     job.ExperienceLevel,
+		EducationLevel:      job.EducationLevel,
+		ApplicationDeadline: applicationDeadlineTime,
+		EmployerID:          employerIDInt, 
+	}, nil
+
+}

@@ -7,4 +7,5 @@ type JobUseCase interface {
 	GetAllJobs(employerID int32) ([]models.AllJob, error)
 	GetAJob(employerID, jobId int32) (models.JobOpeningResponse, error)
 	DeleteAJob(employerIDInt, jobID int32) error
+	UpdateAJob(employerID int32, jobID int32, jobDetails models.JobOpening) (models.JobOpeningResponse, error) 
 }

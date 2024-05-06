@@ -10,4 +10,5 @@ type JobRepository interface {
 	GetAJob(employerID, jobId int32) (models.JobOpeningResponse, error)
 	IsJobExist(jobID int32) (bool, error)
 	DeleteAJob(employerIDInt, jobID int32) error
+	UpdateAJob(employerID int32, jobID int32, jobDetails models.JobOpening) (models.JobOpeningResponse, error) 
 }

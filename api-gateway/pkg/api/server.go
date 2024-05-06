@@ -32,7 +32,7 @@ func NewServerHTTP(adminHandler *handler.AdminHandler, employerHandler *handler.
 		router.GET("/employer/all-job-postings", jobHandler.GetAllJobs)
 		router.GET("/employer/job-postings", jobHandler.GetAJob)
 		router.DELETE("/employer/job-postings", jobHandler.DeleteAJob)
-		
+		router.PUT("/employer/job-postings", jobHandler.UpdateAJob)
 	}
 	// Route for job seeker auth
 	router.POST("/job-seeker/signup", jobSeekerHandler.JobSeekerSignUp)
