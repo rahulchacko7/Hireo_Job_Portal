@@ -3,6 +3,8 @@ package repository
 import (
 	interfaces "Auth/pkg/repository/interface"
 	"Auth/pkg/utils/models"
+	"errors"
+	"fmt"
 	"time"
 
 	"gorm.io/gorm"
@@ -66,4 +68,34 @@ func (jr *jobRepository) GetAJob(employerID, jobId int32) (models.JobOpeningResp
 	}
 
 	return job, nil
+}
+
+func (jr *jobRepository) IsJobExist(jobID int32) (bool, error) {
+	var job models.JobOpeningResponse
+
+	if err := jr.DB.Model(&models.JobOpeningResponse{}).Where("id = ?", jobID).First(&job).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return false, nil
+		}
+		return false, err
+	}
+
+	return true, nil
+}
+func (jr *jobRepository) DeleteAJob(employerIDInt, jobID int32) error {
+	// First, check if the job exists
+	var job models.JobOpeningResponse
+	if err := jr.DB.First(&job, jobID).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return fmt.Errorf("job with ID %d does not exist", jobID)
+		}
+		return err // Other errors
+	}
+
+	// Update the job's is_deleted status to true
+	if err := jr.DB.Model(&models.JobOpeningResponse{}).Where("id = ?", jobID).Update("is_deleted", true).Error; err != nil {
+		return fmt.Errorf("failed to delete job: %v", err)
+	}
+
+	return nil
 }

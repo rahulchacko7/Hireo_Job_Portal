@@ -31,6 +31,8 @@ func NewServerHTTP(adminHandler *handler.AdminHandler, employerHandler *handler.
 		router.POST("/employer/job-post", jobHandler.PostJobOpening)
 		router.GET("/employer/all-job-postings", jobHandler.GetAllJobs)
 		router.GET("/employer/job-postings", jobHandler.GetAJob)
+		router.DELETE("/employer/job-postings", jobHandler.DeleteAJob)
+		
 	}
 	// Route for job seeker auth
 	router.POST("/job-seeker/signup", jobSeekerHandler.JobSeekerSignUp)

@@ -4,6 +4,7 @@ import (
 	interfaces "Auth/pkg/repository/interface"
 	services "Auth/pkg/usecase/interface"
 	"Auth/pkg/utils/models"
+	"fmt"
 )
 
 type jobUseCase struct {
@@ -38,4 +39,24 @@ func (ju *jobUseCase) GetAJob(employerID, jobId int32) (models.JobOpeningRespons
 		return models.JobOpeningResponse{}, err
 	}
 	return jobData, nil
+}
+
+func (ju *jobUseCase) DeleteAJob(employerIDInt, jobID int32) error {
+	// Check if the job exists
+	isJobExist, err := ju.jobRepository.IsJobExist(jobID)
+	if err != nil {
+		return fmt.Errorf("failed to check if job exists: %v", err)
+	}
+
+	if !isJobExist {
+		return fmt.Errorf("job with ID %d does not exist", jobID)
+	}
+
+	// If the job exists, proceed with deletion
+	err = ju.jobRepository.DeleteAJob(employerIDInt, jobID)
+	if err != nil {
+		return fmt.Errorf("failed to delete job: %v", err)
+	}
+
+	return nil
 }

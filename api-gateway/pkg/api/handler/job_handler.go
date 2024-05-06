@@ -126,3 +126,38 @@ func (jh *JobHandler) GetAJob(c *gin.Context) {
 	response := response.ClientResponse(http.StatusOK, "Jobs retrieved successfully", jobs, nil)
 	c.JSON(http.StatusOK, response)
 }
+
+func (jh *JobHandler) DeleteAJob(c *gin.Context) {
+	idStr := c.Query("id")
+
+	employerID, ok := c.Get("id")
+	if !ok {
+		errs := response.ClientResponse(http.StatusBadRequest, "Invalid employer ID type", nil, nil)
+		c.JSON(http.StatusBadRequest, errs)
+		return
+	}
+
+	employerIDInt, ok := employerID.(int32)
+	if !ok {
+		errs := response.ClientResponse(http.StatusBadRequest, "Invalid employer ID type", nil, nil)
+		c.JSON(http.StatusBadRequest, errs)
+		return
+	}
+
+	jobID, err := strconv.ParseInt(idStr, 10, 32)
+	if err != nil {
+		errs := response.ClientResponse(http.StatusBadRequest, "Invalid job ID", nil, err.Error())
+		c.JSON(http.StatusBadRequest, errs)
+		return
+	}
+
+	err = jh.GRPC_Client.DeleteAJob(employerIDInt, int32(jobID))
+	if err != nil {
+		errs := response.ClientResponse(http.StatusInternalServerError, "Failed to delete job", nil, err.Error())
+		c.JSON(http.StatusInternalServerError, errs)
+		return
+	}
+
+	response := response.ClientResponse(http.StatusOK, "Job Deleted successfully", nil, nil)
+	c.JSON(http.StatusOK, response)
+}

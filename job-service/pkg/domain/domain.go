@@ -32,4 +32,6 @@ type JobOpeningResponse struct {
 	ExperienceLevel     string    `json:"experience_level"`
 	EducationLevel      string    `json:"education_level"`
 	ApplicationDeadline time.Time `json:"application_deadline"`
+	UpdatedOn           time.Time `json:"updated_on"`
+	IsDeleted           bool      `json:"is_deleted"`
 }

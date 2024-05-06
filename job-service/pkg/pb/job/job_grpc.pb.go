@@ -8,6 +8,7 @@ package job
 
 import (
 	context "context"
+	empty "github.com/golang/protobuf/ptypes/empty"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -22,6 +23,7 @@ const (
 	Job_PostJob_FullMethodName    = "/job.Job/PostJob"
 	Job_GetAllJobs_FullMethodName = "/job.Job/GetAllJobs"
 	Job_GetAJob_FullMethodName    = "/job.Job/GetAJob"
+	Job_DeleteAJob_FullMethodName = "/job.Job/DeleteAJob"
 )
 
 // JobClient is the client API for Job service.
@@ -31,6 +33,7 @@ type JobClient interface {
 	PostJob(ctx context.Context, in *JobOpeningRequest, opts ...grpc.CallOption) (*JobOpeningResponse, error)
 	GetAllJobs(ctx context.Context, in *GetAllJobsRequest, opts ...grpc.CallOption) (*GetAllJobsResponse, error)
 	GetAJob(ctx context.Context, in *GetAJobRequest, opts ...grpc.CallOption) (*JobOpeningResponse, error)
+	DeleteAJob(ctx context.Context, in *DeleteAJobRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 }
 
 type jobClient struct {
@@ -68,6 +71,15 @@ func (c *jobClient) GetAJob(ctx context.Context, in *GetAJobRequest, opts ...grp
 	return out, nil
 }
 
+func (c *jobClient) DeleteAJob(ctx context.Context, in *DeleteAJobRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, Job_DeleteAJob_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // JobServer is the server API for Job service.
 // All implementations must embed UnimplementedJobServer
 // for forward compatibility
@@ -75,6 +87,7 @@ type JobServer interface {
 	PostJob(context.Context, *JobOpeningRequest) (*JobOpeningResponse, error)
 	GetAllJobs(context.Context, *GetAllJobsRequest) (*GetAllJobsResponse, error)
 	GetAJob(context.Context, *GetAJobRequest) (*JobOpeningResponse, error)
+	DeleteAJob(context.Context, *DeleteAJobRequest) (*empty.Empty, error)
 	mustEmbedUnimplementedJobServer()
 }
 
@@ -90,6 +103,9 @@ func (UnimplementedJobServer) GetAllJobs(context.Context, *GetAllJobsRequest) (*
 }
 func (UnimplementedJobServer) GetAJob(context.Context, *GetAJobRequest) (*JobOpeningResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAJob not implemented")
+}
+func (UnimplementedJobServer) DeleteAJob(context.Context, *DeleteAJobRequest) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteAJob not implemented")
 }
 func (UnimplementedJobServer) mustEmbedUnimplementedJobServer() {}
 
@@ -158,6 +174,24 @@ func _Job_GetAJob_Handler(srv interface{}, ctx context.Context, dec func(interfa
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Job_DeleteAJob_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteAJobRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(JobServer).DeleteAJob(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Job_DeleteAJob_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(JobServer).DeleteAJob(ctx, req.(*DeleteAJobRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Job_ServiceDesc is the grpc.ServiceDesc for Job service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -176,6 +210,10 @@ var Job_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAJob",
 			Handler:    _Job_GetAJob_Handler,
+		},
+		{
+			MethodName: "DeleteAJob",
+			Handler:    _Job_DeleteAJob_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

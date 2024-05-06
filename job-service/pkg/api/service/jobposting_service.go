@@ -7,6 +7,9 @@ import (
 	"context"
 	"fmt"
 
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -115,4 +118,16 @@ func (js *JobServer) GetAJob(ctx context.Context, req *pb.GetAJobRequest) (*pb.J
 	}
 
 	return jobOpening, nil
+}
+
+func (js *JobServer) DeleteAJob(ctx context.Context, req *pb.DeleteAJobRequest) (*emptypb.Empty, error) {
+	employerID := req.EmployerIDInt
+	jobID := req.JobId
+
+	err := js.jobUseCase.DeleteAJob(employerID, jobID)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to delete job: %v", err)
+	}
+
+	return &emptypb.Empty{}, nil
 }

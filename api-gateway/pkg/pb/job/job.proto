@@ -3,6 +3,8 @@ syntax = "proto3";
 package job;
 
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
 
 option go_package = "./pkg/pb/job";
 
@@ -11,6 +13,7 @@ service Job {
     rpc PostJob(JobOpeningRequest) returns (JobOpeningResponse) {};
     rpc GetAllJobs(GetAllJobsRequest) returns (GetAllJobsResponse) {};
     rpc GetAJob(GetAJobRequest) returns (JobOpeningResponse) {};
+    rpc DeleteAJob(DeleteAJobRequest)  returns (google.protobuf.Empty);
 }
 
 // Request message for posting a job opening
@@ -56,4 +59,9 @@ message GetAllJobsResponse {
 message GetAJobRequest {
      int32 employerIDInt =1;
      int32 jobId =2;
+}
+
+message DeleteAJobRequest {
+    int32 employerIDInt =1;
+    int32 jobId =2;
 }

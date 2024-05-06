@@ -122,3 +122,11 @@ func (jc *jobClient) GetAJob(employerIDInt, jobId int32) (models.JobOpeningRespo
 		EmployerID:          employerIDInt,
 	}, nil
 }
+
+func (jc *jobClient) DeleteAJob(employerIDInt, jobID int32) error {
+	_, err := jc.Client.DeleteAJob(context.Background(), &pb.DeleteAJobRequest{EmployerIDInt: employerIDInt, JobId: jobID})
+	if err != nil {
+		return fmt.Errorf("failed to delete job: %v", err)
+	}
+	return nil
+}
