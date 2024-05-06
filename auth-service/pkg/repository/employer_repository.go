@@ -5,6 +5,7 @@ import (
 	"Auth/pkg/domain"
 	interfaces "Auth/pkg/repository/interface"
 	"Auth/pkg/utils/models"
+	"context"
 	"errors"
 	"fmt"
 
@@ -53,4 +54,52 @@ func (er *employerRepository) FindEmployerByEmail(employer models.EmployerLogin)
 		return models.EmployerSignUp{}, errors.New("error checking user details")
 	}
 	return user, nil
+}
+
+func (er *employerRepository) GetCompanyDetails(employerID int32) (models.EmployerDetailsResponse, error) {
+	var user models.EmployerDetailsResponse
+	err := er.DB.Raw("SELECT * FROM employers WHERE id=? ", employerID).Scan(&user).Error
+	if err != nil {
+		return models.EmployerDetailsResponse{}, errors.New("error checking user details")
+	}
+	return user, nil
+}
+
+func (er *employerRepository) UpdateCompany(ctx context.Context, employerIDInt int32, employerDetails models.EmployerDetails) (models.EmployerDetailsResponse, error) {
+	// Prepare the SQL query to update the company details
+	query := `
+		UPDATE employers
+		SET company_name = ?, industry = ?, company_size = ?, website = ?, headquarters_address = ?, about_company = ?, contact_email = ?, contact_phone_number = ?
+		WHERE id = ?
+		RETURNING id, company_name, industry, company_size, website, headquarters_address, about_company, contact_email, contact_phone_number
+	`
+
+	// Execute the SQL query
+	var updatedEmployerDetails models.EmployerDetailsResponse
+	result := er.DB.Raw(query,
+		employerDetails.CompanyName,
+		employerDetails.Industry,
+		employerDetails.CompanySize,
+		employerDetails.Website,
+		employerDetails.HeadquartersAddress,
+		employerDetails.AboutCompany,
+		employerDetails.ContactEmail,
+		employerDetails.ContactPhoneNumber,
+		employerIDInt,
+	).Scan(
+		&updatedEmployerDetails.ID,
+		&updatedEmployerDetails.CompanyName,
+		&updatedEmployerDetails.Industry,
+		&updatedEmployerDetails.CompanySize,
+		&updatedEmployerDetails.Website,
+		&updatedEmployerDetails.HeadquartersAddress,
+		&updatedEmployerDetails.AboutCompany,
+		&updatedEmployerDetails.ContactEmail,
+		&updatedEmployerDetails.ContactPhoneNumber,
+	)
+	if result.Error != nil {
+		return models.EmployerDetailsResponse{}, errors.Wrap(result.Error, "failed to update company details")
+	}
+
+	return updatedEmployerDetails, nil
 }

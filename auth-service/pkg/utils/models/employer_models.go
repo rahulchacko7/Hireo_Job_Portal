@@ -50,3 +50,15 @@ type TokenEmployer struct {
 	Employer EmployerDetailsResponse
 	Token    string
 }
+
+type EmployerDetails struct {
+	ID                  uint   `json:"id"`
+	CompanyName         string `json:"company_name"`
+	Industry            string `json:"industry"`
+	CompanySize         int    `json:"company_size"`
+	Website             string `json:"website"`
+	HeadquartersAddress string `json:"headquarters_address"`
+	AboutCompany        string `json:"about_company"`
+	ContactEmail        string `json:"contact_email"`
+	ContactPhoneNumber  uint   `json:"contact_phone_number"`
+}

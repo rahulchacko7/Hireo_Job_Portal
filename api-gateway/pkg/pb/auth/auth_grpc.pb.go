@@ -146,9 +146,11 @@ var Admin_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	Employer_EmployerSignup_FullMethodName = "/auth.Employer/EmployerSignup"
-	Employer_EmployerLogin_FullMethodName  = "/auth.Employer/EmployerLogin"
-	Employer_PostJobOpening_FullMethodName = "/auth.Employer/PostJobOpening"
+	Employer_EmployerSignup_FullMethodName    = "/auth.Employer/EmployerSignup"
+	Employer_EmployerLogin_FullMethodName     = "/auth.Employer/EmployerLogin"
+	Employer_PostJobOpening_FullMethodName    = "/auth.Employer/PostJobOpening"
+	Employer_GetCompanyDetails_FullMethodName = "/auth.Employer/GetCompanyDetails"
+	Employer_UpdateCompany_FullMethodName     = "/auth.Employer/UpdateCompany"
 )
 
 // EmployerClient is the client API for Employer service.
@@ -158,6 +160,8 @@ type EmployerClient interface {
 	EmployerSignup(ctx context.Context, in *EmployerSignupRequest, opts ...grpc.CallOption) (*EmployerSignupResponse, error)
 	EmployerLogin(ctx context.Context, in *EmployerLoginInRequest, opts ...grpc.CallOption) (*EmployerLoginResponse, error)
 	PostJobOpening(ctx context.Context, in *PostJobOpeningRequest, opts ...grpc.CallOption) (*PostJobOpeningResponse, error)
+	GetCompanyDetails(ctx context.Context, in *GetCompanyDetailsRequest, opts ...grpc.CallOption) (*EmployerDetailsResponse, error)
+	UpdateCompany(ctx context.Context, in *UpdateCompanyRequest, opts ...grpc.CallOption) (*UpdateCompanyResponse, error)
 }
 
 type employerClient struct {
@@ -195,6 +199,24 @@ func (c *employerClient) PostJobOpening(ctx context.Context, in *PostJobOpeningR
 	return out, nil
 }
 
+func (c *employerClient) GetCompanyDetails(ctx context.Context, in *GetCompanyDetailsRequest, opts ...grpc.CallOption) (*EmployerDetailsResponse, error) {
+	out := new(EmployerDetailsResponse)
+	err := c.cc.Invoke(ctx, Employer_GetCompanyDetails_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *employerClient) UpdateCompany(ctx context.Context, in *UpdateCompanyRequest, opts ...grpc.CallOption) (*UpdateCompanyResponse, error) {
+	out := new(UpdateCompanyResponse)
+	err := c.cc.Invoke(ctx, Employer_UpdateCompany_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // EmployerServer is the server API for Employer service.
 // All implementations must embed UnimplementedEmployerServer
 // for forward compatibility
@@ -202,6 +224,8 @@ type EmployerServer interface {
 	EmployerSignup(context.Context, *EmployerSignupRequest) (*EmployerSignupResponse, error)
 	EmployerLogin(context.Context, *EmployerLoginInRequest) (*EmployerLoginResponse, error)
 	PostJobOpening(context.Context, *PostJobOpeningRequest) (*PostJobOpeningResponse, error)
+	GetCompanyDetails(context.Context, *GetCompanyDetailsRequest) (*EmployerDetailsResponse, error)
+	UpdateCompany(context.Context, *UpdateCompanyRequest) (*UpdateCompanyResponse, error)
 	mustEmbedUnimplementedEmployerServer()
 }
 
@@ -217,6 +241,12 @@ func (UnimplementedEmployerServer) EmployerLogin(context.Context, *EmployerLogin
 }
 func (UnimplementedEmployerServer) PostJobOpening(context.Context, *PostJobOpeningRequest) (*PostJobOpeningResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PostJobOpening not implemented")
+}
+func (UnimplementedEmployerServer) GetCompanyDetails(context.Context, *GetCompanyDetailsRequest) (*EmployerDetailsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCompanyDetails not implemented")
+}
+func (UnimplementedEmployerServer) UpdateCompany(context.Context, *UpdateCompanyRequest) (*UpdateCompanyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateCompany not implemented")
 }
 func (UnimplementedEmployerServer) mustEmbedUnimplementedEmployerServer() {}
 
@@ -285,6 +315,42 @@ func _Employer_PostJobOpening_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Employer_GetCompanyDetails_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCompanyDetailsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EmployerServer).GetCompanyDetails(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Employer_GetCompanyDetails_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EmployerServer).GetCompanyDetails(ctx, req.(*GetCompanyDetailsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Employer_UpdateCompany_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateCompanyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EmployerServer).UpdateCompany(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Employer_UpdateCompany_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EmployerServer).UpdateCompany(ctx, req.(*UpdateCompanyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Employer_ServiceDesc is the grpc.ServiceDesc for Employer service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -303,6 +369,14 @@ var Employer_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "PostJobOpening",
 			Handler:    _Employer_PostJobOpening_Handler,
+		},
+		{
+			MethodName: "GetCompanyDetails",
+			Handler:    _Employer_GetCompanyDetails_Handler,
+		},
+		{
+			MethodName: "UpdateCompany",
+			Handler:    _Employer_UpdateCompany_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

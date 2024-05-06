@@ -13,6 +13,8 @@ type AdminUseCase interface {
 type EmployerUseCase interface {
 	EmployerSignUp(employerDetails models.EmployerSignUp) (*domain.TokenEmployer, error)
 	EmployerLogin(employerDetails models.EmployerLogin) (*domain.TokenEmployer, error)
+	GetCompanyDetails(employerID int32) (models.EmployerDetailsResponse, error)
+	UpdateCompany(employerIDInt int32, employerDetails models.EmployerDetails) (models.EmployerDetailsResponse, error)
 }
 
 type JobSeekerUseCase interface {

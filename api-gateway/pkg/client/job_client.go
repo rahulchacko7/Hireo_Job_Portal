@@ -173,7 +173,8 @@ func (jc *jobClient) UpdateAJob(employerIDInt int32, jobID int32, jobDetails mod
 		ExperienceLevel:     job.ExperienceLevel,
 		EducationLevel:      job.EducationLevel,
 		ApplicationDeadline: applicationDeadlineTime,
-		EmployerID:          employerIDInt, 
+		EmployerID:          employerIDInt,
 	}, nil
 
 }
+

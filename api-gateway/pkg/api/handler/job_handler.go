@@ -203,3 +203,4 @@ func (jh *JobHandler) UpdateAJob(c *gin.Context) {
 	response := response.ClientResponse(http.StatusOK, "Job updated successfully", UpdateJobOpening, nil)
 	c.JSON(http.StatusOK, response)
 }
+

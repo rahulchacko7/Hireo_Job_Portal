@@ -88,3 +88,62 @@ func (es *EmployerServer) EmployerLogin(ctx context.Context, req *pb.EmployerLog
 		Token:           employer.Token,
 	}, nil
 }
+
+func (es *EmployerServer) GetCompanyDetails(ctx context.Context, req *pb.GetCompanyDetailsRequest) (*pb.EmployerDetailsResponse, error) {
+
+	employerDetails, err := es.employerUseCase.GetCompanyDetails(req.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	response := &pb.EmployerDetailsResponse{
+		EmployerDetails: &pb.EmployerDetails{
+			Id:                  uint64(req.Id),
+			CompanyName:         employerDetails.CompanyName,
+			Industry:            employerDetails.Industry,
+			CompanySize:         int32(employerDetails.CompanySize),
+			Website:             employerDetails.Website,
+			HeadquartersAddress: employerDetails.HeadquartersAddress,
+			AboutCompany:        employerDetails.AboutCompany,
+			ContactEmail:        employerDetails.ContactEmail,
+			ContactPhoneNumber:  uint64(employerDetails.ContactPhoneNumber),
+		},
+	}
+
+	return response, nil // Return the response
+}
+
+
+func (es *EmployerServer) UpdateCompany(ctx context.Context, req *pb.UpdateCompanyRequest) (*pb.UpdateCompanyResponse, error) {
+	employerID := req.Id
+
+	updateEmployerDetails := &pb.EmployerDetails{
+		CompanyName:         req.CompanyName,
+		Industry:            req.Industry,
+		CompanySize:         req.CompanySize,
+		Website:             req.Website,
+		HeadquartersAddress: req.HeadquartersAddress,
+		AboutCompany:        req.AboutCompany,
+		ContactEmail:        req.ContactEmail,
+		ContactPhoneNumber:  req.ContactPhoneNumber,
+	}
+
+	res, err := es.employerUseCase.UpdateCompany(employerID, updateEmployerDetails)
+	if err != nil {
+		return nil, err
+	}
+
+	response := &pb.UpdateCompanyResponse{
+		Id:                  uint64(res.ID),
+		CompanyName:         res.CompanyName,
+		Industry:            res.Industry,
+		CompanySize:         req.CompanySize,
+		Website:             res.Website,
+		HeadquartersAddress: res.HeadquartersAddress,
+		AboutCompany:        res.AboutCompany,
+		ContactEmail:        res.ContactEmail,
+		ContactPhoneNumber:  uint64(res.ContactPhoneNumber),
+	}
+
+	return response, nil // Return the response
+}

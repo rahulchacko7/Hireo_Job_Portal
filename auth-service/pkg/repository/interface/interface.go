@@ -15,6 +15,8 @@ type EmployerRepository interface {
 	EmployerSignUp(employerDetails models.EmployerSignUp) (models.EmployerDetailsResponse, error)
 	FindEmployerByEmail(employer models.EmployerLogin) (models.EmployerSignUp, error)
 	CheckEmployerExistsByEmail(email string) (*domain.Employer, error)
+	GetCompanyDetails(employerID int32) (models.EmployerDetailsResponse, error)
+	UpdateCompany(employerIDInt int32, employerDetails models.EmployerDetails) (models.EmployerDetailsResponse, error)
 }
 
 type JobSeekerRepository interface {

@@ -87,3 +87,21 @@ func (eu *employerUseCase) EmployerLogin(employer models.EmployerLogin) (*domain
 		Token:    tokenString,
 	}, nil
 }
+
+func (eh *employerUseCase) GetCompanyDetails(employerID int32) (models.EmployerDetailsResponse, error) {
+	// Call the repository method to fetch employer details by ID
+	employerDetails, err := eh.employerRepository.GetCompanyDetails(employerID)
+	if err != nil {
+		return models.EmployerDetailsResponse{}, fmt.Errorf("failed to get company details: %v", err)
+	}
+
+	return employerDetails, nil
+}
+
+func (eh *employerUseCase) UpdateCompany(employerIDInt int32, employerDetails models.EmployerDetails) (models.EmployerDetailsResponse, error) {
+	updatedEmployerDetails, err := eh.employerRepository.UpdateCompany(employerIDInt, employerDetails)
+	if err != nil {
+		return models.EmployerDetailsResponse{}, fmt.Errorf("failed to update company details: %v", err)
+	}
+	return updatedEmployerDetails, nil
+}
