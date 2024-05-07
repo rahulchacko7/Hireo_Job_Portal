@@ -61,7 +61,7 @@ message UpdateCompanyRequest {
     string about_company = 6;
     string contact_email = 7;
     uint64 contact_phone_number = 8;
-    uint32 id = 9;
+    int32 id = 9;
 }
 
 message UpdateCompanyResponse {

@@ -5,9 +5,9 @@ import (
 	"Auth/pkg/domain"
 	interfaces "Auth/pkg/repository/interface"
 	"Auth/pkg/utils/models"
-	"context"
-	"errors"
 	"fmt"
+
+	"github.com/pkg/errors"
 
 	"gorm.io/gorm"
 )
@@ -64,41 +64,45 @@ func (er *employerRepository) GetCompanyDetails(employerID int32) (models.Employ
 	}
 	return user, nil
 }
+func (er *employerRepository) UpdateCompany(employerIDInt int32, employerDetails models.EmployerDetails) (models.EmployerDetailsResponse, error) {
+	if er.DB == nil {
+		return models.EmployerDetailsResponse{}, errors.New("database connection is closed")
+	}
 
-func (er *employerRepository) UpdateCompany(ctx context.Context, employerIDInt int32, employerDetails models.EmployerDetails) (models.EmployerDetailsResponse, error) {
-	// Prepare the SQL query to update the company details
 	query := `
-		UPDATE employers
-		SET company_name = ?, industry = ?, company_size = ?, website = ?, headquarters_address = ?, about_company = ?, contact_email = ?, contact_phone_number = ?
-		WHERE id = ?
-		RETURNING id, company_name, industry, company_size, website, headquarters_address, about_company, contact_email, contact_phone_number
-	`
+        UPDATE employers
+        SET company_name = ?, industry = ?, company_size = ?, website = ?, headquarters_address = ?, about_company = ?, contact_email = ?, contact_phone_number = ?
+        WHERE id = ?
+        RETURNING id, company_name, industry, company_size, website, headquarters_address, about_company, contact_email, contact_phone_number
+    `
 
 	// Execute the SQL query
 	var updatedEmployerDetails models.EmployerDetailsResponse
-	result := er.DB.Raw(query,
-		employerDetails.CompanyName,
-		employerDetails.Industry,
-		employerDetails.CompanySize,
-		employerDetails.Website,
-		employerDetails.HeadquartersAddress,
-		employerDetails.AboutCompany,
-		employerDetails.ContactEmail,
-		employerDetails.ContactPhoneNumber,
-		employerIDInt,
-	).Scan(
-		&updatedEmployerDetails.ID,
-		&updatedEmployerDetails.CompanyName,
-		&updatedEmployerDetails.Industry,
-		&updatedEmployerDetails.CompanySize,
-		&updatedEmployerDetails.Website,
-		&updatedEmployerDetails.HeadquartersAddress,
-		&updatedEmployerDetails.AboutCompany,
-		&updatedEmployerDetails.ContactEmail,
-		&updatedEmployerDetails.ContactPhoneNumber,
-	)
-	if result.Error != nil {
-		return models.EmployerDetailsResponse{}, errors.Wrap(result.Error, "failed to update company details")
+	err := er.DB.
+		Exec(query,
+			employerDetails.CompanyName,
+			employerDetails.Industry,
+			employerDetails.CompanySize,
+			employerDetails.Website,
+			employerDetails.HeadquartersAddress,
+			employerDetails.AboutCompany,
+			employerDetails.ContactEmail,
+			employerDetails.ContactPhoneNumber,
+			employerIDInt,
+		).
+		Error
+	if err != nil {
+		return models.EmployerDetailsResponse{}, errors.Wrap(err, "failed to update company details")
+	}
+
+	err = er.DB.
+		Table("employers").
+		Select("id, company_name, industry, company_size, website, headquarters_address, about_company, contact_email, contact_phone_number").
+		Where("id = ?", employerIDInt).
+		Scan(&updatedEmployerDetails).
+		Error
+	if err != nil {
+		return models.EmployerDetailsResponse{}, errors.Wrap(err, "failed to fetch updated company details")
 	}
 
 	return updatedEmployerDetails, nil

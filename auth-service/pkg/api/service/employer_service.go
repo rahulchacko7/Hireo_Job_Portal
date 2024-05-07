@@ -113,19 +113,18 @@ func (es *EmployerServer) GetCompanyDetails(ctx context.Context, req *pb.GetComp
 	return response, nil // Return the response
 }
 
-
 func (es *EmployerServer) UpdateCompany(ctx context.Context, req *pb.UpdateCompanyRequest) (*pb.UpdateCompanyResponse, error) {
 	employerID := req.Id
 
-	updateEmployerDetails := &pb.EmployerDetails{
+	updateEmployerDetails := models.EmployerDetails{
 		CompanyName:         req.CompanyName,
 		Industry:            req.Industry,
-		CompanySize:         req.CompanySize,
+		CompanySize:         int(req.CompanySize),
 		Website:             req.Website,
 		HeadquartersAddress: req.HeadquartersAddress,
 		AboutCompany:        req.AboutCompany,
 		ContactEmail:        req.ContactEmail,
-		ContactPhoneNumber:  req.ContactPhoneNumber,
+		ContactPhoneNumber:  uint(req.ContactPhoneNumber),
 	}
 
 	res, err := es.employerUseCase.UpdateCompany(employerID, updateEmployerDetails)
@@ -137,7 +136,7 @@ func (es *EmployerServer) UpdateCompany(ctx context.Context, req *pb.UpdateCompa
 		Id:                  uint64(res.ID),
 		CompanyName:         res.CompanyName,
 		Industry:            res.Industry,
-		CompanySize:         req.CompanySize,
+		CompanySize:         int32(res.CompanySize),
 		Website:             res.Website,
 		HeadquartersAddress: res.HeadquartersAddress,
 		AboutCompany:        res.AboutCompany,

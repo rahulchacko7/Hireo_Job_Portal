@@ -119,7 +119,7 @@ func (jc *employerClient) GetCompanyDetails(employerIDInt int32) (models.Employe
 func (ec *employerClient) UpdateCompany(employerIDInt int32, employerDetails models.EmployerDetails) (models.EmployerDetailsResponse, error) {
 
 	employer, err := ec.Client.UpdateCompany(context.Background(), &pb.UpdateCompanyRequest{
-		Id:                  uint32(employerIDInt),
+		Id:                  int32(employerIDInt),
 		CompanyName:         employerDetails.Company_name,
 		Industry:            employerDetails.Industry,
 		CompanySize:         int32(employerDetails.Company_size),
