@@ -38,10 +38,8 @@ func EmployerAuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		// Ensure that the employer ID is correctly converted to int32
 		employerID := int32(tokenClaims.Id)
 
-		// Set the Employer ID in the context
 		c.Set("id", employerID)
 
 		c.Next()

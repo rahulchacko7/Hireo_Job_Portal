@@ -24,7 +24,7 @@ func NewJobServer(useCase interfaces.JobUseCase) pb.JobServer {
 	}
 }
 func (js *JobServer) PostJob(ctx context.Context, req *pb.JobOpeningRequest) (*pb.JobOpeningResponse, error) {
-	// Extract EmployerID from context or request, assuming it's available in the request for now
+
 	employerID := int32(req.EmployerId)
 
 	jobDetails := models.JobOpening{
@@ -47,7 +47,6 @@ func (js *JobServer) PostJob(ctx context.Context, req *pb.JobOpeningRequest) (*p
 		return nil, err
 	}
 
-	// Prepare the response
 	jobOpening := &pb.JobOpeningResponse{
 		Id:                  uint64(res.ID),
 		Title:               res.Title,
@@ -70,13 +69,11 @@ func (js *JobServer) PostJob(ctx context.Context, req *pb.JobOpeningRequest) (*p
 func (js *JobServer) GetAllJobs(ctx context.Context, req *pb.GetAllJobsRequest) (*pb.GetAllJobsResponse, error) {
 	employerID := int32(req.EmployerIDInt)
 
-	// Call the use case to get all jobs
 	jobs, err := js.jobUseCase.GetAllJobs(employerID)
 	if err != nil {
 		return nil, err
 	}
 
-	// Convert jobs to protobuf response format
 	var jobResponses []*pb.JobOpeningResponse
 	for _, job := range jobs {
 		jobResponse := &pb.JobOpeningResponse{
@@ -88,9 +85,9 @@ func (js *JobServer) GetAllJobs(ctx context.Context, req *pb.GetAllJobsRequest) 
 		jobResponses = append(jobResponses, jobResponse)
 	}
 
-	// Create and return the response
 	return &pb.GetAllJobsResponse{Jobs: jobResponses}, nil
 }
+
 func (js *JobServer) GetAJob(ctx context.Context, req *pb.GetAJobRequest) (*pb.JobOpeningResponse, error) {
 	employerID := req.EmployerIDInt
 	jobId := req.JobId
@@ -100,7 +97,6 @@ func (js *JobServer) GetAJob(ctx context.Context, req *pb.GetAJobRequest) (*pb.J
 		return nil, err
 	}
 
-	// Prepare the response
 	jobOpening := &pb.JobOpeningResponse{
 		Id:                  uint64(res.ID),
 		Title:               res.Title,
@@ -114,7 +110,7 @@ func (js *JobServer) GetAJob(ctx context.Context, req *pb.GetAJobRequest) (*pb.J
 		ExperienceLevel:     res.ExperienceLevel,
 		EducationLevel:      res.EducationLevel,
 		ApplicationDeadline: timestamppb.New(res.ApplicationDeadline),
-		EmployerId:          employerID, // Set the EmployerId field
+		EmployerId:          employerID,
 	}
 
 	return jobOpening, nil
@@ -156,7 +152,6 @@ func (js *JobServer) UpdateAJob(ctx context.Context, req *pb.UpdateAJobRequest) 
 		return nil, err
 	}
 
-	// Prepare the response
 	updateResponse := &pb.UpdateAJobResponse{
 		Id:                  uint64(res.ID),
 		Title:               res.Title,
@@ -170,8 +165,32 @@ func (js *JobServer) UpdateAJob(ctx context.Context, req *pb.UpdateAJobRequest) 
 		ExperienceLevel:     res.ExperienceLevel,
 		EducationLevel:      res.EducationLevel,
 		ApplicationDeadline: timestamppb.New(res.ApplicationDeadline),
-		EmployerId:          employerID, // Set the EmployerId field
+		EmployerId:          employerID,
 	}
 
 	return updateResponse, nil
+}
+
+func (js *JobServer) JobSeekerGetAllJobs(ctx context.Context, req *pb.JobSeekerGetAllJobsRequest) (*pb.JobSeekerGetAllJobsResponse, error) {
+	keyword := req.Title
+
+	jobSeekerJobs, err := js.jobUseCase.JobSeekerGetAllJobs(keyword)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to get jobs for job seeker: %v", err)
+	}
+
+	var jobsResponse []*pb.JSGetAllJobsRespons
+	for _, job := range jobSeekerJobs {
+		jobResponse := &pb.JSGetAllJobsRespons{
+			Id:    uint64(job.ID),
+			Title: job.Title,
+		}
+		jobsResponse = append(jobsResponse, jobResponse)
+	}
+
+	response := &pb.JobSeekerGetAllJobsResponse{
+		Jobs: jobsResponse,
+	}
+
+	return response, nil
 }

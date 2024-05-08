@@ -12,7 +12,7 @@ import (
 
 func JobSeekerAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		tokenHeader := c.GetHeader("authorization")
+		tokenHeader := c.GetHeader("Authorization") // Note: "Authorization" should be capitalized
 		fmt.Println(tokenHeader, "this is the token header")
 		if tokenHeader == "" {
 			response := response.ClientResponse(http.StatusUnauthorized, "No auth header provided", nil, nil)
@@ -27,21 +27,20 @@ func JobSeekerAuthMiddleware() gin.HandlerFunc {
 			c.JSON(http.StatusUnauthorized, response)
 			c.Abort()
 			return
-
 		}
+
 		tokenpart := splitted[1]
 		tokenClaims, err := helper.ValidateTokenJobSeeker(tokenpart)
 		if err != nil {
-			response := response.ClientResponse(http.StatusUnauthorized, "Invalid Token  ", nil, err.Error())
+			response := response.ClientResponse(http.StatusUnauthorized, "Invalid Token", nil, err.Error()) // Updated error message
 			c.JSON(http.StatusUnauthorized, response)
 			c.Abort()
 			return
-
 		}
-		c.Set("tokenClaims", tokenClaims)
+
+		jobseekerID := int32(tokenClaims.Id)
+		c.Set("id", jobseekerID)
 
 		c.Next()
-
 	}
-
 }

@@ -7,13 +7,15 @@ import (
 	interfaces "HireoGateWay/pkg/client/interface"
 	"HireoGateWay/pkg/config"
 	pb "HireoGateWay/pkg/pb/auth"
+	pb2 "HireoGateWay/pkg/pb/job"
 	"HireoGateWay/pkg/utils/models"
 
 	"google.golang.org/grpc"
 )
 
 type jobSeekerClient struct {
-	Client pb.JobSeekerClient
+	Client    pb.JobSeekerClient
+	JobClient pb2.JobClient
 }
 
 func NewJobSeekerClient(cfg config.Config) interfaces.JobSeekerClient {
@@ -77,4 +79,21 @@ func (jc *jobSeekerClient) JobSeekerLogin(jobSeekerDetails models.JobSeekerLogin
 		},
 		Token: jobSeeker.Token,
 	}, nil
+}
+
+func (jc *jobSeekerClient) JobSeekerGetAllJobs(keyword string) ([]models.JobSeekerGetAllJobs, error) {
+	resp, err := jc.JobClient.JobSeekerGetAllJobs(context.Background(), &pb2.JobSeekerGetAllJobsRequest{})
+	if err != nil {
+		return nil, fmt.Errorf("failed to get job: %v", err)
+	}
+
+	var jobs []models.JobSeekerGetAllJobs
+	for _, job := range resp.Jobs {
+		jobs = append(jobs, models.JobSeekerGetAllJobs{
+			ID:    uint(job.Id),
+			Title: job.Title,
+		})
+	}
+
+	return jobs, nil
 }

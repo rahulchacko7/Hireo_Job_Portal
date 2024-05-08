@@ -16,7 +16,6 @@ type jobClient struct {
 	Client pb.JobClient
 }
 
-// NewJobClient creates a new instance of JobClient.
 func NewJobClient(cfg config.Config) interfaces.JobClient {
 	grpcConnection, err := grpc.Dial(cfg.HireoJob, grpc.WithInsecure())
 	if err != nil {
@@ -30,10 +29,9 @@ func NewJobClient(cfg config.Config) interfaces.JobClient {
 	}
 }
 func (jc *jobClient) PostJobOpening(jobDetails models.JobOpening, EmployerID int32) (models.JobOpeningResponse, error) {
-	// Create a timestamp for the application deadline
+
 	applicationDeadline := timestamppb.New(jobDetails.ApplicationDeadline)
 
-	// Make the gRPC call to post the job opening
 	job, err := jc.Client.PostJob(context.Background(), &pb.JobOpeningRequest{
 		Title:               jobDetails.Title,
 		Description:         jobDetails.Description,
@@ -51,11 +49,9 @@ func (jc *jobClient) PostJobOpening(jobDetails models.JobOpening, EmployerID int
 		return models.JobOpeningResponse{}, fmt.Errorf("failed to post job opening: %v", err)
 	}
 
-	// Convert timestamp fields to Go time.Time
 	postedOnTime := job.PostedOn.AsTime()
 	applicationDeadlineTime := job.ApplicationDeadline.AsTime()
 
-	// Construct the response
 	return models.JobOpeningResponse{
 		ID:                  uint(job.Id),
 		Title:               job.Title,
@@ -74,16 +70,15 @@ func (jc *jobClient) PostJobOpening(jobDetails models.JobOpening, EmployerID int
 }
 
 func (jc *jobClient) GetAllJobs(employerIDInt int32) ([]models.AllJob, error) {
-	// Make the gRPC call to get all jobs
+
 	resp, err := jc.Client.GetAllJobs(context.Background(), &pb.GetAllJobsRequest{EmployerIDInt: employerIDInt})
 	if err != nil {
 		return nil, fmt.Errorf("failed to get all jobs: %v", err)
 	}
 
-	// Convert gRPC response to models.AllJob
 	var allJobs []models.AllJob
 	for _, job := range resp.Jobs {
-		// Convert timestamp fields to Go time.Time
+
 		applicationDeadlineTime := job.ApplicationDeadline.AsTime()
 
 		allJobs = append(allJobs, models.AllJob{
@@ -133,10 +128,8 @@ func (jc *jobClient) DeleteAJob(employerIDInt, jobID int32) error {
 
 func (jc *jobClient) UpdateAJob(employerIDInt int32, jobID int32, jobDetails models.JobOpening) (models.JobOpeningResponse, error) {
 
-	// Create a timestamp for the application deadline
 	applicationDeadline := timestamppb.New(jobDetails.ApplicationDeadline)
 
-	// Make the gRPC call to post the job opening
 	job, err := jc.Client.UpdateAJob(context.Background(), &pb.UpdateAJobRequest{
 		Title:               jobDetails.Title,
 		Description:         jobDetails.Description,
@@ -155,11 +148,9 @@ func (jc *jobClient) UpdateAJob(employerIDInt int32, jobID int32, jobDetails mod
 		return models.JobOpeningResponse{}, fmt.Errorf("failed to post job opening: %v", err)
 	}
 
-	// Convert timestamp fields to Go time.Time
 	postedOnTime := job.PostedOn.AsTime()
 	applicationDeadlineTime := job.ApplicationDeadline.AsTime()
 
-	// Construct the response
 	return models.JobOpeningResponse{
 		ID:                  uint(job.Id),
 		Title:               job.Title,
@@ -177,4 +168,3 @@ func (jc *jobClient) UpdateAJob(employerIDInt int32, jobID int32, jobDetails mod
 	}, nil
 
 }
-

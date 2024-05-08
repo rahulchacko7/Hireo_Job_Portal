@@ -40,3 +40,8 @@ type AllJob struct {
 	ApplicationDeadline time.Time `json:"application_deadline"`
 	EmployerID          int32     `json:"employer_id"`
 }
+
+type JobSeekerGetAllJobs struct {
+	ID    uint   `json:"id"`
+	Title string `json:"title"`
+}

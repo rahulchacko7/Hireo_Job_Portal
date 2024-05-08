@@ -61,7 +61,7 @@ func (ju *jobUseCase) DeleteAJob(employerIDInt, jobID int32) error {
 	return nil
 }
 func (ju *jobUseCase) UpdateAJob(employerID int32, jobID int32, jobDetails models.JobOpening) (models.JobOpeningResponse, error) {
-	// Check if the job exists
+
 	isJobExist, err := ju.jobRepository.IsJobExist(jobID)
 	if err != nil {
 		return models.JobOpeningResponse{}, fmt.Errorf("failed to check if job exists: %v", err)
@@ -71,12 +71,30 @@ func (ju *jobUseCase) UpdateAJob(employerID int32, jobID int32, jobDetails model
 		return models.JobOpeningResponse{}, fmt.Errorf("job with ID %d does not exist", jobID)
 	}
 
-	// Call the repository method to update the job details
 	updatedJob, err := ju.jobRepository.UpdateAJob(employerID, jobID, jobDetails)
 	if err != nil {
 		return models.JobOpeningResponse{}, fmt.Errorf("failed to update job: %v", err)
 	}
 
-	// If the update is successful, return the updated job and nil error
 	return updatedJob, nil
+}
+
+func (ju *jobUseCase) JobSeekerGetAllJobs(keyword string) ([]models.JobSeekerGetAllJobs, error) {
+
+	jobs, err := ju.jobRepository.JobSeekerGetAllJobs(keyword)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get jobs: %v", err)
+	}
+
+	var jobSeekerJobs []models.JobSeekerGetAllJobs
+	for _, job := range jobs {
+
+		jobSeekerJob := models.JobSeekerGetAllJobs{
+			ID:    job.ID,
+			Title: job.Title,
+		}
+		jobSeekerJobs = append(jobSeekerJobs, jobSeekerJob)
+	}
+
+	return jobSeekerJobs, nil
 }

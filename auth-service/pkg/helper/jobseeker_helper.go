@@ -2,30 +2,21 @@ package helper
 
 import (
 	"Auth/pkg/utils/models"
-	"errors"
 	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type authCustomClaimsJobSeeker struct {
+	ID    uint   `json:"id"`
 	Email string `json:"email"`
 	jwt.StandardClaims
 }
 
-func JobSeekerPasswordHash(password string) (string, error) {
-	hashPassword, err := bcrypt.GenerateFromPassword([]byte(password), 10)
-	if err != nil {
-		return "", errors.New("internal server error")
-	}
-	hash := string(hashPassword)
-	return hash, nil
-}
-
 func GenerateTokenJobSeeker(jobSeeker models.JobSeekerDetailsResponse) (string, error) {
 	claims := &authCustomClaimsJobSeeker{
+		ID:    jobSeeker.ID,
 		Email: jobSeeker.Email,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour * 48).Unix(),
@@ -33,9 +24,9 @@ func GenerateTokenJobSeeker(jobSeeker models.JobSeekerDetailsResponse) (string, 
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString([]byte("jobseekerkey"))
+	tokenString, err := token.SignedString([]byte("123456789"))
 	if err != nil {
-		fmt.Println("Error is", err)
+		fmt.Println("Error generating token:", err)
 		return "", err
 	}
 
@@ -47,7 +38,7 @@ func ValidateTokenJobSeeker(tokenString string) (*authCustomClaimsJobSeeker, err
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte("jobseekerkey"), nil
+		return []byte("123456789"), nil
 	})
 
 	if err != nil {

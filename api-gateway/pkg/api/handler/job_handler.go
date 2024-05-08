@@ -21,7 +21,7 @@ func NewJobHandler(jobClient interfaces.JobClient) *JobHandler {
 	}
 }
 func (jh *JobHandler) PostJobOpening(c *gin.Context) {
-	// Extract EmployerID from context
+
 	employerID, ok := c.Get("id")
 	if !ok {
 		errs := response.ClientResponse(http.StatusBadRequest, "Invalid employer ID type", nil, nil)
@@ -31,7 +31,6 @@ func (jh *JobHandler) PostJobOpening(c *gin.Context) {
 
 	fmt.Println("id", employerID)
 
-	// Convert the extracted employerID to int32
 	employerIDInt, ok := employerID.(int32)
 	if !ok {
 		errs := response.ClientResponse(http.StatusBadRequest, "Invalid employer ID type", nil, nil)
@@ -61,7 +60,6 @@ func (jh *JobHandler) PostJobOpening(c *gin.Context) {
 
 func (jh *JobHandler) GetAllJobs(c *gin.Context) {
 
-	// Extract EmployerID from context
 	employerID, ok := c.Get("id")
 	if !ok {
 		errs := response.ClientResponse(http.StatusBadRequest, "Invalid employer ID type", nil, nil)
@@ -71,7 +69,6 @@ func (jh *JobHandler) GetAllJobs(c *gin.Context) {
 
 	fmt.Println("id", employerID)
 
-	// Convert the extracted employerID to int32
 	employerIDInt, ok := employerID.(int32)
 	if !ok {
 		errs := response.ClientResponse(http.StatusBadRequest, "Invalid employer ID type", nil, nil)
@@ -79,7 +76,6 @@ func (jh *JobHandler) GetAllJobs(c *gin.Context) {
 		return
 	}
 
-	// Retrieve all jobs from the repository
 	jobs, err := jh.GRPC_Client.GetAllJobs(employerIDInt)
 	if err != nil {
 		// Handle error if any
@@ -88,7 +84,6 @@ func (jh *JobHandler) GetAllJobs(c *gin.Context) {
 		return
 	}
 
-	// Return the list of jobs
 	response := response.ClientResponse(http.StatusOK, "Jobs retrieved successfully", jobs, nil)
 	c.JSON(http.StatusOK, response)
 }
@@ -203,4 +198,3 @@ func (jh *JobHandler) UpdateAJob(c *gin.Context) {
 	response := response.ClientResponse(http.StatusOK, "Job updated successfully", UpdateJobOpening, nil)
 	c.JSON(http.StatusOK, response)
 }
-

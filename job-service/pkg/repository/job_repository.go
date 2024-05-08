@@ -21,7 +21,7 @@ func NewJobRepository(DB *gorm.DB) interfaces.JobRepository {
 }
 
 func (jr *jobRepository) PostJob(jobDetails models.JobOpening, employerID int32) (models.JobOpeningResponse, error) {
-	// Get the current time for posted on
+
 	postedOn := time.Now()
 
 	job := models.JobOpeningResponse{
@@ -40,19 +40,16 @@ func (jr *jobRepository) PostJob(jobDetails models.JobOpening, employerID int32)
 		ApplicationDeadline: jobDetails.ApplicationDeadline,
 	}
 
-	// Insert the job into the database
 	if err := jr.DB.Create(&job).Error; err != nil {
 		return models.JobOpeningResponse{}, err
 	}
 
-	// Return the created job with the generated ID
 	return job, nil
 }
 
 func (jr *jobRepository) GetAllJobs(employerID int32) ([]models.AllJob, error) {
 	var jobs []models.AllJob
 
-	// Execute select query to retrieve all jobs
 	if err := jr.DB.Model(&models.JobOpeningResponse{}).Select("id, title, application_deadline, employer_id").Find(&jobs).Error; err != nil {
 		return nil, err
 	}
@@ -83,7 +80,7 @@ func (jr *jobRepository) IsJobExist(jobID int32) (bool, error) {
 	return true, nil
 }
 func (jr *jobRepository) DeleteAJob(employerIDInt, jobID int32) error {
-	// First, check if the job exists
+
 	var job models.JobOpeningResponse
 	if err := jr.DB.First(&job, jobID).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -92,7 +89,6 @@ func (jr *jobRepository) DeleteAJob(employerIDInt, jobID int32) error {
 		return err // Other errors
 	}
 
-	// Update the job's is_deleted status to true
 	if err := jr.DB.Model(&models.JobOpeningResponse{}).Where("id = ?", jobID).Update("is_deleted", true).Error; err != nil {
 		return fmt.Errorf("failed to delete job: %v", err)
 	}
@@ -101,10 +97,9 @@ func (jr *jobRepository) DeleteAJob(employerIDInt, jobID int32) error {
 }
 
 func (jr *jobRepository) UpdateAJob(employerID int32, jobID int32, jobDetails models.JobOpening) (models.JobOpeningResponse, error) {
-	// Get the current time for posted on
+
 	postedOn := time.Now()
 
-	// Construct the updated job object
 	updatedJob := models.JobOpeningResponse{
 		ID:                  uint(jobID),
 		Title:               jobDetails.Title,
@@ -121,11 +116,18 @@ func (jr *jobRepository) UpdateAJob(employerID int32, jobID int32, jobDetails mo
 		ApplicationDeadline: jobDetails.ApplicationDeadline,
 	}
 
-	// Update the job in the database
 	if err := jr.DB.Model(&models.JobOpeningResponse{}).Where("id = ?", jobID).Updates(updatedJob).Error; err != nil {
 		return models.JobOpeningResponse{}, err
 	}
 
-	// Return the updated job
 	return updatedJob, nil
+}
+func (jr *jobRepository) JobSeekerGetAllJobs(keyword string) ([]models.JobSeekerGetAllJobs, error) {
+	var jobSeekerJobs []models.JobSeekerGetAllJobs
+
+	if err := jr.DB.Where("title LIKE ?", "%"+keyword+"%").Find(&jobSeekerJobs).Error; err != nil {
+		return nil, fmt.Errorf("failed to query jobs: %v", err)
+	}
+
+	return jobSeekerJobs, nil
 }

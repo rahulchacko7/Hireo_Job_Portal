@@ -9,12 +9,14 @@ import (
 )
 
 type authCustomClaimsJobSeeker struct {
+	Id    uint   `json:"id"`
 	Email string `json:"email"`
 	jwt.StandardClaims
 }
 
 func GenerateTokenJobSeeker(jobSeeker models.JobSeekerDetailsResponse) (string, error) {
 	claims := &authCustomClaimsJobSeeker{
+		Id:    jobSeeker.ID,
 		Email: jobSeeker.Email,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour * 48).Unix(),

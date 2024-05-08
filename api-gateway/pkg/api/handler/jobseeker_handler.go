@@ -55,3 +55,24 @@ func (jh *JobSeekerHandler) JobSeekerSignUp(c *gin.Context) {
 	success := response.ClientResponse(http.StatusOK, "Job seeker created successfully", jobSeeker, nil)
 	c.JSON(http.StatusOK, success)
 }
+
+func (jh *JobSeekerHandler) ViewAllJobs(c *gin.Context) {
+
+	keyword := c.Query("Keyword")
+
+	if keyword == "" {
+		errs := response.ClientResponse(http.StatusBadRequest, "Keyword parameter is required", nil, nil)
+		c.JSON(http.StatusBadRequest, errs)
+		return
+	}
+
+	jobs, err := jh.GRPC_Client.JobSeekerGetAllJobs(keyword)
+	if err != nil {
+		errs := response.ClientResponse(http.StatusInternalServerError, "Failed to fetch jobs", nil, err.Error())
+		c.JSON(http.StatusInternalServerError, errs)
+		return
+	}
+
+	response := response.ClientResponse(http.StatusOK, "Jobs retrieved successfully", jobs, nil)
+	c.JSON(http.StatusOK, response)
+}
