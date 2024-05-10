@@ -168,3 +168,22 @@ func (jc *jobClient) UpdateAJob(employerIDInt int32, jobID int32, jobDetails mod
 	}, nil
 
 }
+
+func (jc *jobClient) JobSeekerGetAllJobs(keyword string) ([]models.JobSeekerGetAllJobs, error) {
+	resp, err := jc.Client.JobSeekerGetAllJobs(context.Background(), &pb.JobSeekerGetAllJobsRequest{
+		Title: keyword,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to get job: %v", err)
+	}
+
+	var jobs []models.JobSeekerGetAllJobs
+	for _, job := range resp.Jobs {
+		jobs = append(jobs, models.JobSeekerGetAllJobs{
+			ID:    uint(job.Id),
+			Title: job.Title,
+		})
+	}
+
+	return jobs, nil
+}

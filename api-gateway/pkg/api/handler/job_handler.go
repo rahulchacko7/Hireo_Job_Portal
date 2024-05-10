@@ -87,6 +87,7 @@ func (jh *JobHandler) GetAllJobs(c *gin.Context) {
 	response := response.ClientResponse(http.StatusOK, "Jobs retrieved successfully", jobs, nil)
 	c.JSON(http.StatusOK, response)
 }
+
 func (jh *JobHandler) GetAJob(c *gin.Context) {
 	idStr := c.Query("id")
 
@@ -196,5 +197,32 @@ func (jh *JobHandler) UpdateAJob(c *gin.Context) {
 	}
 
 	response := response.ClientResponse(http.StatusOK, "Job updated successfully", UpdateJobOpening, nil)
+	c.JSON(http.StatusOK, response)
+}
+
+func (jh *JobHandler) ViewAllJobs(c *gin.Context) {
+	keyword := c.Query("Keyword")
+
+	if keyword == "" {
+		errs := response.ClientResponse(http.StatusBadRequest, "Keyword parameter is required", nil, nil)
+		c.JSON(http.StatusBadRequest, errs)
+		return
+	}
+
+	jobs, err := jh.GRPC_Client.JobSeekerGetAllJobs(keyword)
+	if err != nil {
+		errs := response.ClientResponse(http.StatusInternalServerError, "Failed to fetch jobs", nil, err.Error())
+		c.JSON(http.StatusInternalServerError, errs)
+		return
+	}
+
+	if len(jobs) == 0 {
+		errMsg := "No jobs found matching your query"
+		errs := response.ClientResponse(http.StatusOK, errMsg, nil, nil)
+		c.JSON(http.StatusOK, errs)
+		return
+	}
+
+	response := response.ClientResponse(http.StatusOK, "Jobs retrieved successfully", jobs, nil)
 	c.JSON(http.StatusOK, response)
 }

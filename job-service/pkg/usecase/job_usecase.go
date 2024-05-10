@@ -26,6 +26,7 @@ func (ju *jobUseCase) PostJob(job models.JobOpening, employerID int32) (models.J
 }
 
 func (ju *jobUseCase) GetAllJobs(employerID int32) ([]models.AllJob, error) {
+
 	jobData, err := ju.jobRepository.GetAllJobs(employerID)
 	if err != nil {
 		return nil, err
@@ -34,6 +35,16 @@ func (ju *jobUseCase) GetAllJobs(employerID int32) ([]models.AllJob, error) {
 }
 
 func (ju *jobUseCase) GetAJob(employerID, jobId int32) (models.JobOpeningResponse, error) {
+
+	isJobExist, err := ju.jobRepository.IsJobExist(jobId)
+	if err != nil {
+		return models.JobOpeningResponse{}, fmt.Errorf("failed to check if job exists: %v", err)
+	}
+
+	if !isJobExist {
+		return models.JobOpeningResponse{}, fmt.Errorf("job with ID %d does not exist", jobId)
+	}
+
 	jobData, err := ju.jobRepository.GetAJob(employerID, jobId)
 	if err != nil {
 		return models.JobOpeningResponse{}, err
@@ -42,7 +53,7 @@ func (ju *jobUseCase) GetAJob(employerID, jobId int32) (models.JobOpeningRespons
 }
 
 func (ju *jobUseCase) DeleteAJob(employerIDInt, jobID int32) error {
-	// Check if the job exists
+
 	isJobExist, err := ju.jobRepository.IsJobExist(jobID)
 	if err != nil {
 		return fmt.Errorf("failed to check if job exists: %v", err)

@@ -81,15 +81,7 @@ func (jr *jobRepository) IsJobExist(jobID int32) (bool, error) {
 }
 func (jr *jobRepository) DeleteAJob(employerIDInt, jobID int32) error {
 
-	var job models.JobOpeningResponse
-	if err := jr.DB.First(&job, jobID).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return fmt.Errorf("job with ID %d does not exist", jobID)
-		}
-		return err // Other errors
-	}
-
-	if err := jr.DB.Model(&models.JobOpeningResponse{}).Where("id = ?", jobID).Update("is_deleted", true).Error; err != nil {
+	if err := jr.DB.Delete(&models.JobOpeningResponse{}, jobID).Error; err != nil {
 		return fmt.Errorf("failed to delete job: %v", err)
 	}
 
@@ -122,12 +114,29 @@ func (jr *jobRepository) UpdateAJob(employerID int32, jobID int32, jobDetails mo
 
 	return updatedJob, nil
 }
-func (jr *jobRepository) JobSeekerGetAllJobs(keyword string) ([]models.JobSeekerGetAllJobs, error) {
-	var jobSeekerJobs []models.JobSeekerGetAllJobs
 
-	if err := jr.DB.Where("title LIKE ?", "%"+keyword+"%").Find(&jobSeekerJobs).Error; err != nil {
+func (jr *jobRepository) JobSeekerGetAllJobs(keyword string) ([]models.JobOpeningResponse, error) {
+	var jobSeekerJobs []models.JobOpeningResponse
+
+	if err := jr.DB.Where("title ILIKE ?", "%"+keyword+"%").Find(&jobSeekerJobs).Error; err != nil {
 		return nil, fmt.Errorf("failed to query jobs: %v", err)
 	}
 
+	fmt.Println(jobSeekerJobs)
+
 	return jobSeekerJobs, nil
+
 }
+
+// func (jr *jobRepository) JobSeekerGetAllJobs(keyword string) ([]models.JobOpeningResponse, error) {
+// 	var jobSeekerJobs []models.JobOpeningResponse
+
+// 	query := "SELECT * FROM job_opening_responses WHERE title LIKE ?"
+// 	if err := jr.DB.Raw(query, "%"+keyword+"%").Scan(&jobSeekerJobs).Error; err != nil {
+// 		return nil, fmt.Errorf("failed to query jobs: %v", err)
+// 	}
+
+// 	fmt.Println(jobSeekerJobs)
+
+// 	return jobSeekerJobs, nil
+// }
