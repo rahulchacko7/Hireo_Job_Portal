@@ -128,15 +128,3 @@ func (jr *jobRepository) JobSeekerGetAllJobs(keyword string) ([]models.JobOpenin
 
 }
 
-// func (jr *jobRepository) JobSeekerGetAllJobs(keyword string) ([]models.JobOpeningResponse, error) {
-// 	var jobSeekerJobs []models.JobOpeningResponse
-
-// 	query := "SELECT * FROM job_opening_responses WHERE title LIKE ?"
-// 	if err := jr.DB.Raw(query, "%"+keyword+"%").Scan(&jobSeekerJobs).Error; err != nil {
-// 		return nil, fmt.Errorf("failed to query jobs: %v", err)
-// 	}
-
-// 	fmt.Println(jobSeekerJobs)
-
-// 	return jobSeekerJobs, nil
-// }

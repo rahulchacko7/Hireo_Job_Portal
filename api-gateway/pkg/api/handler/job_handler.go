@@ -226,3 +226,22 @@ func (jh *JobHandler) ViewAllJobs(c *gin.Context) {
 	response := response.ClientResponse(http.StatusOK, "Jobs retrieved successfully", jobs, nil)
 	c.JSON(http.StatusOK, response)
 }
+func (jh *JobHandler) GetJobDetails(c *gin.Context) {
+	idStr := c.Query("id")
+	jobID, err := strconv.ParseInt(idStr, 10, 32)
+	if err != nil {
+		errs := response.ClientResponse(http.StatusBadRequest, "Invalid job ID", nil, err.Error())
+		c.JSON(http.StatusBadRequest, errs)
+		return
+	}
+
+	jobDetails, err := jh.GRPC_Client.GetJobDetails(int32(jobID))
+	if err != nil {
+		errs := response.ClientResponse(http.StatusInternalServerError, "Failed to fetch job details", nil, err.Error()) // Update error message
+		c.JSON(http.StatusInternalServerError, errs)
+		return
+	}
+
+	response := response.ClientResponse(http.StatusOK, "Job details retrieved successfully", jobDetails, nil) // Update success message
+	c.JSON(http.StatusOK, response)
+}

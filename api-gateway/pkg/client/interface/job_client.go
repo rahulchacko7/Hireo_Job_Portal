@@ -8,5 +8,6 @@ type JobClient interface {
 	GetAJob(employerIDInt, jobId int32) (models.JobOpeningResponse, error)
 	DeleteAJob(employerIDInt, jobID int32) error
 	JobSeekerGetAllJobs(keyword string) ([]models.JobSeekerGetAllJobs, error)
+	GetJobDetails(jobID int32)
 	UpdateAJob(employerIDInt int32, jobID int32, jobDetails models.JobOpening) (models.JobOpeningResponse, error)
 }

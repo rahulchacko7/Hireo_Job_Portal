@@ -85,7 +85,7 @@ func (jc *jobClient) GetAllJobs(employerIDInt int32) ([]models.AllJob, error) {
 			ID:                  uint(job.Id),
 			Title:               job.Title,
 			ApplicationDeadline: applicationDeadlineTime,
-			EmployerID:          employerIDInt, // Assuming the employer ID is the same for all jobs
+			EmployerID:          employerIDInt, 
 		})
 	}
 

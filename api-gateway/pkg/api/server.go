@@ -29,7 +29,11 @@ func NewServerHTTP(adminHandler *handler.AdminHandler, employerHandler *handler.
 	router.POST("/job-seeker/signup", jobSeekerHandler.JobSeekerSignUp)
 	router.POST("/job-seeker/login", jobSeekerHandler.JobSeekerLogin)
 
-	router.GET("/job-seeker/view-jobs", jobHandler.ViewAllJobs)
+	router.Use(middleware.JobSeekerAuthMiddleware())
+	{
+		router.GET("/job-seeker/view-jobs", jobHandler.ViewAllJobs)
+		router.GET("/job-seeker/jobs", jobHandler.GetJobDetails)
+	}
 
 	router.Use(middleware.EmployerAuthMiddleware())
 	{
@@ -43,11 +47,6 @@ func NewServerHTTP(adminHandler *handler.AdminHandler, employerHandler *handler.
 		router.PUT("/employer/company", employerHandler.UpdateCompany)
 
 	}
-
-	// router.Use(middleware.JobSeekerAuthMiddleware())
-	// {
-
-	// }
 
 	return &ServerHTTP{engine: router}
 }
