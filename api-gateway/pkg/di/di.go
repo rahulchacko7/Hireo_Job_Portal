@@ -5,6 +5,7 @@ import (
 	"HireoGateWay/pkg/api/handler"
 	"HireoGateWay/pkg/client"
 	"HireoGateWay/pkg/config"
+	"HireoGateWay/pkg/helper"
 )
 
 func InitializeAPI(cfg config.Config) (*server.ServerHTTP, error) {
@@ -21,7 +22,11 @@ func InitializeAPI(cfg config.Config) (*server.ServerHTTP, error) {
 	jobClient := client.NewJobClient(cfg)
 	jobHandler := handler.NewJobHandler(jobClient)
 
-	serverHTTP := server.NewServerHTTP(adminHandler, employerHandler, jobSeekerHandler, jobHandler)
+	helper := helper.NewHelper(&cfg)
+	chatClient := client.NewChatClient(cfg)
+	chatHandler := handler.NewChatHandler(chatClient, helper)
+
+	serverHTTP := server.NewServerHTTP(adminHandler, employerHandler, jobSeekerHandler, jobHandler, chatHandler)
 
 	return serverHTTP, nil
 }

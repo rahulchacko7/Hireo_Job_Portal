@@ -12,7 +12,7 @@ type ServerHTTP struct {
 	engine *gin.Engine
 }
 
-func NewServerHTTP(adminHandler *handler.AdminHandler, employerHandler *handler.EmployerHandler, jobSeekerHandler *handler.JobSeekerHandler, jobHandler *handler.JobHandler) *ServerHTTP {
+func NewServerHTTP(adminHandler *handler.AdminHandler, employerHandler *handler.EmployerHandler, jobSeekerHandler *handler.JobSeekerHandler, jobHandler *handler.JobHandler, chatHandler *handler.ChatHandler) *ServerHTTP {
 
 	router := gin.New()
 
@@ -33,6 +33,7 @@ func NewServerHTTP(adminHandler *handler.AdminHandler, employerHandler *handler.
 	{
 		router.GET("/job-seeker/view-jobs", jobHandler.ViewAllJobs)
 		router.GET("/job-seeker/jobs", jobHandler.GetJobDetails)
+
 	}
 
 	router.Use(middleware.EmployerAuthMiddleware())
@@ -45,6 +46,8 @@ func NewServerHTTP(adminHandler *handler.AdminHandler, employerHandler *handler.
 
 		router.GET("/employer/company", employerHandler.GetCompanyDetails)
 		router.PUT("/employer/company", employerHandler.UpdateCompany)
+
+		router.GET("/employer/chat", chatHandler.EmployerMessage)
 
 	}
 
