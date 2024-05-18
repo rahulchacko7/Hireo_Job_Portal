@@ -1,27 +1,52 @@
 package client
 
 import (
-	interfaces "HireoGateWay/pkg/client/interface"
 	"HireoGateWay/pkg/config"
-	pb "HireoGateWay/pkg/pb/job"
+	pb "HireoGateWay/pkg/pb/chat"
+	"HireoGateWay/pkg/utils/models"
+	"context"
 	"fmt"
 
 	"google.golang.org/grpc"
 )
 
-type chatClient struct {
-	Client pb.JobClient
+type ChatClient struct {
+	Client pb.ChatServiceClient
 }
 
-func NewChatClient(cfg config.Config) interfaces.JobClient {
-	grpcConnection, err := grpc.Dial(cfg.HireoJob, grpc.WithInsecure())
+func NewChatClient(cfg config.Config) *ChatClient {
+	grpcConnection, err := grpc.Dial(cfg.ChatSvcUrl, grpc.WithInsecure())
 	if err != nil {
 		fmt.Println("Could not connect", err)
 	}
 
-	grpcClient := pb.NewJobClient(grpcConnection)
+	grpcClient := pb.NewChatServiceClient(grpcConnection)
 
-	return &jobClient{
+	return &ChatClient{
 		Client: grpcClient,
 	}
+}
+
+func (c *ChatClient) GetChat(userID string, req models.ChatRequest) ([]models.TempMessage, error) {
+	data, err := c.Client.GetFriendChat(context.Background(), &pb.GetFriendChatRequest{
+		UserID:   userID,
+		FriendID: req.FriendID,
+		OffSet:   req.Offset,
+		Limit:    req.Limit,
+	})
+	if err != nil {
+		return []models.TempMessage{}, err
+	}
+	var response []models.TempMessage
+	for _, v := range data.FriendChat {
+		chatResponse := models.TempMessage{
+			SenderID:    v.SenderId,
+			RecipientID: v.RecipientId,
+			Content:     v.Content,
+			Timestamp:   v.Timestamp,
+		}
+		response = append(response, chatResponse)
+
+	}
+	return response, nil
 }

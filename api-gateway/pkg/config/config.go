@@ -3,9 +3,13 @@ package config
 import "github.com/spf13/viper"
 
 type Config struct {
-	Port      string `mapstructure:"PORT"`
-	HireoAuth string `mapstructure:"Hireo_Auth"`
-	HireoJob  string `mapstructure:"Hireo_Job"`
+	Port       string `mapstructure:"PORT"`
+	HireoAuth  string `mapstructure:"Hireo_Auth"`
+	HireoJob   string `mapstructure:"Hireo_Job"`
+	ChatSvcUrl string `mapstructure:"CHAT_SVC_URL"`
+
+	KafkaPort  string `mapstructure:"KAFKA_PORT"`
+	KafkaTopic string `mapstructure:"KAFKA_TOPIC"`
 }
 
 var envs = []string{

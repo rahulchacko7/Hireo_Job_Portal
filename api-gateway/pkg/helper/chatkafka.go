@@ -7,7 +7,8 @@ import (
 	"fmt"
 	"log"
 
-	"golang.org/x/net/websocket"
+	"github.com/IBM/sarama"
+	"github.com/gorilla/websocket"
 )
 
 type Helper struct {

@@ -9,7 +9,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"golang.org/x/net/websocket"
+	"github.com/gorilla/websocket"
 )
 
 var upgrade = websocket.Upgrader{
@@ -31,7 +31,7 @@ func NewChatHandler(chatClient interfaces.ChatClient, helper *helper.Helper) *Ch
 	}
 }
 
-func (ch *JobHandler) EmployerMessage(c *gin.Context) {
+func (ch *ChatHandler) EmployerMessage(c *gin.Context) {
 	fmt.Println("message called")
 	conn, err := upgrade.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
