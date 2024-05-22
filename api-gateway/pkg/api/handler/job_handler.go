@@ -5,6 +5,7 @@ import (
 	"HireoGateWay/pkg/utils/models"
 	"HireoGateWay/pkg/utils/response"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 
@@ -244,4 +245,65 @@ func (jh *JobHandler) GetJobDetails(c *gin.Context) {
 
 	response := response.ClientResponse(http.StatusOK, "Job details retrieved successfully", jobDetails, nil) // Update success message
 	c.JSON(http.StatusOK, response)
+}
+
+func (jh *JobHandler) ApplyJob(c *gin.Context) {
+
+	employerID, ok := c.Get("id")
+	if !ok {
+		errs := response.ClientResponse(http.StatusBadRequest, "Invalid employer ID type", nil, nil)
+		c.JSON(http.StatusBadRequest, errs)
+		return
+	}
+
+	userIdInt, ok := employerID.(int32)
+	if !ok {
+		errs := response.ClientResponse(http.StatusBadRequest, "Invalid employer ID type", nil, nil)
+		c.JSON(http.StatusBadRequest, errs)
+		return
+	}
+	// userId, err := strconv.ParseInt(userIDStr, 10, 64)
+	// if err != nil {
+	// 	errorRes := response.ClientResponse(http.StatusBadRequest, "conversion failed", nil, "user id conversion failed")
+	// 	c.JSON(http.StatusBadRequest, errorRes)
+	// 	return
+	// }
+
+	var jobApplication models.ApplyJob
+	jobIDStr := c.PostForm("job_id")
+	jobApplication.JobID, _ = strconv.ParseInt(jobIDStr, 10, 64)
+	jobApplication.CoverLetter = c.PostForm("cover_letter")
+	jobApplication.JobseekerID = int64(userIdInt)
+
+	file, err := c.FormFile("resume")
+	if err != nil {
+		errorRes := response.ClientResponse(http.StatusBadRequest, "error in getting data", nil, err.Error())
+		c.JSON(http.StatusBadRequest, errorRes)
+		return
+	}
+
+	filePath := fmt.Sprintf("uploads/resumes/%d_%s", jobApplication.JobID, file.Filename)
+	if err := c.SaveUploadedFile(file, filePath); err != nil {
+		errorRes := response.ClientResponse(http.StatusInternalServerError, "Failed to save resume file", nil, err.Error())
+		c.JSON(http.StatusInternalServerError, errorRes)
+		return
+	}
+
+	fileBytes, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		errorRes := response.ClientResponse(http.StatusInternalServerError, "Failed to read resume file", nil, err.Error())
+		c.JSON(http.StatusInternalServerError, errorRes)
+		return
+	}
+	jobApplication.Resume = fileBytes
+
+	res, err := jh.GRPC_Client.ApplyJob(jobApplication, file)
+	if err != nil {
+		errorRes := response.ClientResponse(http.StatusInternalServerError, "Failed to apply for job", nil, err.Error())
+		c.JSON(http.StatusInternalServerError, errorRes)
+		return
+	}
+
+	successRes := response.ClientResponse(http.StatusOK, "Job applied successfully", res, nil)
+	c.JSON(http.StatusOK, successRes)
 }

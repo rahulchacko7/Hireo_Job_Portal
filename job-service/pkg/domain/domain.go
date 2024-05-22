@@ -35,3 +35,12 @@ type JobOpeningResponse struct {
 	UpdatedOn           time.Time `json:"updated_on"`
 	IsDeleted           bool      `json:"is_deleted"`
 }
+
+type ApplyJob struct {
+	ID          uint   `json:"id"`
+	JobseekerID int64  `json:"jobseeker_id" validate:"required"`
+	JobID       int64  `json:"job_id" validate:"required"`
+	Resume      []byte `json:"resume" validate:"required"`
+	ResumeURL   string `json:"resume_url" validate:"required"`
+	CoverLetter string `json:"cover_letter" validate:"lte=500"`
+}

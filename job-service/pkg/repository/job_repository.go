@@ -128,3 +128,40 @@ func (jr *jobRepository) JobSeekerGetAllJobs(keyword string) ([]models.JobOpenin
 
 }
 
+func (jr *jobRepository) GetJobDetails(jobID int32) (models.JobOpeningResponse, error) {
+	var job models.JobOpeningResponse
+
+	if err := jr.DB.Model(&models.JobOpeningResponse{}).Where("id = ?", jobID).First(&job).Error; err != nil {
+		return models.JobOpeningResponse{}, err
+	}
+
+	return job, nil
+}
+
+func (aj *jobRepository) ApplyJob(application models.ApplyJob, resumeURL string) (models.ApplyJobResponse, error) {
+	var JobResponse models.ApplyJobResponse
+
+	result := aj.DB.Exec("INSERT INTO apply_jobs (jobseeker_id, job_id, resume, resume_url, cover_letter) VALUES (?, ?, ?, ?, ?)",
+		application.JobseekerID,
+		application.JobID,
+		nil,
+		resumeURL,
+		application.CoverLetter)
+
+	if result.Error != nil {
+		return models.ApplyJobResponse{}, fmt.Errorf("error on inserting into database: %w", result.Error)
+	}
+
+	if result.RowsAffected == 0 {
+		return models.ApplyJobResponse{}, errors.New("no rows were affected during insert")
+	}
+
+	err := aj.DB.Raw("select * from apply_jobs where jobseeker_id = ? and job_id = ? ", application.JobseekerID, application.JobID).Scan(&JobResponse).Error
+	if err != nil {
+		return models.ApplyJobResponse{}, fmt.Errorf("failed to get last inserted ID: %w", err)
+	}
+
+	fmt.Println("job", JobResponse.ID)
+
+	return JobResponse, nil
+}

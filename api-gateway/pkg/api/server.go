@@ -34,6 +34,7 @@ func NewServerHTTP(adminHandler *handler.AdminHandler, employerHandler *handler.
 		router.GET("/job-seeker/view-jobs", jobHandler.ViewAllJobs)
 		router.GET("/job-seeker/jobs", jobHandler.GetJobDetails)
 
+		router.POST("/job-seeker/apply-job", jobHandler.ApplyJob)
 	}
 
 	router.Use(middleware.EmployerAuthMiddleware())

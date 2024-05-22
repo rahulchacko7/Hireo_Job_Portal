@@ -194,3 +194,52 @@ func (js *JobServer) JobSeekerGetAllJobs(ctx context.Context, req *pb.JobSeekerG
 
 	return response, nil
 }
+
+func (js *JobServer) GetJobDetails(ctx context.Context, req *pb.GetJobDetailsRequest) (*pb.GetJobDetailsResponse, error) {
+	jobId := req.JobId
+
+	res, err := js.jobUseCase.GetJobDetails(jobId)
+	if err != nil {
+		return nil, err
+	}
+
+	jobDetailsResponse := &pb.GetJobDetailsResponse{
+		Title:               res.Title,
+		Description:         res.Description,
+		Requirements:        res.Requirements,
+		EmployerId:          int32(res.EmployerID),
+		Location:            res.Location,
+		EmploymentType:      res.EmploymentType,
+		Salary:              res.Salary,
+		SkillsRequired:      res.SkillsRequired,
+		ExperienceLevel:     res.ExperienceLevel,
+		EducationLevel:      res.EducationLevel,
+		ApplicationDeadline: timestamppb.New(res.ApplicationDeadline),
+	}
+
+	return jobDetailsResponse, nil
+}
+
+func (js *JobServer) ApplyJob(ctx context.Context, req *pb.ApplyJobRequest) (*pb.ApplyJobResponse, error) {
+	fmt.Println("Applying for job...")
+
+	jobApplication := models.ApplyJob{
+		JobID:       req.JobId,
+		JobseekerID: req.JobseekerId,
+		CoverLetter: req.CoverLetter,
+		Resume:      req.ResumeData,
+	}
+
+	Data, err := js.jobUseCase.ApplyJob(jobApplication, req.ResumeData)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.ApplyJobResponse{
+		Id:          int64(Data.ID),
+		JobId:       Data.JobID,
+		JobseekerId: Data.JobseekerID,
+		CoverLetter: Data.CoverLetter,
+		ResumeUrl:   Data.ResumeURL,
+	}, nil
+}

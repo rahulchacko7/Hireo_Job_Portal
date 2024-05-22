@@ -1,10 +1,15 @@
 package usecase
 
 import (
+	"Auth/pkg/config"
+	"Auth/pkg/helper"
 	interfaces "Auth/pkg/repository/interface"
 	services "Auth/pkg/usecase/interface"
 	"Auth/pkg/utils/models"
+	"errors"
 	"fmt"
+
+	"github.com/google/uuid"
 )
 
 type jobUseCase struct {
@@ -108,4 +113,47 @@ func (ju *jobUseCase) JobSeekerGetAllJobs(keyword string) ([]models.JobSeekerGet
 	}
 
 	return jobSeekerJobs, nil
+}
+
+func (ju *jobUseCase) GetJobDetails(jobID int32) (models.JobOpeningResponse, error) {
+
+	isJobExist, err := ju.jobRepository.IsJobExist(jobID)
+	if err != nil {
+		return models.JobOpeningResponse{}, fmt.Errorf("failed to check if job exists: %v", err)
+	}
+
+	if !isJobExist {
+		return models.JobOpeningResponse{}, fmt.Errorf("job with ID %d does not exist", jobID)
+	}
+
+	jobData, err := ju.jobRepository.GetJobDetails(jobID)
+	if err != nil {
+		return models.JobOpeningResponse{}, err
+	}
+
+	return jobData, nil
+}
+func (ju *jobUseCase) ApplyJob(jobApplication models.ApplyJob, resumeData []byte) (models.ApplyJobResponse, error) {
+
+	if jobApplication.JobID == 0 || jobApplication.JobseekerID == 0 || jobApplication.CoverLetter == "" {
+		return models.ApplyJobResponse{}, errors.New("invalid input data")
+	}
+
+	fileUID := uuid.New()
+	fileName := fileUID.String()
+	h := helper.NewHelper(config.Config{})
+
+	url, err := h.AddImageToAwsS3([]byte(jobApplication.ResumeURL), fileName)
+	if err != nil {
+		return models.ApplyJobResponse{}, err
+	}
+
+	fmt.Println("url", url)
+
+	Data, err := ju.jobRepository.ApplyJob(jobApplication, url)
+	if err != nil {
+		return models.ApplyJobResponse{}, err
+	}
+
+	return Data, nil
 }

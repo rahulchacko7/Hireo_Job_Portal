@@ -7,6 +7,8 @@ import (
 	"HireoGateWay/pkg/utils/models"
 	"context"
 	"fmt"
+	"io"
+	"mime/multipart"
 
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -210,4 +212,41 @@ func (jc *jobClient) GetJobDetails(jobID int32) (models.JobOpeningResponse, erro
 		ApplicationDeadline: applicationDeadlineTime,
 		EmployerID:          resp.EmployerId,
 	}, nil
+}
+
+func (jc *jobClient) ApplyJob(jobApplication models.ApplyJob, file *multipart.FileHeader) (models.ApplyJobResponse, error) {
+	var response models.ApplyJobResponse
+
+	f, err := file.Open()
+	if err != nil {
+		return response, err
+	}
+	defer f.Close()
+
+	fileData, err := io.ReadAll(f)
+	if err != nil {
+		return response, err
+	}
+
+	req := &pb.ApplyJobRequest{
+		JobId:       jobApplication.JobID,
+		JobseekerId: jobApplication.JobseekerID,
+		CoverLetter: jobApplication.CoverLetter,
+		ResumeData:  fileData,
+	}
+
+	grpcResponse, err := jc.Client.ApplyJob(context.Background(), req)
+	if err != nil {
+		return response, err
+	}
+
+	response = models.ApplyJobResponse{
+		ID:          uint(grpcResponse.Id),
+		JobID:       grpcResponse.JobId,
+		JobseekerID: grpcResponse.JobseekerId,
+		CoverLetter: grpcResponse.CoverLetter,
+		ResumeURL:   grpcResponse.ResumeUrl,
+	}
+
+	return response, nil
 }
