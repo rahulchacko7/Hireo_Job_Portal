@@ -21,11 +21,9 @@ func NewJobRepository(DB *gorm.DB) interfaces.JobRepository {
 }
 
 func (jr *jobRepository) PostJob(jobDetails models.JobOpening, employerID int32) (models.JobOpeningResponse, error) {
-
 	postedOn := time.Now()
 
 	job := models.JobOpeningResponse{
-		ID:                  jobDetails.ID,
 		Title:               jobDetails.Title,
 		Description:         jobDetails.Description,
 		Requirements:        jobDetails.Requirements,
@@ -50,7 +48,7 @@ func (jr *jobRepository) PostJob(jobDetails models.JobOpening, employerID int32)
 func (jr *jobRepository) GetAllJobs(employerID int32) ([]models.AllJob, error) {
 	var jobs []models.AllJob
 
-	if err := jr.DB.Model(&models.JobOpeningResponse{}).Select("id, title, application_deadline, employer_id").Find(&jobs).Error; err != nil {
+	if err := jr.DB.Model(&models.JobOpeningResponse{}).Where("employer_id = ?", employerID).Select("id, title, application_deadline, employer_id").Find(&jobs).Error; err != nil {
 		return nil, err
 	}
 
@@ -79,9 +77,36 @@ func (jr *jobRepository) IsJobExist(jobID int32) (bool, error) {
 
 	return true, nil
 }
-func (jr *jobRepository) DeleteAJob(employerIDInt, jobID int32) error {
 
-	if err := jr.DB.Delete(&models.JobOpeningResponse{}, jobID).Error; err != nil {
+func (jr *jobRepository) GetJobIDByEmployerID(employerID int64) (int64, error) {
+	var job models.JobOpeningResponse
+
+	if err := jr.DB.Model(&models.JobOpeningResponse{}).Where("employer_id = ?", employerID).Scan(&job).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return 0, nil
+		}
+		return 0, err
+	}
+
+	return int64(job.ID), nil
+}
+func (jr *jobRepository) GetApplicantsByEmployerID(jobID int64) ([]models.ApplyJobResponse, error) {
+	var applicants []models.ApplyJobResponse
+
+	fmt.Println("job id", jobID)
+
+	query := "SELECT * FROM apply_jobs WHERE job_id = ?"
+	if err := jr.DB.Raw(query, jobID).Scan(&applicants).Error; err != nil {
+		return nil, err
+	}
+
+	fmt.Println("Retrieved applicants:", applicants)
+
+	return applicants, nil
+}
+
+func (jr *jobRepository) DeleteAJob(employerID, jobID int32) error {
+	if err := jr.DB.Where("id = ? AND employer_id = ?", jobID, employerID).Delete(&models.JobOpeningResponse{}).Error; err != nil {
 		return fmt.Errorf("failed to delete job: %v", err)
 	}
 
@@ -89,7 +114,6 @@ func (jr *jobRepository) DeleteAJob(employerIDInt, jobID int32) error {
 }
 
 func (jr *jobRepository) UpdateAJob(employerID int32, jobID int32, jobDetails models.JobOpening) (models.JobOpeningResponse, error) {
-
 	postedOn := time.Now()
 
 	updatedJob := models.JobOpeningResponse{
@@ -108,7 +132,7 @@ func (jr *jobRepository) UpdateAJob(employerID int32, jobID int32, jobDetails mo
 		ApplicationDeadline: jobDetails.ApplicationDeadline,
 	}
 
-	if err := jr.DB.Model(&models.JobOpeningResponse{}).Where("id = ?", jobID).Updates(updatedJob).Error; err != nil {
+	if err := jr.DB.Model(&models.JobOpeningResponse{}).Where("id = ? AND employer_id = ?", jobID, employerID).Updates(updatedJob).Error; err != nil {
 		return models.JobOpeningResponse{}, err
 	}
 
@@ -122,10 +146,7 @@ func (jr *jobRepository) JobSeekerGetAllJobs(keyword string) ([]models.JobOpenin
 		return nil, fmt.Errorf("failed to query jobs: %v", err)
 	}
 
-	fmt.Println(jobSeekerJobs)
-
 	return jobSeekerJobs, nil
-
 }
 
 func (jr *jobRepository) GetJobDetails(jobID int32) (models.JobOpeningResponse, error) {
@@ -138,13 +159,12 @@ func (jr *jobRepository) GetJobDetails(jobID int32) (models.JobOpeningResponse, 
 	return job, nil
 }
 
-func (aj *jobRepository) ApplyJob(application models.ApplyJob, resumeURL string) (models.ApplyJobResponse, error) {
-	var JobResponse models.ApplyJobResponse
+func (jr *jobRepository) ApplyJob(application models.ApplyJob, resumeURL string) (models.ApplyJobResponse, error) {
+	var jobResponse models.ApplyJobResponse
 
-	result := aj.DB.Exec("INSERT INTO apply_jobs (jobseeker_id, job_id, resume, resume_url, cover_letter) VALUES (?, ?, ?, ?, ?)",
+	result := jr.DB.Exec("INSERT INTO apply_jobs (jobseeker_id, job_id, resume_url, cover_letter) VALUES (?, ?, ?, ?)",
 		application.JobseekerID,
 		application.JobID,
-		nil,
 		resumeURL,
 		application.CoverLetter)
 
@@ -156,12 +176,10 @@ func (aj *jobRepository) ApplyJob(application models.ApplyJob, resumeURL string)
 		return models.ApplyJobResponse{}, errors.New("no rows were affected during insert")
 	}
 
-	err := aj.DB.Raw("select * from apply_jobs where jobseeker_id = ? and job_id = ? ", application.JobseekerID, application.JobID).Scan(&JobResponse).Error
+	err := jr.DB.Raw("SELECT * FROM apply_jobs WHERE jobseeker_id = ? AND job_id = ?", application.JobseekerID, application.JobID).Scan(&jobResponse).Error
 	if err != nil {
 		return models.ApplyJobResponse{}, fmt.Errorf("failed to get last inserted ID: %w", err)
 	}
 
-	fmt.Println("job", JobResponse.ID)
-
-	return JobResponse, nil
+	return jobResponse, nil
 }

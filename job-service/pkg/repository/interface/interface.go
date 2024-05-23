@@ -9,6 +9,8 @@ type JobRepository interface {
 	GetAllJobs(employerID int32) ([]models.AllJob, error)
 	GetAJob(employerID, jobId int32) (models.JobOpeningResponse, error)
 	IsJobExist(jobID int32) (bool, error)
+	GetJobIDByEmployerID(employerID int64) (int64, error)
+	GetApplicantsByEmployerID(employerID int64) ([]models.ApplyJobResponse, error)
 	DeleteAJob(employerIDInt, jobID int32) error
 	JobSeekerGetAllJobs(keyword string) ([]models.JobOpeningResponse, error)
 	GetJobDetails(jobID int32) (models.JobOpeningResponse, error)

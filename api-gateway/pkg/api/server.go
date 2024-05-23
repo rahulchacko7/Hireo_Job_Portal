@@ -50,6 +50,8 @@ func NewServerHTTP(adminHandler *handler.AdminHandler, employerHandler *handler.
 
 		router.GET("/employer/chat", chatHandler.EmployerMessage)
 
+		router.GET("/employer/get-applicants", jobHandler.GetApplicants)
+
 	}
 
 	return &ServerHTTP{engine: router}

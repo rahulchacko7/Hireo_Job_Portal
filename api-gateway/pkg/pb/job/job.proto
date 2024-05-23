@@ -17,8 +17,24 @@ service Job {
     rpc JobSeekerGetAllJobs(JobSeekerGetAllJobsRequest) returns (JobSeekerGetAllJobsResponse) {};
     rpc GetJobDetails(GetJobDetailsRequest) returns (GetJobDetailsResponse) {};
     rpc ApplyJob(ApplyJobRequest) returns (ApplyJobResponse);
+    rpc GetJobApplications(GetJobApplicationsRequest) returns (GetJobApplicationsResponse);
 } 
 
+message GetJobApplicationsRequest {
+    string employer_id = 1;
+}
+
+message GetJobApplicationsResponse{
+    repeated JobApplication job_applications = 1;
+}
+
+message JobApplication {
+    string id = 1;
+    string job_id = 2;
+    string job_seeker_id = 3;
+    string resume = 4;
+    string cover_letter = 5;
+}
 
 message ApplyJobRequest {
     int64 job_id = 1;

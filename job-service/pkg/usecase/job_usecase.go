@@ -157,3 +157,19 @@ func (ju *jobUseCase) ApplyJob(jobApplication models.ApplyJob, resumeData []byte
 
 	return Data, nil
 }
+func (ju *jobUseCase) GetApplicants(employerID int64) ([]models.ApplyJobResponse, error) {
+
+	jobid, err := ju.jobRepository.GetJobIDByEmployerID(employerID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to check if job exists: %v", err)
+	}
+
+	fmt.Println("jobid", jobid)
+
+	applicants, err := ju.jobRepository.GetApplicantsByEmployerID(jobid)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get job applications: %v", err)
+	}
+
+	return applicants, nil
+}

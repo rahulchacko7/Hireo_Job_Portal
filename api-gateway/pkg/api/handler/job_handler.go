@@ -307,3 +307,30 @@ func (jh *JobHandler) ApplyJob(c *gin.Context) {
 	successRes := response.ClientResponse(http.StatusOK, "Job applied successfully", res, nil)
 	c.JSON(http.StatusOK, successRes)
 }
+
+func (jh *JobHandler) GetApplicants(c *gin.Context) {
+
+	employerID, ok := c.Get("id")
+	if !ok {
+		errs := response.ClientResponse(http.StatusBadRequest, "Invalid employer ID type", nil, nil)
+		c.JSON(http.StatusBadRequest, errs)
+		return
+	}
+
+	userIdInt, ok := employerID.(int32)
+	if !ok {
+		errs := response.ClientResponse(http.StatusBadRequest, "Invalid employer ID type", nil, nil)
+		c.JSON(http.StatusBadRequest, errs)
+		return
+	}
+
+	applicants, err := jh.GRPC_Client.GetApplicants(int64(userIdInt))
+	if err != nil {
+		errs := response.ClientResponse(http.StatusInternalServerError, "Failed to fetch applicants", nil, err.Error())
+		c.JSON(http.StatusInternalServerError, errs)
+		return
+	}
+
+	response := response.ClientResponse(http.StatusOK, "Applicants retrieved successfully", applicants, nil)
+	c.JSON(http.StatusOK, response)
+}

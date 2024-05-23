@@ -6,6 +6,7 @@ import (
 	"Auth/pkg/utils/models"
 	"context"
 	"fmt"
+	"strconv"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -242,4 +243,30 @@ func (js *JobServer) ApplyJob(ctx context.Context, req *pb.ApplyJobRequest) (*pb
 		CoverLetter: Data.CoverLetter,
 		ResumeUrl:   Data.ResumeURL,
 	}, nil
+}
+
+func (js *JobServer) GetJobApplications(ctx context.Context, req *pb.GetJobApplicationsRequest) (*pb.GetJobApplicationsResponse, error) {
+	employerID, err := strconv.ParseInt(req.EmployerId, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+
+	applications, err := js.jobUseCase.GetApplicants(employerID)
+	if err != nil {
+		return nil, err
+	}
+
+	var applicationResponses []*pb.JobApplication
+	for _, application := range applications {
+		applicationResponse := &pb.JobApplication{
+			Id:          strconv.FormatUint(uint64(application.ID), 10),
+			JobId:       strconv.FormatUint(uint64(application.JobID), 10),
+			JobSeekerId: strconv.FormatUint(uint64(application.JobseekerID), 10),
+			Resume:      application.ResumeURL,
+			CoverLetter: application.CoverLetter,
+		}
+		applicationResponses = append(applicationResponses, applicationResponse)
+	}
+
+	return &pb.GetJobApplicationsResponse{JobApplications: applicationResponses}, nil
 }

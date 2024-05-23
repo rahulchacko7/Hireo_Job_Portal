@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"mime/multipart"
+	"strconv"
 
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -248,5 +249,38 @@ func (jc *jobClient) ApplyJob(jobApplication models.ApplyJob, file *multipart.Fi
 		ResumeURL:   grpcResponse.ResumeUrl,
 	}
 
+	return response, nil
+}
+
+func (jc *jobClient) GetApplicants(employerID int64) ([]models.ApplyJobResponse, error) {
+	var response []models.ApplyJobResponse
+	req := &pb.GetJobApplicationsRequest{
+		EmployerId: strconv.FormatInt(employerID, 10),
+	}
+	grpcResponse, err := jc.Client.GetJobApplications(context.Background(), req)
+	if err != nil {
+		return response, err
+	}
+	for _, v := range grpcResponse.JobApplications {
+		jobID, err := strconv.ParseUint(v.JobId, 10, 64)
+		if err != nil {
+			return response, err
+		}
+		jobseekerID, err := strconv.ParseUint(v.JobSeekerId, 10, 64)
+		if err != nil {
+			return response, err
+		}
+		applicationID, err := strconv.ParseUint(v.Id, 10, 64)
+		if err != nil {
+			return response, err
+		}
+		response = append(response, models.ApplyJobResponse{
+			ID:          uint(applicationID),
+			JobID:       int64(jobID),
+			JobseekerID: int64(jobseekerID),
+			CoverLetter: v.CoverLetter,
+			ResumeURL:   v.Resume,
+		})
+	}
 	return response, nil
 }
