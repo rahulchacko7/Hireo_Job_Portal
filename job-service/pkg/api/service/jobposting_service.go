@@ -270,3 +270,29 @@ func (js *JobServer) GetJobApplications(ctx context.Context, req *pb.GetJobAppli
 
 	return &pb.GetJobApplicationsResponse{JobApplications: applicationResponses}, nil
 }
+
+func (js *JobServer) SaveJobs(ctx context.Context, req *pb.SaveJobRequest) (*pb.SaveJobResponse, error) {
+	JobID, err := strconv.ParseInt(req.JobId, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+
+	UserID, err := strconv.ParseInt(req.UserId, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+
+	savedJob, err := js.jobUseCase.SaveJobs(JobID, UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	response := &pb.SaveJobResponse{
+		Id:      strconv.FormatUint(uint64(savedJob.ID), 10),
+		JobId:   strconv.FormatInt(savedJob.JobID, 10),
+		UserId:  strconv.FormatInt(savedJob.JobseekerID, 10),
+		Message: "Job saved successfully",
+	}
+
+	return response, nil
+}

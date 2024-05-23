@@ -284,3 +284,35 @@ func (jc *jobClient) GetApplicants(employerID int64) ([]models.ApplyJobResponse,
 	}
 	return response, nil
 }
+
+func (jc *jobClient) SaveAJob(userIdInt, jobIdInt int32) (models.SavedJobsResponse, error) {
+	req := &pb.SaveJobRequest{
+		UserId: strconv.FormatInt(int64(userIdInt), 10),
+		JobId:  strconv.FormatInt(int64(jobIdInt), 10),
+	}
+
+	grpcResponse, err := jc.Client.SaveJobs(context.Background(), req)
+	if err != nil {
+		return models.SavedJobsResponse{}, err
+	}
+
+	jobID, err := strconv.ParseInt(grpcResponse.JobId, 10, 64)
+	if err != nil {
+		return models.SavedJobsResponse{}, err
+	}
+	userID, err := strconv.ParseInt(grpcResponse.UserId, 10, 64)
+	if err != nil {
+		return models.SavedJobsResponse{}, err
+	}
+	savedJobID, err := strconv.ParseInt(grpcResponse.Id, 10, 64)
+	if err != nil {
+		return models.SavedJobsResponse{}, err
+	}
+
+	response := models.SavedJobsResponse{
+		ID:          uint(savedJobID),
+		JobID:       jobID,
+		JobseekerID: userID,
+	}
+	return response, nil
+}

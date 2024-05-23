@@ -31,7 +31,6 @@ func (h *Helper) AddImageToAwsS3(file []byte, filename string) (string, error) {
 	fmt.Println("print2", config.Access_key_ID)
 	fmt.Println("print3", config.Secret_access_key)
 
-	// Create a new session with the correct region
 	sess, err := session.NewSession(&aws.Config{
 		Region: aws.String(config.AWSRegion),
 		Credentials: credentials.NewStaticCredentials(
@@ -50,7 +49,7 @@ func (h *Helper) AddImageToAwsS3(file []byte, filename string) (string, error) {
 
 	_, err = uploader.Upload(&s3manager.UploadInput{
 		Bucket: aws.String(bucketName),
-		Key:    aws.String(filename), 
+		Key:    aws.String(filename),
 		Body:   bytes.NewReader(file),
 	})
 

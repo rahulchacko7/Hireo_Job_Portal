@@ -15,5 +15,6 @@ type JobRepository interface {
 	JobSeekerGetAllJobs(keyword string) ([]models.JobOpeningResponse, error)
 	GetJobDetails(jobID int32) (models.JobOpeningResponse, error)
 	ApplyJob(application models.ApplyJob, resumeURL string) (models.ApplyJobResponse, error)
+	SaveJobs(jobID, userID int64) (models.SavedJobsResponse, error)
 	UpdateAJob(employerID int32, jobID int32, jobDetails models.JobOpening) (models.JobOpeningResponse, error)
 }

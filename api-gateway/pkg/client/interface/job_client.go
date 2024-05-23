@@ -15,4 +15,5 @@ type JobClient interface {
 	UpdateAJob(employerIDInt int32, jobID int32, jobDetails models.JobOpening) (models.JobOpeningResponse, error)
 	ApplyJob(jobApplication models.ApplyJob, file *multipart.FileHeader) (models.ApplyJobResponse, error)
 	GetApplicants(employerID int64) ([]models.ApplyJobResponse, error)
+	SaveAJob(userIdInt, jobIdInt int32) (models.SavedJobsResponse, error)
 }

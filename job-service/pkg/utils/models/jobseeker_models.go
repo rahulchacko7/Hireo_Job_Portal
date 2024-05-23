@@ -46,3 +46,14 @@ type ApplyJobResponse struct {
 	ResumeURL   string `json:"resume_url" validate:"required"`
 	CoverLetter string `json:"cover_letter" validate:"lte=500"`
 }
+
+type SavedJobs struct {
+	JobID       int64 `json:"job_id" validate:"required"`
+	JobseekerID int64 `json:"jobseeker_id" validate:"required"`
+}
+
+type SavedJobsResponse struct {
+	ID          uint  `json:"id"`
+	JobID       int64 `json:"job_id" validate:"required"`
+	JobseekerID int64 `json:"jobseeker_id" validate:"required"`
+}

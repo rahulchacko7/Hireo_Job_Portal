@@ -183,3 +183,23 @@ func (jr *jobRepository) ApplyJob(application models.ApplyJob, resumeURL string)
 
 	return jobResponse, nil
 }
+
+func (jr *jobRepository) SaveJobs(jobID, userID int64) (models.SavedJobsResponse, error) {
+
+	var savedJobResponse models.SavedJobsResponse
+
+	result := jr.DB.Exec("INSERT INTO saved_jobs (job_id, jobseeker_id) VALUES (?, ?) ", jobID, userID)
+	if result.Error != nil {
+		return models.SavedJobsResponse{}, fmt.Errorf("error inserting into database: %w", result.Error)
+	}
+	if result.RowsAffected == 0 {
+		return models.SavedJobsResponse{}, errors.New("no rows were affected during insert")
+	}
+
+	err := jr.DB.Raw("SELECT * FROM saved_jobs WHERE job_id = ? AND jobseeker_id = ?", jobID, userID).Scan(&savedJobResponse).Error
+	if err != nil {
+		return models.SavedJobsResponse{}, fmt.Errorf("failed to retrieve saved job: %w", err)
+	}
+
+	return savedJobResponse, nil
+}

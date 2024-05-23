@@ -173,3 +173,31 @@ func (ju *jobUseCase) GetApplicants(employerID int64) ([]models.ApplyJobResponse
 
 	return applicants, nil
 }
+
+func (uc *jobUseCase) SaveJobs(jobID, userID int64) (models.SavedJobsResponse, error) {
+
+	if jobID == 0 || userID == 0 {
+		return models.SavedJobsResponse{}, errors.New("invalid input data")
+	}
+
+	isJobAvailable, err := uc.jobRepository.IsJobExist(int32(jobID))
+	if err != nil {
+		return models.SavedJobsResponse{}, fmt.Errorf("failed to check if job exists: %v", err)
+	}
+
+	if !isJobAvailable {
+		return models.SavedJobsResponse{}, errors.New("job does not exist")
+	}
+
+	savedJob, err := uc.jobRepository.SaveJobs(jobID, userID)
+	if err != nil {
+		return models.SavedJobsResponse{}, fmt.Errorf("failed to save job: %v", err)
+	}
+
+	response := models.SavedJobsResponse{
+		ID:          uint(savedJob.ID),
+		JobID:       savedJob.JobID,
+		JobseekerID: savedJob.JobseekerID,
+	}
+	return response, nil
+}

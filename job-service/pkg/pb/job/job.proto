@@ -16,9 +16,22 @@ service Job {
     rpc UpdateAJob(UpdateAJobRequest) returns (UpdateAJobResponse) {};
     rpc JobSeekerGetAllJobs(JobSeekerGetAllJobsRequest) returns (JobSeekerGetAllJobsResponse) {};
     rpc GetJobDetails(GetJobDetailsRequest) returns (GetJobDetailsResponse) {};
-    rpc ApplyJob(ApplyJobRequest) returns (ApplyJobResponse);
-    rpc GetJobApplications(GetJobApplicationsRequest) returns (GetJobApplicationsResponse);
+    rpc ApplyJob(ApplyJobRequest) returns (ApplyJobResponse){};
+    rpc GetJobApplications(GetJobApplicationsRequest) returns (GetJobApplicationsResponse){};
+    rpc SaveJobs(SaveJobRequest) returns (SaveJobResponse){};
 } 
+
+message SaveJobRequest {
+    string job_id = 1;
+    string user_id = 2;
+}
+
+message SaveJobResponse {
+    string id = 1;
+    string job_id = 2;
+    string user_id = 3;
+    string message = 4;
+}
 
 message GetJobApplicationsRequest {
     string employer_id = 1;
