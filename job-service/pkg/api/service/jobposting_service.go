@@ -317,3 +317,26 @@ func (js *JobServer) DeleteSavedJob(ctx context.Context, req *pb.DeleteSavedJobR
 		Message: "Job deleted successfully",
 	}, nil
 }
+
+func (js *JobServer) GetSavedJobs(ctx context.Context, req *pb.GetSavedJobsRequest) (*pb.GetSavedJobsResponse, error) {
+	userID, err := strconv.ParseInt(req.UserId, 10, 32)
+	if err != nil {
+		return nil, fmt.Errorf("invalid user ID: %w", err)
+	}
+
+	savedJobs, err := js.jobUseCase.GetSavedJobs(int32(userID))
+	if err != nil {
+		return nil, fmt.Errorf("failed to get saved jobs: %w", err)
+	}
+
+	var savedJobsResponse []*pb.SavedJobResponse
+	for _, savedJob := range savedJobs {
+		savedJobsResponse = append(savedJobsResponse, &pb.SavedJobResponse{
+			Id:     strconv.FormatInt(int64(savedJob.ID), 10),
+			JobId:  strconv.FormatInt(savedJob.JobID, 10),
+			UserId: strconv.FormatInt(savedJob.JobseekerID, 10),
+		})
+	}
+
+	return &pb.GetSavedJobsResponse{SavedJobs: savedJobsResponse}, nil
+}

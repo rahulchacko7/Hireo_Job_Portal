@@ -31,6 +31,7 @@ const (
 	Job_GetJobApplications_FullMethodName  = "/job.Job/GetJobApplications"
 	Job_SaveJobs_FullMethodName            = "/job.Job/SaveJobs"
 	Job_DeleteSavedJob_FullMethodName      = "/job.Job/DeleteSavedJob"
+	Job_GetSavedJobs_FullMethodName        = "/job.Job/GetSavedJobs"
 )
 
 // JobClient is the client API for Job service.
@@ -48,6 +49,7 @@ type JobClient interface {
 	GetJobApplications(ctx context.Context, in *GetJobApplicationsRequest, opts ...grpc.CallOption) (*GetJobApplicationsResponse, error)
 	SaveJobs(ctx context.Context, in *SaveJobRequest, opts ...grpc.CallOption) (*SaveJobResponse, error)
 	DeleteSavedJob(ctx context.Context, in *DeleteSavedJobRequest, opts ...grpc.CallOption) (*DeleteSavedJobResponse, error)
+	GetSavedJobs(ctx context.Context, in *GetSavedJobsRequest, opts ...grpc.CallOption) (*GetSavedJobsResponse, error)
 }
 
 type jobClient struct {
@@ -157,6 +159,15 @@ func (c *jobClient) DeleteSavedJob(ctx context.Context, in *DeleteSavedJobReques
 	return out, nil
 }
 
+func (c *jobClient) GetSavedJobs(ctx context.Context, in *GetSavedJobsRequest, opts ...grpc.CallOption) (*GetSavedJobsResponse, error) {
+	out := new(GetSavedJobsResponse)
+	err := c.cc.Invoke(ctx, Job_GetSavedJobs_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // JobServer is the server API for Job service.
 // All implementations must embed UnimplementedJobServer
 // for forward compatibility
@@ -172,6 +183,7 @@ type JobServer interface {
 	GetJobApplications(context.Context, *GetJobApplicationsRequest) (*GetJobApplicationsResponse, error)
 	SaveJobs(context.Context, *SaveJobRequest) (*SaveJobResponse, error)
 	DeleteSavedJob(context.Context, *DeleteSavedJobRequest) (*DeleteSavedJobResponse, error)
+	GetSavedJobs(context.Context, *GetSavedJobsRequest) (*GetSavedJobsResponse, error)
 	mustEmbedUnimplementedJobServer()
 }
 
@@ -211,6 +223,9 @@ func (UnimplementedJobServer) SaveJobs(context.Context, *SaveJobRequest) (*SaveJ
 }
 func (UnimplementedJobServer) DeleteSavedJob(context.Context, *DeleteSavedJobRequest) (*DeleteSavedJobResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteSavedJob not implemented")
+}
+func (UnimplementedJobServer) GetSavedJobs(context.Context, *GetSavedJobsRequest) (*GetSavedJobsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSavedJobs not implemented")
 }
 func (UnimplementedJobServer) mustEmbedUnimplementedJobServer() {}
 
@@ -423,6 +438,24 @@ func _Job_DeleteSavedJob_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Job_GetSavedJobs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetSavedJobsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(JobServer).GetSavedJobs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Job_GetSavedJobs_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(JobServer).GetSavedJobs(ctx, req.(*GetSavedJobsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Job_ServiceDesc is the grpc.ServiceDesc for Job service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -473,6 +506,10 @@ var Job_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteSavedJob",
 			Handler:    _Job_DeleteSavedJob_Handler,
+		},
+		{
+			MethodName: "GetSavedJobs",
+			Handler:    _Job_GetSavedJobs_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

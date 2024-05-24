@@ -16,4 +16,5 @@ type JobUseCase interface {
 	GetApplicants(employerID int64) ([]models.ApplyJobResponse, error)
 	SaveJobs(jobID, userID int64) (models.SavedJobsResponse, error)
 	DeleteSavedJob(jobID, userID int32) error
+	GetSavedJobs(userIdInt int32) ([]models.SavedJobsResponse, error)
 }

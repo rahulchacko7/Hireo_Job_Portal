@@ -331,34 +331,38 @@ func (jc *jobClient) DeleteSavedJob(jobIdInt, userIdInt int32) error {
 	return nil
 }
 
-// func (jc *jobClient) GetSavedJobs(userIdInt int32) ([]models.SavedJobsResponse, error) {
-// 	req := &pb.GetSavedJobsRequest{
-// 		UserId: strconv.FormatInt(int64(userIdInt), 10),
-// 	}
-// 	grpcResponse, err := jc.Client.GetSavedJobs(context.Background(), req)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	var savedJobs []models.SavedJobsResponse
-// 	for _, savedJob := range grpcResponse.SavedJobs {
-// 		jobID, err := strconv.ParseInt(savedJob.JobId, 10, 64)
-// 		if err != nil {
-// 			return nil, err
-// 		}
-// 		userID, err := strconv.ParseInt(savedJob.UserId, 10, 64)
-// 		if err != nil {
-// 			return nil, err
-// 		}
-// 		savedJobID, err := strconv.ParseInt(savedJob.Id, 10, 64)
-// 		if err != nil {
-// 			return nil, err
-// 		}
-// 		savedJobResponse := models.SavedJobsResponse{
-// 			ID:          uint(savedJobID),
-// 			JobID:       uint(jobID),
-// 			JobseekerID: uint(userID),
-// 		}
-// 		savedJobs = append(savedJobs, savedJobResponse)
-// 	}
-// 	return savedJobs, nil
-// }
+func (jc *jobClient) GetASavedJob(userID int32) ([]models.SavedJobsResponse, error) {
+	var savedJobs []models.SavedJobsResponse
+	req := &pb.GetSavedJobsRequest{
+		UserId: strconv.Itoa(int(userID)),
+	}
+
+	grpcResponse, err := jc.Client.GetSavedJobs(context.Background(), req)
+	if err != nil {
+		return savedJobs, err
+	}
+
+	for _, savedJob := range grpcResponse.SavedJobs {
+		jobID, err := strconv.ParseInt(savedJob.JobId, 10, 64)
+		if err != nil {
+			return savedJobs, err
+		}
+		savedJobID, err := strconv.ParseInt(savedJob.Id, 10, 64)
+		if err != nil {
+			return savedJobs, err
+		}
+		jobSeekerId, err := strconv.ParseInt(savedJob.UserId, 10, 64)
+		if err != nil {
+			return savedJobs, err
+		}
+		savedJobResponse := models.SavedJobsResponse{
+			ID:          uint(savedJobID),
+			JobID:       jobID,
+			JobseekerID: jobSeekerId,
+		}
+		savedJobs = append(savedJobs, savedJobResponse)
+	}
+
+	fmt.Println("saved jobs", savedJobs)
+	return savedJobs, nil
+}

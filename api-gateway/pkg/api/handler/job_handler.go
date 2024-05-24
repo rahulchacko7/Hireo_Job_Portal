@@ -393,25 +393,22 @@ func (jh *JobHandler) DeleteSavedJob(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-// func (jh *JobHandler) GetASavedJob(c *gin.Context) {
-// 	jobID, ok := c.Get("job_id")
-// 	if !ok {
-// 		errs := response.ClientResponse(http.StatusBadRequest, "Invalid job ID type", nil, nil)
-// 		c.JSON(http.StatusBadRequest, errs)
-// 		return
-// 	}
-// 	jobIdInt, ok := jobID.(int32)
-// 	if !ok {
-// 		errs := response.ClientResponse(http.StatusBadRequest, "Invalid job ID type", nil, nil)
-// 		c.JSON(http.StatusBadRequest, errs)
-// 		return
-// 	}
-// 	job, err := jh.GRPC_Client.GetASavedJob(jobIdInt)
-// 	if err != nil {
-// 		errs := response.ClientResponse(http.StatusInternalServerError, "Failed to get job", nil, err.Error())
-// 		c.JSON(http.StatusInternalServerError, errs)
-// 		return
-// 	}
-// 	response := response.ClientResponse(http.StatusOK, "Job fetched successfully", job, nil)
-// 	c.JSON(http.StatusOK, response)
-// }
+func (jh *JobHandler) GetASavedJob(c *gin.Context) {
+	userID, userIDExists := c.Get("id")
+	userIdInt, userIDOk := userID.(int32)
+	if !userIDExists || !userIDOk {
+		errs := response.ClientResponse(http.StatusBadRequest, "Invalid or missing user ID", nil, nil)
+		c.JSON(http.StatusBadRequest, errs)
+		return
+	}
+
+	job, err := jh.GRPC_Client.GetASavedJob(userIdInt)
+	fmt.Println("job", job)
+	if err != nil {
+		errs := response.ClientResponse(http.StatusInternalServerError, "Failed to get job", nil, err.Error())
+		c.JSON(http.StatusInternalServerError, errs)
+		return
+	}
+	response := response.ClientResponse(http.StatusOK, "Job fetched successfully", job, nil)
+	c.JSON(http.StatusOK, response)
+}

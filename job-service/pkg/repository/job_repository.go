@@ -223,3 +223,12 @@ func (jr *jobRepository) DeleteSavedJob(jobID, userID int32) error {
 	}
 	return nil
 }
+
+func (jr *jobRepository) GetSavedJobs(userID int32) ([]models.SavedJobsResponse, error) {
+	var savedJobs []models.SavedJobsResponse
+	err := jr.DB.Raw("SELECT * FROM saved_jobs WHERE jobseeker_id = ?", userID).Scan(&savedJobs).Error
+	if err != nil {
+		return nil, fmt.Errorf("failed to retrieve saved jobs: %w", err)
+	}
+	return savedJobs, nil
+}

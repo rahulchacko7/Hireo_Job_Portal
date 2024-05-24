@@ -19,8 +19,23 @@ service Job {
     rpc ApplyJob(ApplyJobRequest) returns (ApplyJobResponse){};
     rpc GetJobApplications(GetJobApplicationsRequest) returns (GetJobApplicationsResponse){};
     rpc SaveJobs(SaveJobRequest) returns (SaveJobResponse){};
-     rpc DeleteSavedJob(DeleteSavedJobRequest) returns (DeleteSavedJobResponse){};
+    rpc DeleteSavedJob(DeleteSavedJobRequest) returns (DeleteSavedJobResponse){};
+    rpc GetSavedJobs(GetSavedJobsRequest) returns (GetSavedJobsResponse) {};
 } 
+
+message GetSavedJobsRequest {
+    string user_id = 1;
+}
+
+message GetSavedJobsResponse {
+    repeated SavedJobResponse saved_jobs = 1;
+}
+
+message SavedJobResponse {
+    string id = 1;
+    string job_id = 2;
+    string user_id = 3;
+}
 
 message DeleteSavedJobRequest {
     string user_id = 1;

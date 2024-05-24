@@ -219,3 +219,12 @@ func (ju *jobUseCase) DeleteSavedJob(jobID, userID int32) error {
 	}
 	return nil
 }
+
+func (ju *jobUseCase) GetSavedJobs(userIdInt int32) ([]models.SavedJobsResponse, error) {
+	savedJobs, err := ju.jobRepository.GetSavedJobs(userIdInt)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get saved jobs: %v", err)
+	}
+
+	return savedJobs, nil
+}
