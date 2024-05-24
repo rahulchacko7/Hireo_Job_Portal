@@ -203,3 +203,23 @@ func (jr *jobRepository) SaveJobs(jobID, userID int64) (models.SavedJobsResponse
 
 	return savedJobResponse, nil
 }
+
+func (jr *jobRepository) IsJobSaved(jobID, userID int32) (bool, error) {
+	var savedJob models.SavedJobsResponse
+	err := jr.DB.Raw("SELECT * FROM saved_jobs WHERE job_id = ? AND jobseeker_id = ?", jobID, userID).Scan(&savedJob).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return false, nil
+		}
+		return false, fmt.Errorf("failed to retrieve saved job: %w", err)
+	}
+	return true, nil
+}
+
+func (jr *jobRepository) DeleteSavedJob(jobID, userID int32) error {
+	result := jr.DB.Exec("DELETE FROM saved_jobs WHERE job_id = ? AND jobseeker_id = ?", jobID, userID)
+	if result.Error != nil {
+		return fmt.Errorf("error deleting saved job: %w", result.Error)
+	}
+	return nil
+}

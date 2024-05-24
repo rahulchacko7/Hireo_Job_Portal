@@ -201,3 +201,21 @@ func (uc *jobUseCase) SaveJobs(jobID, userID int64) (models.SavedJobsResponse, e
 	}
 	return response, nil
 }
+
+func (ju *jobUseCase) DeleteSavedJob(jobID, userID int32) error {
+
+	isJobSaved, err := ju.jobRepository.IsJobSaved(jobID, userID)
+	if err != nil {
+		return fmt.Errorf("failed to check if job is saved: %v", err)
+	}
+
+	if !isJobSaved {
+		return errors.New("job is not saved by the user")
+	}
+
+	err = ju.jobRepository.DeleteSavedJob(jobID, userID)
+	if err != nil {
+		return fmt.Errorf("failed to delete saved job: %v", err)
+	}
+	return nil
+}

@@ -365,40 +365,34 @@ func (jh *JobHandler) SaveAJob(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-// func (jh *JobHandler) DeleteSavedJob(c *gin.Context) {
-// 	jobID, ok := c.Get("job_id")
-// 	if !ok {
-// 		errs := response.ClientResponse(http.StatusBadRequest, "Invalid job ID type", nil, nil)
-// 		c.JSON(http.StatusBadRequest, errs)
-// 		return
-// 	}
-// 	jobIdInt, ok := jobID.(int32)
-// 	if !ok {
-// 		errs := response.ClientResponse(http.StatusBadRequest, "Invalid job ID type", nil, nil)
-// 		c.JSON(http.StatusBadRequest, errs)
-// 		return
-// 	}
-// 	userId, ok := c.Get("id")
-// 	if !ok {
-// 		errs := response.ClientResponse(http.StatusBadRequest, "Invalid user ID type", nil, nil)
-// 		c.JSON(http.StatusBadRequest, errs)
-// 		return
-// 	}
-// 	userIdInt, ok := userId.(int32)
-// 	if !ok {
-// 		errs := response.ClientResponse(http.StatusBadRequest, "Invalid user ID type", nil, nil)
-// 		c.JSON(http.StatusBadRequest, errs)
-// 		return
-// 	}
-// 	err := jh.GRPC_Client.DeleteSavedJob(jobIdInt, userIdInt)
-// 	if err != nil {
-// 		errs := response.ClientResponse(http.StatusInternalServerError, "Failed to delete job", nil, err.Error())
-// 		c.JSON(http.StatusInternalServerError, errs)
-// 		return
-// 	}
-// 	response := response.ClientResponse(http.StatusOK, "Job deleted successfully", nil, nil)
-// 	c.JSON(http.StatusOK, response)
-// }
+func (jh *JobHandler) DeleteSavedJob(c *gin.Context) {
+	jobIDStr := c.Query("job_id")
+	jobIdInt, err := strconv.ParseInt(jobIDStr, 10, 32)
+	if err != nil {
+		errs := response.ClientResponse(http.StatusBadRequest, "Invalid job ID", nil, err.Error())
+		c.JSON(http.StatusBadRequest, errs)
+		return
+	}
+
+	userID, userIDExists := c.Get("id")
+	userIdInt, userIDOk := userID.(int32)
+	if !userIDExists || !userIDOk {
+		errs := response.ClientResponse(http.StatusBadRequest, "Invalid or missing user ID", nil, nil)
+		c.JSON(http.StatusBadRequest, errs)
+		return
+	}
+
+	err = jh.GRPC_Client.DeleteSavedJob(int32(jobIdInt), userIdInt)
+	if err != nil {
+		errs := response.ClientResponse(http.StatusInternalServerError, "Failed to delete job", nil, err.Error())
+		c.JSON(http.StatusInternalServerError, errs)
+		return
+	}
+
+	response := response.ClientResponse(http.StatusOK, "Job deleted successfully", nil, nil)
+	c.JSON(http.StatusOK, response)
+}
+
 // func (jh *JobHandler) GetASavedJob(c *gin.Context) {
 // 	jobID, ok := c.Get("job_id")
 // 	if !ok {

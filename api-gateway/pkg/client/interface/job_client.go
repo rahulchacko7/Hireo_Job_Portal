@@ -16,4 +16,5 @@ type JobClient interface {
 	ApplyJob(jobApplication models.ApplyJob, file *multipart.FileHeader) (models.ApplyJobResponse, error)
 	GetApplicants(employerID int64) ([]models.ApplyJobResponse, error)
 	SaveAJob(userIdInt, jobIdInt int32) (models.SavedJobsResponse, error)
+	DeleteSavedJob(jobIdInt, userIdInt int32) error
 }

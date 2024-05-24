@@ -316,3 +316,49 @@ func (jc *jobClient) SaveAJob(userIdInt, jobIdInt int32) (models.SavedJobsRespon
 	}
 	return response, nil
 }
+
+func (jc *jobClient) DeleteSavedJob(jobIdInt, userIdInt int32) error {
+	req := &pb.DeleteSavedJobRequest{
+		UserId: strconv.FormatInt(int64(userIdInt), 10),
+		JobId:  strconv.FormatInt(int64(jobIdInt), 10),
+	}
+
+	_, err := jc.Client.DeleteSavedJob(context.Background(), req)
+	if err != nil {
+		return fmt.Errorf("failed to delete saved job: %w", err)
+	}
+
+	return nil
+}
+
+// func (jc *jobClient) GetSavedJobs(userIdInt int32) ([]models.SavedJobsResponse, error) {
+// 	req := &pb.GetSavedJobsRequest{
+// 		UserId: strconv.FormatInt(int64(userIdInt), 10),
+// 	}
+// 	grpcResponse, err := jc.Client.GetSavedJobs(context.Background(), req)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	var savedJobs []models.SavedJobsResponse
+// 	for _, savedJob := range grpcResponse.SavedJobs {
+// 		jobID, err := strconv.ParseInt(savedJob.JobId, 10, 64)
+// 		if err != nil {
+// 			return nil, err
+// 		}
+// 		userID, err := strconv.ParseInt(savedJob.UserId, 10, 64)
+// 		if err != nil {
+// 			return nil, err
+// 		}
+// 		savedJobID, err := strconv.ParseInt(savedJob.Id, 10, 64)
+// 		if err != nil {
+// 			return nil, err
+// 		}
+// 		savedJobResponse := models.SavedJobsResponse{
+// 			ID:          uint(savedJobID),
+// 			JobID:       uint(jobID),
+// 			JobseekerID: uint(userID),
+// 		}
+// 		savedJobs = append(savedJobs, savedJobResponse)
+// 	}
+// 	return savedJobs, nil
+// }

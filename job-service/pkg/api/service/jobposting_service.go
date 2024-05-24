@@ -296,3 +296,24 @@ func (js *JobServer) SaveJobs(ctx context.Context, req *pb.SaveJobRequest) (*pb.
 
 	return response, nil
 }
+
+func (js *JobServer) DeleteSavedJob(ctx context.Context, req *pb.DeleteSavedJobRequest) (*pb.DeleteSavedJobResponse, error) {
+	jobID, err := strconv.ParseInt(req.JobId, 10, 32)
+	if err != nil {
+		return nil, fmt.Errorf("invalid job ID: %w", err)
+	}
+
+	userID, err := strconv.ParseInt(req.UserId, 10, 32)
+	if err != nil {
+		return nil, fmt.Errorf("invalid user ID: %w", err)
+	}
+
+	err = js.jobUseCase.DeleteSavedJob(int32(jobID), int32(userID))
+	if err != nil {
+		return nil, fmt.Errorf("failed to delete saved job: %w", err)
+	}
+
+	return &pb.DeleteSavedJobResponse{
+		Message: "Job deleted successfully",
+	}, nil
+}
