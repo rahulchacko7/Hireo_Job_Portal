@@ -38,6 +38,7 @@ func NewServerHTTP(adminHandler *handler.AdminHandler, employerHandler *handler.
 		router.GET("/job-seeker/saved-jobs", jobHandler.GetASavedJob)
 		router.POST("/job-seeker/save-jobs", jobHandler.SaveAJob)
 		router.DELETE("/job-seeker/saved-jobs", jobHandler.DeleteSavedJob)
+		router.POST("job-seeker/apply-saved-job", jobHandler.ApplySavedJob)
 	}
 
 	router.Use(middleware.EmployerAuthMiddleware())

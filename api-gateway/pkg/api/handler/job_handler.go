@@ -412,3 +412,81 @@ func (jh *JobHandler) GetASavedJob(c *gin.Context) {
 	response := response.ClientResponse(http.StatusOK, "Job fetched successfully", job, nil)
 	c.JSON(http.StatusOK, response)
 }
+
+func (jh *JobHandler) ApplySavedJob(c *gin.Context) {
+
+	userID, userIDExists := c.Get("id")
+	userIdInt, userIDOk := userID.(int32)
+	if !userIDExists || !userIDOk {
+		errs := response.ClientResponse(http.StatusBadRequest, "Invalid or missing user ID", nil, nil)
+		c.JSON(http.StatusBadRequest, errs)
+		return
+	}
+
+	jobIDStr := c.PostForm("job_id")
+	jobID, err := strconv.ParseInt(jobIDStr, 10, 64)
+	if err != nil {
+		errs := response.ClientResponse(http.StatusBadRequest, "Invalid job ID", nil, nil)
+		c.JSON(http.StatusBadRequest, errs)
+		return
+	}
+
+	savedJobs, err := jh.GRPC_Client.GetASavedJob(userIdInt)
+	if err != nil {
+		errs := response.ClientResponse(http.StatusInternalServerError, "Failed to check saved jobs", nil, err.Error())
+		c.JSON(http.StatusInternalServerError, errs)
+		return
+	}
+
+	jobIsSaved := false
+	for _, savedJob := range savedJobs {
+		if savedJob.JobID == jobID {
+			jobIsSaved = true
+			break
+		}
+	}
+
+	if !jobIsSaved {
+		errs := response.ClientResponse(http.StatusNotFound, "No such saved job found", nil, nil)
+		c.JSON(http.StatusNotFound, errs)
+		return
+	}
+
+	var jobApplication models.ApplyJob
+	jobApplication.JobID = jobID
+	jobApplication.CoverLetter = c.PostForm("cover_letter")
+	jobApplication.JobseekerID = int64(userIdInt)
+
+	file, err := c.FormFile("resume")
+	if err != nil {
+		errorRes := response.ClientResponse(http.StatusBadRequest, "Error in getting resume file", nil, err.Error())
+		c.JSON(http.StatusBadRequest, errorRes)
+		return
+	}
+
+	filePath := fmt.Sprintf("uploads/resumes/%d_%s", jobApplication.JobID, file.Filename)
+	if err := c.SaveUploadedFile(file, filePath); err != nil {
+		errorRes := response.ClientResponse(http.StatusInternalServerError, "Failed to save resume file", nil, err.Error())
+		c.JSON(http.StatusInternalServerError, errorRes)
+		return
+	}
+
+	fileBytes, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		errorRes := response.ClientResponse(http.StatusInternalServerError, "Failed to read resume file", nil, err.Error())
+		c.JSON(http.StatusInternalServerError, errorRes)
+		return
+	}
+	jobApplication.Resume = fileBytes
+	jobApplication.ResumeURL = filePath
+
+	res, err := jh.GRPC_Client.ApplyJob(jobApplication, file)
+	if err != nil {
+		errorRes := response.ClientResponse(http.StatusInternalServerError, "Failed to apply for job", nil, err.Error())
+		c.JSON(http.StatusInternalServerError, errorRes)
+		return
+	}
+
+	successRes := response.ClientResponse(http.StatusOK, "Job applied successfully", res, nil)
+	c.JSON(http.StatusOK, successRes)
+}
