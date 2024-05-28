@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"time"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -339,4 +340,60 @@ func (js *JobServer) GetSavedJobs(ctx context.Context, req *pb.GetSavedJobsReque
 	}
 
 	return &pb.GetSavedJobsResponse{SavedJobs: savedJobsResponse}, nil
+}
+
+func (js *JobServer) ScheduleInterview(ctx context.Context, req *pb.ScheduleInterviewRequest) (*pb.ScheduleInterviewResponse, error) {
+	jobID, err := strconv.ParseInt(req.JobId, 10, 64)
+	if err != nil {
+		return nil, fmt.Errorf("invalid job ID: %w", err)
+	}
+	jobseekerID, err := strconv.ParseInt(req.JobseekerId, 10, 64)
+	if err != nil {
+		return nil, fmt.Errorf("invalid jobseeker ID: %w", err)
+	}
+	employerID, err := strconv.ParseInt(req.EmployerId, 10, 64)
+	if err != nil {
+		return nil, fmt.Errorf("invalid employer ID: %w", err)
+	}
+	scheduledTime, err := time.Parse(time.RFC3339, req.ScheduledTime)
+	if err != nil {
+		return nil, fmt.Errorf("invalid scheduled time: %w", err)
+	}
+
+	mode := req.Mode
+	if mode != "ONLINE" && mode != "OFFLINE" {
+		return nil, fmt.Errorf("invalid mode: must be either 'ONLINE' or 'OFFLINE'")
+	}
+
+	status := req.Status
+	if status != "SCHEDULED" && status != "COMPLETED" && status != "CANCELLED" {
+		return nil, fmt.Errorf("invalid status: must be 'SCHEDULED', 'COMPLETED', or 'CANCELLED'")
+	}
+
+	interview := models.Interview{
+		JobID:         jobID,
+		JobseekerID:   jobseekerID,
+		EmployerID:    employerID,
+		ScheduledTime: scheduledTime,
+		Mode:          mode,
+		Link:          req.Link,
+		Status:        status,
+	}
+
+	savedInterview, err := js.jobUseCase.saveInterview(interview)
+	if err != nil {
+		return nil, fmt.Errorf("failed to schedule interview: %w", err)
+	}
+
+	response := &pb.ScheduleInterviewResponse{
+		JobId:         strconv.FormatInt(savedInterview.JobID, 10),
+		JobseekerId:   strconv.FormatInt(savedInterview.JobseekerID, 10),
+		EmployerId:    strconv.FormatInt(savedInterview.EmployerID, 10),
+		ScheduledTime: savedInterview.ScheduledTime.Format(time.RFC3339),
+		Mode:          savedInterview.Mode,
+		Link:          savedInterview.Link,
+		Status:        savedInterview.Status,
+	}
+
+	return response, nil
 }

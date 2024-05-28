@@ -19,5 +19,6 @@ type JobRepository interface {
 	IsJobSaved(jobID, userID int32) (bool, error)
 	DeleteSavedJob(jobID, userID int32) error
 	GetSavedJobs(userIdInt int32) ([]models.SavedJobsResponse, error)
+	SaveInterview(interview models.Interview) (models.InterviewResponse, error)
 	UpdateAJob(employerID int32, jobID int32, jobDetails models.JobOpening) (models.JobOpeningResponse, error)
 }

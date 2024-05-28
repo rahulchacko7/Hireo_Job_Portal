@@ -10,6 +10,7 @@ import (
 	"io"
 	"mime/multipart"
 	"strconv"
+	"time"
 
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -365,4 +366,34 @@ func (jc *jobClient) GetASavedJob(userID int32) ([]models.SavedJobsResponse, err
 
 	fmt.Println("saved jobs", savedJobs)
 	return savedJobs, nil
+}
+
+func (jc *jobClient) ScheduleInterview(interview models.Interview) (models.InterviewResponse, error) {
+	var interviewResponse models.InterviewResponse
+
+	req := &pb.ScheduleInterviewRequest{
+		JobId:         strconv.FormatInt(interview.JobID, 10),
+		JobseekerId:   strconv.FormatInt(interview.JobseekerID, 10),
+		EmployerId:    strconv.FormatInt(interview.EmployerID, 10),
+		ScheduledTime: interview.ScheduledTime.Format(time.RFC3339),
+		Mode:          interview.Mode,
+		Link:          interview.Link,
+		Status:        interview.Status,
+	}
+
+	grpcResponse, err := jc.Client.ScheduleInterview(context.Background(), req)
+	if err != nil {
+		return interviewResponse, err
+	}
+
+	//interviewResponse.ID, _ = grpcResponse.Id
+	interviewResponse.JobID, _ = strconv.ParseInt(grpcResponse.JobId, 10, 64)
+	interviewResponse.JobseekerID, _ = strconv.ParseInt(grpcResponse.JobseekerId, 10, 64)
+	interviewResponse.EmployerID, _ = strconv.ParseInt(grpcResponse.EmployerId, 10, 64)
+	interviewResponse.ScheduledTime, _ = time.Parse(time.RFC3339, grpcResponse.ScheduledTime)
+	interviewResponse.Mode = grpcResponse.Mode
+	interviewResponse.Link = grpcResponse.Link
+	interviewResponse.Status = grpcResponse.Status
+
+	return interviewResponse, nil
 }

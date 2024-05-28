@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -488,5 +489,75 @@ func (jh *JobHandler) ApplySavedJob(c *gin.Context) {
 	}
 
 	successRes := response.ClientResponse(http.StatusOK, "Job applied successfully", res, nil)
+	c.JSON(http.StatusOK, successRes)
+}
+func (jh *JobHandler) ScheduleInterview(c *gin.Context) {
+	empID, userIDExists := c.Get("id")
+	employerIDInt, userIDOk := empID.(int64)
+	if !userIDExists || !userIDOk {
+		errs := response.ClientResponse(http.StatusBadRequest, "Invalid or missing user ID", nil, nil)
+		c.JSON(http.StatusBadRequest, errs)
+		return
+	}
+
+	jobID, err := strconv.ParseInt(c.Query("job_id"), 10, 64)
+	if err != nil {
+		errorRes := response.ClientResponse(http.StatusBadRequest, "Invalid job ID", nil, err.Error())
+		c.JSON(http.StatusBadRequest, errorRes)
+		return
+	}
+
+	jobseekerID, err := strconv.ParseInt(c.Query("jobseeker_id"), 10, 64)
+	if err != nil {
+		errorRes := response.ClientResponse(http.StatusBadRequest, "Invalid jobseeker ID", nil, err.Error())
+		c.JSON(http.StatusBadRequest, errorRes)
+		return
+	}
+
+	interviewDate, err := time.Parse("2006-01-02", c.Query("interview_date"))
+	if err != nil {
+		errorRes := response.ClientResponse(http.StatusBadRequest, "Invalid interview date", nil, err.Error())
+		c.JSON(http.StatusBadRequest, errorRes)
+		return
+	}
+
+	interviewTime, err := time.Parse("15:04", c.Query("interview_time"))
+	if err != nil {
+		errorRes := response.ClientResponse(http.StatusBadRequest, "Invalid interview time", nil, err.Error())
+		c.JSON(http.StatusBadRequest, errorRes)
+		return
+	}
+
+	interviewLink := c.Query("link")
+	interviewType := c.Query("interview_type")
+	if interviewType != "ONLINE" && interviewType != "OFFLINE" {
+		errorRes := response.ClientResponse(http.StatusBadRequest, "Invalid interview type", nil, "Interview type must be ONLINE or OFFLINE")
+		c.JSON(http.StatusBadRequest, errorRes)
+		return
+	}
+
+	scheduledTime := time.Date(
+		interviewDate.Year(), interviewDate.Month(), interviewDate.Day(),
+		interviewTime.Hour(), interviewTime.Minute(), 0, 0, time.UTC,
+	)
+
+	interview := models.Interview{
+		JobID:         jobID,
+		JobseekerID:   jobseekerID,
+		EmployerID:    employerIDInt,
+		ScheduledTime: scheduledTime,
+		Mode:          interviewType,
+		Link:          interviewLink,
+		Status:        "SCHEDULED",
+	}
+
+	scheduledInterview, err := jh.GRPC_Client.ScheduleInterview(interview)
+	if err != nil {
+		errorRes := response.ClientResponse(http.StatusInternalServerError, "Failed to schedule interview", nil, err.Error())
+		c.JSON(http.StatusInternalServerError, errorRes)
+		return
+	}
+
+	successRes := response.ClientResponse(http.StatusOK, "Interview scheduled successfully", scheduledInterview, nil)
 	c.JSON(http.StatusOK, successRes)
 }

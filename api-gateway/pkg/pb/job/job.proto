@@ -21,7 +21,30 @@ service Job {
     rpc SaveJobs(SaveJobRequest) returns (SaveJobResponse){};
     rpc DeleteSavedJob(DeleteSavedJobRequest) returns (DeleteSavedJobResponse){};
     rpc GetSavedJobs(GetSavedJobsRequest) returns (GetSavedJobsResponse) {};
+    rpc ScheduleInterview(ScheduleInterviewRequest) returns (ScheduleInterviewResponse) {};
 } 
+
+message ScheduleInterviewRequest {
+  string job_id = 1;
+  string jobseeker_id = 2;
+  string employer_id = 3;
+  string scheduled_time = 4;
+  string mode = 5;  // e.g., "ONLINE" or "OFFLINE"
+  string link = 6;
+  string status = 7;  // e.g., "SCHEDULED", "COMPLETED", "CANCELLED"
+}
+
+message ScheduleInterviewResponse {
+  string id = 1;
+  string job_id = 2;
+  string jobseeker_id = 3;
+  string employer_id = 4;
+  string scheduled_time = 5;
+  string mode = 6;
+  string link = 7;
+  string status = 8;
+}
+
 
 message GetSavedJobsRequest {
     string user_id = 1;
