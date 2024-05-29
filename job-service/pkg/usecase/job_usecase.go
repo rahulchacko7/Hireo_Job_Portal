@@ -229,7 +229,7 @@ func (ju *jobUseCase) GetSavedJobs(userIdInt int32) ([]models.SavedJobsResponse,
 	return savedJobs, nil
 }
 
-func (ju *jobUseCase) SaveInterview(saveInterview models.Interview) (models.InterviewResponse, error) {
+func (ju *jobUseCase) ScheduleInterview(saveInterview models.Interview) (models.InterviewResponse, error) {
 	jobID := saveInterview.JobID
 	isJobAvailable, err := ju.jobRepository.IsJobExist(int32(jobID))
 	if err != nil {
@@ -240,7 +240,9 @@ func (ju *jobUseCase) SaveInterview(saveInterview models.Interview) (models.Inte
 		return models.InterviewResponse{}, errors.New("job does not exist")
 	}
 
-	savedInterview, err := ju.jobRepository.SaveInterview(saveInterview)
+	savedInterview, err := ju.jobRepository.ScheduleInterview(saveInterview)
+
+	fmt.Println("savedInterview", savedInterview)
 	if err != nil {
 		return models.InterviewResponse{}, fmt.Errorf("failed to save interview: %v", err)
 	}

@@ -492,8 +492,8 @@ func (jh *JobHandler) ApplySavedJob(c *gin.Context) {
 	c.JSON(http.StatusOK, successRes)
 }
 func (jh *JobHandler) ScheduleInterview(c *gin.Context) {
-	empID, userIDExists := c.Get("id")
-	employerIDInt, userIDOk := empID.(int64)
+	userID, userIDExists := c.Get("id")
+	employerIDInt, userIDOk := userID.(int32)
 	if !userIDExists || !userIDOk {
 		errs := response.ClientResponse(http.StatusBadRequest, "Invalid or missing user ID", nil, nil)
 		c.JSON(http.StatusBadRequest, errs)

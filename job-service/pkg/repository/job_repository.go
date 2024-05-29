@@ -247,29 +247,15 @@ func (jr *jobRepository) GetSavedJobs(userID int32) ([]models.SavedJobsResponse,
 	return savedJobs, nil
 }
 
-func (jr *jobRepository) SaveInterview(interview models.Interview) (models.InterviewResponse, error) {
+func (jr *jobRepository) ScheduleInterview(interview models.Interview) (models.InterviewResponse, error) {
+	var Data models.InterviewResponse
 	query := `
-			INSERT INTO interviews (job_id, jobseeker_id, employer_id, scheduled_time, mode, link, status)
-			VALUES (?, ?, ?, ?, ?, ?, ?)
-		`
-	result, err := jr.DB.Exec(query, interview.JobID, interview.JobseekerID, interview.EmployerID, interview.ScheduledTime, interview.Mode, interview.Link, interview.Status)
+		INSERT INTO interviews (job_id, jobseeker_id, employer_id, scheduled_time, mode, link, status)
+		VALUES (?, ?, ?, ?, ?, ?, ?) returning id, job_id, jobseeker_id, employer_id, scheduled_time, mode, link, status
+	`
+	err := jr.DB.Raw(query, interview.JobID, interview.JobseekerID, interview.EmployerID, interview.ScheduledTime, interview.Mode, interview.Link, interview.Status).Scan(&Data).Error
 	if err != nil {
 		return models.InterviewResponse{}, fmt.Errorf("failed to save interview: %v", err)
 	}
-
-	interviewID, err := result.LastInsertId()
-	if err != nil {
-		return models.InterviewResponse{}, fmt.Errorf("failed to retrieve last insert ID: %v", err)
-	}
-
-	return models.InterviewResponse{
-		ID:            uint(interviewID),
-		JobID:         interview.JobID,
-		JobseekerID:   interview.JobseekerID,
-		EmployerID:    interview.EmployerID,
-		ScheduledTime: interview.ScheduledTime,
-		Mode:          interview.Mode,
-		Link:          interview.Link,
-		Status:        interview.Status,
-	}, nil
+	return Data, nil
 }

@@ -374,7 +374,7 @@ func (jc *jobClient) ScheduleInterview(interview models.Interview) (models.Inter
 	req := &pb.ScheduleInterviewRequest{
 		JobId:         strconv.FormatInt(interview.JobID, 10),
 		JobseekerId:   strconv.FormatInt(interview.JobseekerID, 10),
-		EmployerId:    strconv.FormatInt(interview.EmployerID, 10),
+		EmployerId:    interview.EmployerID,
 		ScheduledTime: interview.ScheduledTime.Format(time.RFC3339),
 		Mode:          interview.Mode,
 		Link:          interview.Link,
@@ -386,10 +386,16 @@ func (jc *jobClient) ScheduleInterview(interview models.Interview) (models.Inter
 		return interviewResponse, err
 	}
 
-	//interviewResponse.ID, _ = grpcResponse.Id
+	// Convert string ID to int64 first
+	idInt64, err := strconv.ParseInt(grpcResponse.Id, 10, 64)
+	if err != nil {
+		return interviewResponse, fmt.Errorf("failed to parse ID: %w", err)
+	}
+
+	interviewResponse.ID = uint(idInt64)
 	interviewResponse.JobID, _ = strconv.ParseInt(grpcResponse.JobId, 10, 64)
 	interviewResponse.JobseekerID, _ = strconv.ParseInt(grpcResponse.JobseekerId, 10, 64)
-	interviewResponse.EmployerID, _ = strconv.ParseInt(grpcResponse.EmployerId, 10, 64)
+	interviewResponse.EmployerID = grpcResponse.EmployerId
 	interviewResponse.ScheduledTime, _ = time.Parse(time.RFC3339, grpcResponse.ScheduledTime)
 	interviewResponse.Mode = grpcResponse.Mode
 	interviewResponse.Link = grpcResponse.Link

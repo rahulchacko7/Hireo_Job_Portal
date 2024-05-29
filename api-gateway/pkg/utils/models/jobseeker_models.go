@@ -64,9 +64,10 @@ type SavedJobsResponse struct {
 }
 
 type Interview struct {
+	ID            uint      `json:"id"`
 	JobID         int64     `json:"job_id" validate:"required"`
 	JobseekerID   int64     `json:"jobseeker_id" validate:"required"`
-	EmployerID    int64     `json:"employer_id" validate:"required"`
+	EmployerID    int32     `json:"employer_id" validate:"required"`
 	ScheduledTime time.Time `json:"scheduled_time" validate:"required"`
 	Mode          string    `json:"mode" validate:"oneof=ONLINE OFFLINE" default:"ONLINE"`
 	Link          string    `json:"link,omitempty"`
@@ -77,7 +78,7 @@ type InterviewResponse struct {
 	ID            uint      `json:"id"`
 	JobID         int64     `json:"job_id" validate:"required"`
 	JobseekerID   int64     `json:"jobseeker_id" validate:"required"`
-	EmployerID    int64     `json:"employer_id" validate:"required"`
+	EmployerID    int32     `json:"employer_id" validate:"required"`
 	ScheduledTime time.Time `json:"scheduled_time" validate:"required"`
 	Mode          string    `json:"mode" validate:"oneof=ONLINE OFFLINE" default:"ONLINE"`
 	Link          string    `json:"link,omitempty"`
