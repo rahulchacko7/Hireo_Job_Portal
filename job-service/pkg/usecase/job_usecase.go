@@ -249,3 +249,11 @@ func (ju *jobUseCase) ScheduleInterview(saveInterview models.Interview) (models.
 
 	return savedInterview, nil
 }
+
+func (ju *jobUseCase) GetInterview(jobID, employerID int32) (models.InterviewResponse, error) {
+	interview, err := ju.jobRepository.GetInterview(jobID, employerID)
+	if err != nil {
+		return models.InterviewResponse{}, fmt.Errorf("failed to get interview: %v", err)
+	}
+	return interview, nil
+}

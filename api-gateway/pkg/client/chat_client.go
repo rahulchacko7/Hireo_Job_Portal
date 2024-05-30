@@ -28,6 +28,10 @@ func NewChatClient(cfg config.Config) *ChatClient {
 }
 
 func (c *ChatClient) GetChat(userID string, req models.ChatRequest) ([]models.TempMessage, error) {
+	if c.Client == nil {
+		return nil, fmt.Errorf("gRPC client is not initialized")
+	}
+
 	data, err := c.Client.GetFriendChat(context.Background(), &pb.GetFriendChatRequest{
 		UserID:   userID,
 		FriendID: req.FriendID,
@@ -35,8 +39,9 @@ func (c *ChatClient) GetChat(userID string, req models.ChatRequest) ([]models.Te
 		Limit:    req.Limit,
 	})
 	if err != nil {
-		return []models.TempMessage{}, err
+		return nil, err
 	}
+
 	var response []models.TempMessage
 	for _, v := range data.FriendChat {
 		chatResponse := models.TempMessage{
@@ -46,7 +51,7 @@ func (c *ChatClient) GetChat(userID string, req models.ChatRequest) ([]models.Te
 			Timestamp:   v.Timestamp,
 		}
 		response = append(response, chatResponse)
-
 	}
+
 	return response, nil
 }

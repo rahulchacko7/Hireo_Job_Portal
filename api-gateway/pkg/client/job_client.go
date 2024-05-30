@@ -385,8 +385,6 @@ func (jc *jobClient) ScheduleInterview(interview models.Interview) (models.Inter
 	if err != nil {
 		return interviewResponse, err
 	}
-
-	// Convert string ID to int64 first
 	idInt64, err := strconv.ParseInt(grpcResponse.Id, 10, 64)
 	if err != nil {
 		return interviewResponse, fmt.Errorf("failed to parse ID: %w", err)
@@ -403,3 +401,54 @@ func (jc *jobClient) ScheduleInterview(interview models.Interview) (models.Inter
 
 	return interviewResponse, nil
 }
+
+func (jc *jobClient) GetInterview(jobID, employerID int32) (models.InterviewResponse, error) {
+	var interviewResponse models.InterviewResponse
+	req := &pb.GetInterviewRequest{
+		JobId:      strconv.FormatInt(int64(jobID), 10),
+		EmployerId: employerID,
+	}
+	grpcResponse, err := jc.Client.GetInterview(context.Background(), req)
+	if err != nil {
+		return interviewResponse, err
+	}
+
+	interviewResponse.ID = uint(grpcResponse.Id)
+	interviewResponse.JobID = int64(grpcResponse.JobId)
+	interviewResponse.JobseekerID = int64(grpcResponse.JobseekerId)
+	interviewResponse.EmployerID = grpcResponse.EmployerId
+	interviewResponse.ScheduledTime = grpcResponse.ScheduledTime.AsTime()
+	interviewResponse.Mode = grpcResponse.Mode
+	interviewResponse.Link = grpcResponse.Link
+	interviewResponse.Status = grpcResponse.Status
+
+	return interviewResponse, nil
+}
+
+// func (jc *jobClient) GetAnApplicant(jobID, employerID, jobseekerIdInt int32) (models.ApplyJobResponse, error) {
+// 	var applyJobResponse models.ApplyJobResponse
+// 	req := &pb.GetAnApplicantRequest{
+// 		JobId:       strconv.FormatInt(int64(jobID), 10),
+// 		EmployerId:  employerID,
+// 		JobseekerId: strconv.FormatInt(int64(jobseekerIdInt), 10),
+// 	}
+// 	grpcResponse, err := jc.Client.GetAnApplicant(context.Background(), req)
+// 	if err != nil {
+// 		return applyJobResponse, err
+// 	}
+// 	idInt64, err := strconv.ParseInt(grpcResponse.Id, 10, 64)
+// 	if err != nil {
+// 		return applyJobResponse, err
+// 	}
+// 	jobseekerIdInt64, err := strconv.ParseInt(grpcResponse.JobseekerId, 10, 64)
+// 	if err != nil {
+// 		return applyJobResponse, err
+// 	}
+// 	applyJobResponse.ID = uint(idInt64)
+// 	applyJobResponse.JobID = int64(jobID)
+// 	applyJobResponse.JobseekerID = jobseekerIdInt64
+// 	applyJobResponse.EmployerID = employerID
+// 	applyJobResponse.Status = grpcResponse.Status
+// 	applyJobResponse.AppliedTime = grpcResponse.AppliedTime.AsTime()
+// 	return applyJobResponse, nil
+// }

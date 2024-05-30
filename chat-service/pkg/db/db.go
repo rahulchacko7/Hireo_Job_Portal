@@ -12,9 +12,8 @@ import (
 )
 
 func ConnectDatabase(c config.Config) (*mongo.Database, error) {
-	fmt.Println("ksajdfkjdahfjkg ", c.DBUri)
 	ctx := context.TODO()
-	mongoConn := options.Client().ApplyURI("mongodb://localhost:27017/mydatabase")
+	mongoConn := options.Client().ApplyURI(c.DBUri)
 	mongoClient, err := mongo.Connect(ctx, mongoConn)
 	if err != nil {
 		return nil, err

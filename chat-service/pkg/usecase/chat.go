@@ -1,7 +1,6 @@
 package usecase
 
 import (
-	"chat/pkg/config"
 	"chat/pkg/helper"
 	"chat/pkg/pb/auth"
 	interfaces "chat/pkg/repository/interface"
@@ -27,20 +26,20 @@ func NewChatUseCase(repository interfaces.ChatRepository, authclient auth.AuthSe
 }
 
 func (c *ChatUseCase) MessageConsumer() {
-	cfg, err := config.LoadConfig()
-	if err != nil {
-		fmt.Println("Error loading config:", err)
-		return
-	}
+	// cfg, err := config.LoadConfig()
+	// if err != nil {
+	// 	fmt.Println("Error loading config:", err)
+	// 	return
+	// }
 
 	configs := sarama.NewConfig()
-	consumer, err := sarama.NewConsumer([]string{cfg.KafkaBrokers}, configs)
+	consumer, err := sarama.NewConsumer([]string{"localhost:9092"}, configs)
 	if err != nil {
 		fmt.Println("Error creating Kafka consumer:", err)
 		return
 	}
 	defer consumer.Close()
-	partitionConsumer, err := consumer.ConsumePartition(cfg.KafkaTopic, 0, sarama.OffsetNewest)
+	partitionConsumer, err := consumer.ConsumePartition("test", 0, sarama.OffsetNewest)
 	if err != nil {
 		fmt.Println("Error creating partition consumer:", err)
 		return

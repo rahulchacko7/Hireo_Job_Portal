@@ -18,4 +18,5 @@ type JobUseCase interface {
 	DeleteSavedJob(jobID, userID int32) error
 	GetSavedJobs(userIdInt int32) ([]models.SavedJobsResponse, error)
 	ScheduleInterview(saveInterview models.Interview) (models.InterviewResponse, error)
+	GetInterview(jobID, employerID int32) (models.InterviewResponse, error)
 }

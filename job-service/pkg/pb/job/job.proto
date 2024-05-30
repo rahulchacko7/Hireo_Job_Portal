@@ -22,7 +22,24 @@ service Job {
     rpc DeleteSavedJob(DeleteSavedJobRequest) returns (DeleteSavedJobResponse){};
     rpc GetSavedJobs(GetSavedJobsRequest) returns (GetSavedJobsResponse) {};
     rpc ScheduleInterview(ScheduleInterviewRequest) returns (ScheduleInterviewResponse) {};
+    rpc GetInterview(GetInterviewRequest) returns (GetInterviewsResponse) {};
 } 
+
+message GetInterviewRequest {
+    string job_id = 1;
+    int32 employer_id = 2;
+}
+
+message GetInterviewsResponse {
+    uint64 id = 1;
+    uint64 job_id = 2;
+    uint64 jobseeker_id = 3;
+    int32 employer_id = 4;
+    google.protobuf.Timestamp scheduled_time = 5;
+    string mode = 6;
+    string link = 7;
+    string status = 8;
+}
 
 message ScheduleInterviewRequest {
     string job_id = 1;
@@ -44,7 +61,6 @@ message ScheduleInterviewResponse {
     string link = 7;
     string status = 8;
 }
-
 
 message GetSavedJobsRequest {
     string user_id = 1;

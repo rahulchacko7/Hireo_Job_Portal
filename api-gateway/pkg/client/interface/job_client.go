@@ -19,4 +19,6 @@ type JobClient interface {
 	DeleteSavedJob(jobIdInt, userIdInt int32) error
 	GetASavedJob(userIdInt int32) ([]models.SavedJobsResponse, error)
 	ScheduleInterview(interview models.Interview) (models.InterviewResponse, error)
+	GetInterview(jobID, employerID int32) (models.InterviewResponse, error)
+	//GetAnApplicant(jobID, employerID, jobseekerIdInt int32) (models.ApplyJobResponse, error)
 }

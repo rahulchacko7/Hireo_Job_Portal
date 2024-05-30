@@ -5,6 +5,7 @@ import (
 	interfaces "chat/pkg/usecase/interface"
 	models "chat/pkg/utils"
 	"context"
+	"fmt"
 	"time"
 )
 
@@ -20,6 +21,7 @@ func NewChatServer(UseCaseChat interfaces.ChatUseCase) pb.ChatServiceServer {
 }
 
 func (c *ChatServer) GetFriendChat(ctx context.Context, req *pb.GetFriendChatRequest) (*pb.GetFriendChatResponse, error) {
+	fmt.Println("line service1")
 	ind, _ := time.LoadLocation("Asia/Kolkata")
 	result, err := c.chatUseCase.GetFriendChat(req.UserID, req.FriendID, models.Pagination{Limit: req.Limit, OffSet: req.OffSet})
 	if err != nil {

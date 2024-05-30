@@ -561,3 +561,69 @@ func (jh *JobHandler) ScheduleInterview(c *gin.Context) {
 	successRes := response.ClientResponse(http.StatusOK, "Interview scheduled successfully", scheduledInterview, nil)
 	c.JSON(http.StatusOK, successRes)
 }
+
+func (jh *JobHandler) GetInterviews(c *gin.Context) {
+	userID, userIDExists := c.Get("id")
+	if !userIDExists {
+		errs := response.ClientResponse(http.StatusBadRequest, "Invalid or missing user ID", nil, nil)
+		c.JSON(http.StatusBadRequest, errs)
+		return
+	}
+	employerID, ok := userID.(int32)
+	if !ok {
+		errs := response.ClientResponse(http.StatusBadRequest, "Invalid user ID type", nil, nil)
+		c.JSON(http.StatusBadRequest, errs)
+		return
+	}
+	jobIDStr := c.Query("job_id")
+	jobID, err := strconv.ParseInt(jobIDStr, 10, 32)
+	if err != nil {
+		errs := response.ClientResponse(http.StatusBadRequest, "Invalid job ID", nil, err.Error())
+		c.JSON(http.StatusBadRequest, errs)
+		return
+	}
+	getInterview, err := jh.GRPC_Client.GetInterview(int32(jobID), employerID)
+	fmt.Println("getInterview", getInterview)
+	if err != nil {
+		errorRes := response.ClientResponse(http.StatusInternalServerError, "Failed to fetch interview details", nil, err.Error())
+		c.JSON(http.StatusInternalServerError, errorRes)
+		return
+	}
+	successRes := response.ClientResponse(http.StatusOK, "Interview details fetched successfully", getInterview, nil)
+	c.JSON(http.StatusOK, successRes)
+}
+
+// func (jh *JobHandler) GetAnApplicant(c *gin.Context) {
+// 	jobIDStr := c.Query("job_id")
+// 	jobID, err := strconv.ParseInt(jobIDStr, 10, 32)
+// 	if err != nil {
+// 		errs := response.ClientResponse(http.StatusBadRequest, "Invalid job ID", nil, err.Error())
+// 		c.JSON(http.StatusBadRequest, errs)
+// 		return
+// 	}
+
+// 	jobseekerId := c.Query("jobseeker_id")
+// 	jobseekerIdInt, err := strconv.ParseInt(jobseekerId, 10, 32)
+// 	if err != nil {
+// 		errs := response.ClientResponse(http.StatusBadRequest, "Invalid job ID", nil, err.Error())
+// 		c.JSON(http.StatusBadRequest, errs)
+// 		return
+// 	}
+
+// 	employerID, userIDExists := c.Get("id")
+// 	if !userIDExists {
+// 		errs := response.ClientResponse(http.StatusBadRequest, "Invalid or missing user ID", nil, nil)
+// 		c.JSON(http.StatusBadRequest, errs)
+// 		return
+// 	}
+
+// 	getAllApplicants, err := jh.GRPC_Client.GetAnApplicant(int32(jobID), employerID, jobseekerIdInt)
+
+// 	if err != nil {
+// 		errorRes := response.ClientResponse(http.StatusInternalServerError, "Failed to fetch interview details", nil, err.Error())
+// 		c.JSON(http.StatusInternalServerError, errorRes)
+// 		return
+// 	}
+// 	successRes := response.ClientResponse(http.StatusOK, "Interview details fetched successfully", getAllApplicants, nil)
+// 	c.JSON(http.StatusOK, successRes)
+// }

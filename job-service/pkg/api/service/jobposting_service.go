@@ -351,7 +351,7 @@ func (js *JobServer) ScheduleInterview(ctx context.Context, req *pb.ScheduleInte
 	if err != nil {
 		return nil, fmt.Errorf("invalid jobseeker ID: %w", err)
 	}
-	// No need to parse EmployerId as it's already int32
+
 	employerID := req.EmployerId
 	scheduledTime, err := time.Parse(time.RFC3339, req.ScheduledTime)
 	if err != nil {
@@ -392,6 +392,31 @@ func (js *JobServer) ScheduleInterview(ctx context.Context, req *pb.ScheduleInte
 		Mode:          savedInterview.Mode,
 		Link:          savedInterview.Link,
 		Status:        savedInterview.Status,
+	}
+
+	return response, nil
+}
+func (js *JobServer) GetInterview(ctx context.Context, req *pb.GetInterviewRequest) (*pb.GetInterviewsResponse, error) {
+	jobID, err := strconv.ParseInt(req.JobId, 10, 64)
+	if err != nil {
+		return nil, fmt.Errorf("invalid job ID: %w", err)
+	}
+	employerID := req.EmployerId
+
+	interviewDetails, err := js.jobUseCase.GetInterview(int32(jobID), employerID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get interview details: %w", err)
+	}
+
+	response := &pb.GetInterviewsResponse{
+		Id:            uint64(interviewDetails.ID),
+		JobId:         uint64(interviewDetails.JobID),
+		JobseekerId:   uint64(interviewDetails.JobseekerID),
+		EmployerId:    employerID,
+		ScheduledTime: timestamppb.New(interviewDetails.ScheduledTime),
+		Mode:          interviewDetails.Mode,
+		Link:          interviewDetails.Link,
+		Status:        interviewDetails.Status,
 	}
 
 	return response, nil

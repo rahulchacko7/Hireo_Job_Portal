@@ -259,3 +259,14 @@ func (jr *jobRepository) ScheduleInterview(interview models.Interview) (models.I
 	}
 	return Data, nil
 }
+
+func (jr *jobRepository) GetInterview(jobID, employerID int32) (models.InterviewResponse, error) {
+	var Data models.InterviewResponse
+	fmt.Println("job,emp", jobID, employerID)
+	err := jr.DB.Raw("SELECT * FROM interviews WHERE job_id = ? AND employer_id = ?", jobID, employerID).Scan(&Data).Error
+	if err != nil {
+		return models.InterviewResponse{}, fmt.Errorf("failed to retrieve interview: %v", err)
+	}
+	fmt.Println("Data", Data)
+	return Data, nil
+}
