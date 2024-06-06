@@ -23,6 +23,11 @@ func NewJobUseCase(repository interfaces.JobRepository) services.JobUseCase {
 }
 
 func (ju *jobUseCase) PostJob(job models.JobOpening, employerID int32) (models.JobOpeningResponse, error) {
+
+	if employerID <= 0 {
+		return models.JobOpeningResponse{}, errors.New("invalid input data")
+	}
+
 	jobData, err := ju.jobRepository.PostJob(job, int32(employerID))
 	if err != nil {
 		return models.JobOpeningResponse{}, err
@@ -32,6 +37,10 @@ func (ju *jobUseCase) PostJob(job models.JobOpening, employerID int32) (models.J
 
 func (ju *jobUseCase) GetAllJobs(employerID int32) ([]models.AllJob, error) {
 
+	if employerID <= 0 {
+		return []models.AllJob{}, errors.New("invalid input data")
+	}
+
 	jobData, err := ju.jobRepository.GetAllJobs(employerID)
 	if err != nil {
 		return nil, err
@@ -40,6 +49,10 @@ func (ju *jobUseCase) GetAllJobs(employerID int32) ([]models.AllJob, error) {
 }
 
 func (ju *jobUseCase) GetAJob(employerID, jobId int32) (models.JobOpeningResponse, error) {
+
+	if employerID <= 0 || jobId <= 0 {
+		return models.JobOpeningResponse{}, errors.New("invalid input data")
+	}
 
 	isJobExist, err := ju.jobRepository.IsJobExist(jobId)
 	if err != nil {
@@ -58,6 +71,10 @@ func (ju *jobUseCase) GetAJob(employerID, jobId int32) (models.JobOpeningRespons
 }
 
 func (ju *jobUseCase) DeleteAJob(employerIDInt, jobID int32) error {
+
+	if employerIDInt <= 0 || jobID <= 0 {
+		return errors.New("invalid input data")
+	}
 
 	isJobExist, err := ju.jobRepository.IsJobExist(jobID)
 	if err != nil {
@@ -78,6 +95,10 @@ func (ju *jobUseCase) DeleteAJob(employerIDInt, jobID int32) error {
 }
 func (ju *jobUseCase) UpdateAJob(employerID int32, jobID int32, jobDetails models.JobOpening) (models.JobOpeningResponse, error) {
 
+	if employerID <= 0 || jobID <= 0 {
+		return models.JobOpeningResponse{}, errors.New("invalid input data")
+	}
+
 	isJobExist, err := ju.jobRepository.IsJobExist(jobID)
 	if err != nil {
 		return models.JobOpeningResponse{}, fmt.Errorf("failed to check if job exists: %v", err)
@@ -96,6 +117,10 @@ func (ju *jobUseCase) UpdateAJob(employerID int32, jobID int32, jobDetails model
 }
 
 func (ju *jobUseCase) JobSeekerGetAllJobs(keyword string) ([]models.JobSeekerGetAllJobs, error) {
+
+	if keyword == "" {
+		return []models.JobSeekerGetAllJobs{}, errors.New("invalid input data")
+	}
 
 	jobs, err := ju.jobRepository.JobSeekerGetAllJobs(keyword)
 	if err != nil {
@@ -117,6 +142,10 @@ func (ju *jobUseCase) JobSeekerGetAllJobs(keyword string) ([]models.JobSeekerGet
 
 func (ju *jobUseCase) GetJobDetails(jobID int32) (models.JobOpeningResponse, error) {
 
+	if jobID <= 0 {
+		return models.JobOpeningResponse{}, errors.New("invalid input data")
+	}
+
 	isJobExist, err := ju.jobRepository.IsJobExist(jobID)
 	if err != nil {
 		return models.JobOpeningResponse{}, fmt.Errorf("failed to check if job exists: %v", err)
@@ -135,7 +164,7 @@ func (ju *jobUseCase) GetJobDetails(jobID int32) (models.JobOpeningResponse, err
 }
 func (ju *jobUseCase) ApplyJob(jobApplication models.ApplyJob, resumeData []byte) (models.ApplyJobResponse, error) {
 
-	if jobApplication.JobID == 0 || jobApplication.JobseekerID == 0 || jobApplication.CoverLetter == "" {
+	if jobApplication.JobID <= 0 || jobApplication.JobseekerID <= 0 || jobApplication.CoverLetter == "" {
 		return models.ApplyJobResponse{}, errors.New("invalid input data")
 	}
 
@@ -159,6 +188,10 @@ func (ju *jobUseCase) ApplyJob(jobApplication models.ApplyJob, resumeData []byte
 }
 func (ju *jobUseCase) GetApplicants(employerID int64) ([]models.ApplyJobResponse, error) {
 
+	if employerID <= 0 {
+		return []models.ApplyJobResponse{}, errors.New("cannot use negative values")
+	}
+
 	jobid, err := ju.jobRepository.GetJobIDByEmployerID(employerID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to check if job exists: %v", err)
@@ -176,8 +209,8 @@ func (ju *jobUseCase) GetApplicants(employerID int64) ([]models.ApplyJobResponse
 
 func (uc *jobUseCase) SaveJobs(jobID, userID int64) (models.SavedJobsResponse, error) {
 
-	if jobID == 0 || userID == 0 {
-		return models.SavedJobsResponse{}, errors.New("invalid input data")
+	if jobID <= 0 || userID <= 0 {
+		return models.SavedJobsResponse{}, errors.New("cannot use negative values")
 	}
 
 	isJobAvailable, err := uc.jobRepository.IsJobExist(int32(jobID))
@@ -204,6 +237,10 @@ func (uc *jobUseCase) SaveJobs(jobID, userID int64) (models.SavedJobsResponse, e
 
 func (ju *jobUseCase) DeleteSavedJob(jobID, userID int32) error {
 
+	if jobID <= 0 || userID <= 0 {
+		return errors.New("cannot use negative values")
+	}
+
 	isJobSaved, err := ju.jobRepository.IsJobSaved(jobID, userID)
 	if err != nil {
 		return fmt.Errorf("failed to check if job is saved: %v", err)
@@ -221,6 +258,11 @@ func (ju *jobUseCase) DeleteSavedJob(jobID, userID int32) error {
 }
 
 func (ju *jobUseCase) GetSavedJobs(userIdInt int32) ([]models.SavedJobsResponse, error) {
+
+	if userIdInt <= 0 {
+		return []models.SavedJobsResponse{}, errors.New("cannot use negative values")
+	}
+
 	savedJobs, err := ju.jobRepository.GetSavedJobs(userIdInt)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get saved jobs: %v", err)
@@ -230,6 +272,7 @@ func (ju *jobUseCase) GetSavedJobs(userIdInt int32) ([]models.SavedJobsResponse,
 }
 
 func (ju *jobUseCase) ScheduleInterview(saveInterview models.Interview) (models.InterviewResponse, error) {
+
 	jobID := saveInterview.JobID
 	isJobAvailable, err := ju.jobRepository.IsJobExist(int32(jobID))
 	if err != nil {
@@ -251,6 +294,11 @@ func (ju *jobUseCase) ScheduleInterview(saveInterview models.Interview) (models.
 }
 
 func (ju *jobUseCase) GetInterview(jobID, employerID int32) (models.InterviewResponse, error) {
+
+	if jobID <= 0 || employerID <= 0 {
+		return models.InterviewResponse{}, errors.New("cannot use negative values")
+	}
+
 	interview, err := ju.jobRepository.GetInterview(jobID, employerID)
 	if err != nil {
 		return models.InterviewResponse{}, fmt.Errorf("failed to get interview: %v", err)

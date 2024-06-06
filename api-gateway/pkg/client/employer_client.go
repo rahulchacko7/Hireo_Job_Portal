@@ -144,3 +144,14 @@ func (ec *employerClient) UpdateCompany(employerIDInt int32, employerDetails mod
 		Contact_phone_number: uint(employer.ContactPhoneNumber),
 	}, nil
 }
+
+func (ec *employerClient) VideoCallKey(userID, oppositeUser int) (string, error) {
+	key, err := ec.Client.VideoCallKey(context.Background(), &pb.VideoCallRequest{
+		UserID:       int64(userID),
+		OppositeUser: int64(oppositeUser),
+	})
+	if err != nil {
+		return "", err
+	}
+	return key.Key, nil
+}

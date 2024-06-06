@@ -2,6 +2,7 @@ package handler
 
 import (
 	interfaces "HireoGateWay/pkg/client/interface"
+	"HireoGateWay/pkg/logging"
 	"HireoGateWay/pkg/utils/models"
 	"HireoGateWay/pkg/utils/response"
 	"net/http"
@@ -20,8 +21,12 @@ func NewJobSeekerHandler(jobSeekerClient interfaces.JobSeekerClient) *JobSeekerH
 }
 
 func (jh *JobSeekerHandler) JobSeekerLogin(c *gin.Context) {
+	logEntry := logging.GetLogger().WithField("context", "JobSeekerLogin")
+	logEntry.Info("Processing job seeker login request")
+
 	var jobSeekerDetails models.JobSeekerLogin
 	if err := c.ShouldBindJSON(&jobSeekerDetails); err != nil {
+		logEntry.Error("Details not in correct format")
 		errs := response.ClientResponse(http.StatusBadRequest, "Details not in correct format", nil, err.Error())
 		c.JSON(http.StatusBadRequest, errs)
 		return
@@ -29,18 +34,24 @@ func (jh *JobSeekerHandler) JobSeekerLogin(c *gin.Context) {
 
 	jobSeeker, err := jh.GRPC_Client.JobSeekerLogin(jobSeekerDetails)
 	if err != nil {
+		logEntry.Errorf("Cannot authenticate job seeker: %v", err)
 		errs := response.ClientResponse(http.StatusInternalServerError, "Cannot authenticate job seeker", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, errs)
 		return
 	}
+
+	logEntry.Info("Job seeker authenticated successfully")
 	success := response.ClientResponse(http.StatusOK, "Job seeker authenticated successfully", jobSeeker, nil)
 	c.JSON(http.StatusOK, success)
 }
 
 func (jh *JobSeekerHandler) JobSeekerSignUp(c *gin.Context) {
-	var jobSeekerDetails models.JobSeekerSignUp
+	logEntry := logging.GetLogger().WithField("context", "JobSeekerSignUp")
+	logEntry.Info("Processing job seeker sign up request")
 
+	var jobSeekerDetails models.JobSeekerSignUp
 	if err := c.ShouldBindJSON(&jobSeekerDetails); err != nil {
+		logEntry.Error("Details not in correct format")
 		errs := response.ClientResponse(http.StatusBadRequest, "Details not in correct format", nil, err.Error())
 		c.JSON(http.StatusBadRequest, errs)
 		return
@@ -48,10 +59,13 @@ func (jh *JobSeekerHandler) JobSeekerSignUp(c *gin.Context) {
 
 	jobSeeker, err := jh.GRPC_Client.JobSeekerSignUp(jobSeekerDetails)
 	if err != nil {
+		logEntry.Errorf("Cannot create job seeker: %v", err)
 		errs := response.ClientResponse(http.StatusInternalServerError, "Cannot create job seeker", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, errs)
 		return
 	}
+
+	logEntry.Info("Job seeker created successfully")
 	success := response.ClientResponse(http.StatusOK, "Job seeker created successfully", jobSeeker, nil)
 	c.JSON(http.StatusOK, success)
 }

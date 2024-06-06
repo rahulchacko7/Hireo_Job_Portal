@@ -35,6 +35,7 @@ const (
 	Job_ScheduleInterview_FullMethodName   = "/job.Job/ScheduleInterview"
 	Job_GetInterview_FullMethodName        = "/job.Job/GetInterview"
 	Job_GetAnApplicant_FullMethodName      = "/job.Job/GetAnApplicant"
+	Job_VideoCallKey_FullMethodName        = "/job.Job/VideoCallKey"
 )
 
 // JobClient is the client API for Job service.
@@ -56,6 +57,7 @@ type JobClient interface {
 	ScheduleInterview(ctx context.Context, in *ScheduleInterviewRequest, opts ...grpc.CallOption) (*ScheduleInterviewResponse, error)
 	GetInterview(ctx context.Context, in *GetInterviewRequest, opts ...grpc.CallOption) (*GetInterviewsResponse, error)
 	GetAnApplicant(ctx context.Context, in *GetAnApplicantRequest, opts ...grpc.CallOption) (*GetAnApplicantResponse, error)
+	VideoCallKey(ctx context.Context, in *VideoCallRequest, opts ...grpc.CallOption) (*VideoCallResponse, error)
 }
 
 type jobClient struct {
@@ -201,6 +203,15 @@ func (c *jobClient) GetAnApplicant(ctx context.Context, in *GetAnApplicantReques
 	return out, nil
 }
 
+func (c *jobClient) VideoCallKey(ctx context.Context, in *VideoCallRequest, opts ...grpc.CallOption) (*VideoCallResponse, error) {
+	out := new(VideoCallResponse)
+	err := c.cc.Invoke(ctx, Job_VideoCallKey_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // JobServer is the server API for Job service.
 // All implementations must embed UnimplementedJobServer
 // for forward compatibility
@@ -220,6 +231,7 @@ type JobServer interface {
 	ScheduleInterview(context.Context, *ScheduleInterviewRequest) (*ScheduleInterviewResponse, error)
 	GetInterview(context.Context, *GetInterviewRequest) (*GetInterviewsResponse, error)
 	GetAnApplicant(context.Context, *GetAnApplicantRequest) (*GetAnApplicantResponse, error)
+	VideoCallKey(context.Context, *VideoCallRequest) (*VideoCallResponse, error)
 	mustEmbedUnimplementedJobServer()
 }
 
@@ -271,6 +283,9 @@ func (UnimplementedJobServer) GetInterview(context.Context, *GetInterviewRequest
 }
 func (UnimplementedJobServer) GetAnApplicant(context.Context, *GetAnApplicantRequest) (*GetAnApplicantResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAnApplicant not implemented")
+}
+func (UnimplementedJobServer) VideoCallKey(context.Context, *VideoCallRequest) (*VideoCallResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method VideoCallKey not implemented")
 }
 func (UnimplementedJobServer) mustEmbedUnimplementedJobServer() {}
 
@@ -555,6 +570,24 @@ func _Job_GetAnApplicant_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Job_VideoCallKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VideoCallRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(JobServer).VideoCallKey(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Job_VideoCallKey_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(JobServer).VideoCallKey(ctx, req.(*VideoCallRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Job_ServiceDesc is the grpc.ServiceDesc for Job service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -621,6 +654,10 @@ var Job_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAnApplicant",
 			Handler:    _Job_GetAnApplicant_Handler,
+		},
+		{
+			MethodName: "VideoCallKey",
+			Handler:    _Job_VideoCallKey_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

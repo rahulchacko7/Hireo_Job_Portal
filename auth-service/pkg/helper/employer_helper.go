@@ -2,7 +2,10 @@ package helper
 
 import (
 	"Auth/pkg/utils/models"
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt"
@@ -51,4 +54,13 @@ func ValidateTokenEmployer(tokenString string) (*authCustomClaimsEmployer, error
 		return claims, nil
 	}
 	return nil, fmt.Errorf("invalid token")
+}
+
+func GenerateVideoCallKey(userID, oppositeUser int) (string, error) {
+	currentTime := strconv.FormatInt(time.Now().UnixNano(), 10)
+	key := strconv.Itoa(userID) + "_" + strconv.Itoa(oppositeUser) + "_" + currentTime
+	hash := md5.Sum([]byte(key))
+	keyString := hex.EncodeToString(hash[:])
+
+	return keyString, nil
 }

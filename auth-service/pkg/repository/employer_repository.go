@@ -107,3 +107,29 @@ func (er *employerRepository) UpdateCompany(employerIDInt int32, employerDetails
 
 	return updatedEmployerDetails, nil
 }
+
+func (ur *employerRepository) CheckUserExistFromData(userID, oppositeUser int) bool {
+	var count int
+	err := ur.DB.Raw(`SELECT COUNT(*) FROM followers WHERE user_id = ? AND following_user = ?`, userID, oppositeUser).Scan(&count).Error
+	if err != nil {
+		return false
+	}
+	return count > 0
+}
+
+func (ur *employerRepository) CheckUserAvailabilityWithUserID(userID int) bool {
+	var count int
+	if err := ur.DB.Raw("SELECT COUNT(*) FROM users WHERE id= ?", userID).Scan(&count).Error; err != nil {
+		return false
+	}
+	return count > 0
+}
+
+func (ur *employerRepository) UserData(userID int) (models.UserData, error) {
+	var user models.UserData
+	err := ur.DB.Raw(`SELECT id, company_name, website FROM users WHERE id = ?`, userID).Scan(&user).Error
+	if err != nil {
+		return models.UserData{}, err
+	}
+	return user, nil
+}

@@ -3,15 +3,16 @@ package handler
 import (
 	interfaces "HireoGateWay/pkg/client/interface"
 	"HireoGateWay/pkg/helper"
+	"HireoGateWay/pkg/logging"
 	"HireoGateWay/pkg/utils/models"
 	"HireoGateWay/pkg/utils/response"
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"github.com/sirupsen/logrus"
 )
 
 var upgrade = websocket.Upgrader{
@@ -34,13 +35,15 @@ func NewChatHandler(chatClient interfaces.ChatClient, helper *helper.Helper) *Ch
 }
 
 func (ch *ChatHandler) EmployerMessage(c *gin.Context) {
-
-	fmt.Println("message")
+	logEntry := logging.GetLogger().WithField("context", "EmployerMessage")
+	logEntry.Info("Processing EmployerMessage request")
 
 	tokenString := c.Request.Header.Get("Authorization")
-	fmt.Println("message")
+	logEntry.Info("Extracted Authorization header")
+
 	splitToken := strings.Split(tokenString, " ")
 	if tokenString == "" {
+		logEntry.Error("Missing Authorization header")
 		errs := response.ClientResponse(http.StatusUnauthorized, "Missing Authorization header", nil, "")
 		c.JSON(http.StatusUnauthorized, errs)
 		return
@@ -48,38 +51,53 @@ func (ch *ChatHandler) EmployerMessage(c *gin.Context) {
 
 	splitToken[1] = strings.TrimSpace(splitToken[1])
 	userID, err := ch.helper.ValidateToken(splitToken[1])
-	fmt.Println("validate token result ", userID, err)
+	logEntry.WithFields(logrus.Fields{
+		"userID": userID,
+		"error":  err,
+	}).Info("Validated token")
+
 	if err != nil {
+		logEntry.WithError(err).Error("Invalid token")
 		errs := response.ClientResponse(http.StatusUnauthorized, "Invalid token", nil, err.Error())
 		c.JSON(http.StatusUnauthorized, errs)
 		return
 	}
 
-	fmt.Println("upgrading ")
+	logEntry.Info("Upgrading to WebSocket connection")
 	conn, err := upgrade.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
+		logEntry.WithError(err).Error("WebSocket Connection Issue")
 		errs := response.ClientResponse(http.StatusBadRequest, "Websocket Connection Issue", nil, err.Error())
 		c.JSON(http.StatusBadRequest, errs)
 		return
 	}
+	defer func() {
+		delete(User, strconv.Itoa(int(userID.Id)))
+		conn.Close()
+		logEntry.Info("WebSocket connection closed and user removed from map")
+	}()
 
-	defer delete(User, strconv.Itoa(int(userID.Id)))
-	defer conn.Close()
 	user := strconv.Itoa(int(userID.Id))
 	User[user] = conn
+	logEntry.WithField("user", user).Info("User added to WebSocket connection map")
 
 	for {
-		fmt.Println("loop starts", userID, User)
+		logEntry.WithField("userID", userID).Info("Starting message read loop")
 		_, msg, err := conn.ReadMessage()
 		if err != nil {
+			logEntry.WithError(err).Error("Error reading WebSocket message")
 			errs := response.ClientResponse(http.StatusBadRequest, "Details not in correct format", nil, err.Error())
 			c.JSON(http.StatusBadRequest, errs)
 			return
 		}
-		fmt.Println("message sting msg ", string(msg))
-		fmt.Println("message soket conn map ", User)
-		fmt.Println("message user id ", user)
+
+		logEntry.WithFields(logrus.Fields{
+			"message": string(msg),
+			"user":    user,
+		}).Info("Received WebSocket message")
+
 		ch.helper.SendMessageToUser(User, msg, user)
+		logEntry.WithField("message", string(msg)).Info("Message sent to user")
 	}
 }
 
@@ -125,7 +143,6 @@ func (ch *ChatHandler) GetChat(c *gin.Context) {
 		return
 	}
 
-	// Convert userIDInterface to int32 before converting to string
 	userID := strconv.Itoa(int(userIDInterface.(int32)))
 
 	result, err := ch.GRPC_Client.GetChat(userID, chatRequest)

@@ -33,6 +33,7 @@ const (
 	Job_DeleteSavedJob_FullMethodName      = "/job.Job/DeleteSavedJob"
 	Job_GetSavedJobs_FullMethodName        = "/job.Job/GetSavedJobs"
 	Job_ScheduleInterview_FullMethodName   = "/job.Job/ScheduleInterview"
+	Job_VideoCallKey_FullMethodName        = "/job.Job/VideoCallKey"
 	Job_GetInterview_FullMethodName        = "/job.Job/GetInterview"
 )
 
@@ -53,6 +54,7 @@ type JobClient interface {
 	DeleteSavedJob(ctx context.Context, in *DeleteSavedJobRequest, opts ...grpc.CallOption) (*DeleteSavedJobResponse, error)
 	GetSavedJobs(ctx context.Context, in *GetSavedJobsRequest, opts ...grpc.CallOption) (*GetSavedJobsResponse, error)
 	ScheduleInterview(ctx context.Context, in *ScheduleInterviewRequest, opts ...grpc.CallOption) (*ScheduleInterviewResponse, error)
+	VideoCallKey(ctx context.Context, in *VideoCallRequest, opts ...grpc.CallOption) (*VideoCallResponse, error)
 	GetInterview(ctx context.Context, in *GetInterviewRequest, opts ...grpc.CallOption) (*GetInterviewsResponse, error)
 }
 
@@ -181,6 +183,15 @@ func (c *jobClient) ScheduleInterview(ctx context.Context, in *ScheduleInterview
 	return out, nil
 }
 
+func (c *jobClient) VideoCallKey(ctx context.Context, in *VideoCallRequest, opts ...grpc.CallOption) (*VideoCallResponse, error) {
+	out := new(VideoCallResponse)
+	err := c.cc.Invoke(ctx, Job_VideoCallKey_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *jobClient) GetInterview(ctx context.Context, in *GetInterviewRequest, opts ...grpc.CallOption) (*GetInterviewsResponse, error) {
 	out := new(GetInterviewsResponse)
 	err := c.cc.Invoke(ctx, Job_GetInterview_FullMethodName, in, out, opts...)
@@ -207,6 +218,7 @@ type JobServer interface {
 	DeleteSavedJob(context.Context, *DeleteSavedJobRequest) (*DeleteSavedJobResponse, error)
 	GetSavedJobs(context.Context, *GetSavedJobsRequest) (*GetSavedJobsResponse, error)
 	ScheduleInterview(context.Context, *ScheduleInterviewRequest) (*ScheduleInterviewResponse, error)
+	VideoCallKey(context.Context, *VideoCallRequest) (*VideoCallResponse, error)
 	GetInterview(context.Context, *GetInterviewRequest) (*GetInterviewsResponse, error)
 	mustEmbedUnimplementedJobServer()
 }
@@ -253,6 +265,9 @@ func (UnimplementedJobServer) GetSavedJobs(context.Context, *GetSavedJobsRequest
 }
 func (UnimplementedJobServer) ScheduleInterview(context.Context, *ScheduleInterviewRequest) (*ScheduleInterviewResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ScheduleInterview not implemented")
+}
+func (UnimplementedJobServer) VideoCallKey(context.Context, *VideoCallRequest) (*VideoCallResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method VideoCallKey not implemented")
 }
 func (UnimplementedJobServer) GetInterview(context.Context, *GetInterviewRequest) (*GetInterviewsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetInterview not implemented")
@@ -504,6 +519,24 @@ func _Job_ScheduleInterview_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Job_VideoCallKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VideoCallRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(JobServer).VideoCallKey(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Job_VideoCallKey_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(JobServer).VideoCallKey(ctx, req.(*VideoCallRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Job_GetInterview_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetInterviewRequest)
 	if err := dec(in); err != nil {
@@ -580,6 +613,10 @@ var Job_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ScheduleInterview",
 			Handler:    _Job_ScheduleInterview_Handler,
+		},
+		{
+			MethodName: "VideoCallKey",
+			Handler:    _Job_VideoCallKey_Handler,
 		},
 		{
 			MethodName: "GetInterview",

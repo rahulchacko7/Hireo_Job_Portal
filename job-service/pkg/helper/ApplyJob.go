@@ -2,7 +2,11 @@ package helper
 
 import (
 	"bytes"
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
+	"strconv"
+	"time"
 
 	cfg "Auth/pkg/config"
 
@@ -60,4 +64,13 @@ func (h *Helper) AddImageToAwsS3(file []byte, filename string) (string, error) {
 
 	url := fmt.Sprintf("https://%s.s3.%s.amazonaws.com/%s", bucketName, config.AWSRegion, filename)
 	return url, nil
+}
+
+func GenerateVideoCallKey(userID, oppositeUser int) (string, error) {
+	currentTime := strconv.FormatInt(time.Now().UnixNano(), 10)
+	key := strconv.Itoa(userID) + "_" + strconv.Itoa(oppositeUser) + "_" + currentTime
+	hash := md5.Sum([]byte(key))
+	keyString := hex.EncodeToString(hash[:])
+
+	return keyString, nil
 }

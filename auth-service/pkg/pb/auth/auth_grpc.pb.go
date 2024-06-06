@@ -151,6 +151,7 @@ const (
 	Employer_PostJobOpening_FullMethodName    = "/auth.Employer/PostJobOpening"
 	Employer_GetCompanyDetails_FullMethodName = "/auth.Employer/GetCompanyDetails"
 	Employer_UpdateCompany_FullMethodName     = "/auth.Employer/UpdateCompany"
+	Employer_VideoCallKey_FullMethodName      = "/auth.Employer/VideoCallKey"
 )
 
 // EmployerClient is the client API for Employer service.
@@ -162,6 +163,7 @@ type EmployerClient interface {
 	PostJobOpening(ctx context.Context, in *PostJobOpeningRequest, opts ...grpc.CallOption) (*PostJobOpeningResponse, error)
 	GetCompanyDetails(ctx context.Context, in *GetCompanyDetailsRequest, opts ...grpc.CallOption) (*EmployerDetailsResponse, error)
 	UpdateCompany(ctx context.Context, in *UpdateCompanyRequest, opts ...grpc.CallOption) (*UpdateCompanyResponse, error)
+	VideoCallKey(ctx context.Context, in *VideoCallRequest, opts ...grpc.CallOption) (*VideoCallResponse, error)
 }
 
 type employerClient struct {
@@ -217,6 +219,15 @@ func (c *employerClient) UpdateCompany(ctx context.Context, in *UpdateCompanyReq
 	return out, nil
 }
 
+func (c *employerClient) VideoCallKey(ctx context.Context, in *VideoCallRequest, opts ...grpc.CallOption) (*VideoCallResponse, error) {
+	out := new(VideoCallResponse)
+	err := c.cc.Invoke(ctx, Employer_VideoCallKey_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // EmployerServer is the server API for Employer service.
 // All implementations must embed UnimplementedEmployerServer
 // for forward compatibility
@@ -226,6 +237,7 @@ type EmployerServer interface {
 	PostJobOpening(context.Context, *PostJobOpeningRequest) (*PostJobOpeningResponse, error)
 	GetCompanyDetails(context.Context, *GetCompanyDetailsRequest) (*EmployerDetailsResponse, error)
 	UpdateCompany(context.Context, *UpdateCompanyRequest) (*UpdateCompanyResponse, error)
+	VideoCallKey(context.Context, *VideoCallRequest) (*VideoCallResponse, error)
 	mustEmbedUnimplementedEmployerServer()
 }
 
@@ -247,6 +259,9 @@ func (UnimplementedEmployerServer) GetCompanyDetails(context.Context, *GetCompan
 }
 func (UnimplementedEmployerServer) UpdateCompany(context.Context, *UpdateCompanyRequest) (*UpdateCompanyResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateCompany not implemented")
+}
+func (UnimplementedEmployerServer) VideoCallKey(context.Context, *VideoCallRequest) (*VideoCallResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method VideoCallKey not implemented")
 }
 func (UnimplementedEmployerServer) mustEmbedUnimplementedEmployerServer() {}
 
@@ -351,6 +366,24 @@ func _Employer_UpdateCompany_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Employer_VideoCallKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VideoCallRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EmployerServer).VideoCallKey(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Employer_VideoCallKey_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EmployerServer).VideoCallKey(ctx, req.(*VideoCallRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Employer_ServiceDesc is the grpc.ServiceDesc for Employer service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -377,6 +410,10 @@ var Employer_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateCompany",
 			Handler:    _Employer_UpdateCompany_Handler,
+		},
+		{
+			MethodName: "VideoCallKey",
+			Handler:    _Employer_VideoCallKey_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

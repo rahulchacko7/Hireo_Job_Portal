@@ -62,3 +62,9 @@ type EmployerDetails struct {
 	ContactEmail        string `json:"contact_email"`
 	ContactPhoneNumber  uint   `json:"contact_phone_number"`
 }
+
+type UserData struct {
+	ID          uint   `json:"id" gorm:"column:id"`
+	CompanyName string `json:"company_name"`
+	Website     string `json:"website"`
+}

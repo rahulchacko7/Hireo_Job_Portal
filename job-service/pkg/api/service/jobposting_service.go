@@ -421,3 +421,4 @@ func (js *JobServer) GetInterview(ctx context.Context, req *pb.GetInterviewReque
 
 	return response, nil
 }
+

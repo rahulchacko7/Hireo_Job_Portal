@@ -22,8 +22,18 @@ service Job {
     rpc DeleteSavedJob(DeleteSavedJobRequest) returns (DeleteSavedJobResponse){};
     rpc GetSavedJobs(GetSavedJobsRequest) returns (GetSavedJobsResponse) {};
     rpc ScheduleInterview(ScheduleInterviewRequest) returns (ScheduleInterviewResponse) {};
+    rpc VideoCallKey (VideoCallRequest) returns (VideoCallResponse) {};
     rpc GetInterview(GetInterviewRequest) returns (GetInterviewsResponse) {};
 } 
+
+message VideoCallRequest{
+    int64 userID = 1;
+    int64 OppositeUser = 2;
+}
+
+message VideoCallResponse {
+    string Key = 1;
+}
 
 message GetInterviewRequest {
     string job_id = 1;

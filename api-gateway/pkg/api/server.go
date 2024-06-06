@@ -12,11 +12,18 @@ type ServerHTTP struct {
 	engine *gin.Engine
 }
 
-func NewServerHTTP(adminHandler *handler.AdminHandler, employerHandler *handler.EmployerHandler, jobSeekerHandler *handler.JobSeekerHandler, jobHandler *handler.JobHandler, chatHandler *handler.ChatHandler) *ServerHTTP {
+func NewServerHTTP(adminHandler *handler.AdminHandler, employerHandler *handler.EmployerHandler, jobSeekerHandler *handler.JobSeekerHandler, jobHandler *handler.JobHandler, chatHandler *handler.ChatHandler, videocallHandler *handler.VideoCallHandler) *ServerHTTP {
 
 	router := gin.New()
 
 	router.Use(gin.Logger())
+
+	router.Static("/static", "./static")
+	router.LoadHTMLGlob("template/*")
+
+	router.GET("/exit", videocallHandler.ExitPage)
+	router.GET("/error", videocallHandler.ErrorPage)
+	router.GET("/index", videocallHandler.IndexedPage)
 
 	// Route for admin auth
 	router.POST("/admin/login", adminHandler.LoginHandler)
@@ -59,6 +66,7 @@ func NewServerHTTP(adminHandler *handler.AdminHandler, employerHandler *handler.
 		router.POST("/employer/schedule-interview", jobHandler.ScheduleInterview)
 		router.GET("/employer/interviews", jobHandler.GetInterviews)
 		//router.GET("/employer/interviews", jobHandler.GetAnApplicant)
+
 
 	}
 

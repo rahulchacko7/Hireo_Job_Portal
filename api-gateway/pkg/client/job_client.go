@@ -452,3 +452,4 @@ func (jc *jobClient) GetInterview(jobID, employerID int32) (models.InterviewResp
 // 	applyJobResponse.AppliedTime = grpcResponse.AppliedTime.AsTime()
 // 	return applyJobResponse, nil
 // }
+
