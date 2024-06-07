@@ -55,3 +55,32 @@ func (c *ChatClient) GetChat(userID string, req models.ChatRequest) ([]models.Te
 
 	return response, nil
 }
+
+func (c *ChatClient) GetGroupChat(userID string, groupID string, req models.ChatRequest) ([]models.TempMessage, error) {
+	if c.Client == nil {
+		return nil, fmt.Errorf("gRPC client is not initialized")
+	}
+
+	data, err := c.Client.GetGroupChat(context.Background(), &pb.GetGroupChatRequest{
+		UserID:  userID,
+		GroupID: groupID,
+		OffSet:  req.Offset,
+		Limit:   req.Limit,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var response []models.TempMessage
+	for _, v := range data.GroupChat {
+		chatResponse := models.TempMessage{
+			SenderID:    v.SenderId,
+			RecipientID: v.RecipientId,
+			Content:     v.Content,
+			Timestamp:   v.Timestamp,
+		}
+		response = append(response, chatResponse)
+	}
+
+	return response, nil
+}

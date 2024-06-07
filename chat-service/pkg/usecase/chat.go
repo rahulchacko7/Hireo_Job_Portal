@@ -88,3 +88,8 @@ func (c *ChatUseCase) GetFriendChat(userID, friendID string, pagination models.P
 	_ = c.chatRepository.UpdateReadAsMessage(userID, friendID)
 	return c.chatRepository.GetFriendChat(userID, friendID, pagination)
 }
+
+func (uc *ChatUseCase) GetGroupMessages(groupID string, limit, offset int) ([]models.Message, error) {
+	// Retrieve messages from the repository
+	return uc.chatRepository.GetGroupMessages(groupID, limit, offset)
+}

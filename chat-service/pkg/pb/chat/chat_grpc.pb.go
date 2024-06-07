@@ -20,6 +20,8 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	ChatService_GetFriendChat_FullMethodName = "/chat.ChatService/GetFriendChat"
+	ChatService_GroupMessage_FullMethodName  = "/chat.ChatService/GroupMessage"
+	ChatService_GetGroupChat_FullMethodName  = "/chat.ChatService/GetGroupChat"
 )
 
 // ChatServiceClient is the client API for ChatService service.
@@ -27,6 +29,8 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ChatServiceClient interface {
 	GetFriendChat(ctx context.Context, in *GetFriendChatRequest, opts ...grpc.CallOption) (*GetFriendChatResponse, error)
+	GroupMessage(ctx context.Context, in *GroupMessageRequest, opts ...grpc.CallOption) (*GroupMessageResponse, error)
+	GetGroupChat(ctx context.Context, in *GetGroupChatRequest, opts ...grpc.CallOption) (*GetGroupChatResponse, error)
 }
 
 type chatServiceClient struct {
@@ -46,11 +50,31 @@ func (c *chatServiceClient) GetFriendChat(ctx context.Context, in *GetFriendChat
 	return out, nil
 }
 
+func (c *chatServiceClient) GroupMessage(ctx context.Context, in *GroupMessageRequest, opts ...grpc.CallOption) (*GroupMessageResponse, error) {
+	out := new(GroupMessageResponse)
+	err := c.cc.Invoke(ctx, ChatService_GroupMessage_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *chatServiceClient) GetGroupChat(ctx context.Context, in *GetGroupChatRequest, opts ...grpc.CallOption) (*GetGroupChatResponse, error) {
+	out := new(GetGroupChatResponse)
+	err := c.cc.Invoke(ctx, ChatService_GetGroupChat_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ChatServiceServer is the server API for ChatService service.
 // All implementations must embed UnimplementedChatServiceServer
 // for forward compatibility
 type ChatServiceServer interface {
 	GetFriendChat(context.Context, *GetFriendChatRequest) (*GetFriendChatResponse, error)
+	GroupMessage(context.Context, *GroupMessageRequest) (*GroupMessageResponse, error)
+	GetGroupChat(context.Context, *GetGroupChatRequest) (*GetGroupChatResponse, error)
 	mustEmbedUnimplementedChatServiceServer()
 }
 
@@ -60,6 +84,12 @@ type UnimplementedChatServiceServer struct {
 
 func (UnimplementedChatServiceServer) GetFriendChat(context.Context, *GetFriendChatRequest) (*GetFriendChatResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetFriendChat not implemented")
+}
+func (UnimplementedChatServiceServer) GroupMessage(context.Context, *GroupMessageRequest) (*GroupMessageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GroupMessage not implemented")
+}
+func (UnimplementedChatServiceServer) GetGroupChat(context.Context, *GetGroupChatRequest) (*GetGroupChatResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetGroupChat not implemented")
 }
 func (UnimplementedChatServiceServer) mustEmbedUnimplementedChatServiceServer() {}
 
@@ -92,6 +122,42 @@ func _ChatService_GetFriendChat_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ChatService_GroupMessage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GroupMessageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ChatServiceServer).GroupMessage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ChatService_GroupMessage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ChatServiceServer).GroupMessage(ctx, req.(*GroupMessageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ChatService_GetGroupChat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetGroupChatRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ChatServiceServer).GetGroupChat(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ChatService_GetGroupChat_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ChatServiceServer).GetGroupChat(ctx, req.(*GetGroupChatRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ChatService_ServiceDesc is the grpc.ServiceDesc for ChatService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -102,6 +168,14 @@ var ChatService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetFriendChat",
 			Handler:    _ChatService_GetFriendChat_Handler,
+		},
+		{
+			MethodName: "GroupMessage",
+			Handler:    _ChatService_GroupMessage_Handler,
+		},
+		{
+			MethodName: "GetGroupChat",
+			Handler:    _ChatService_GetGroupChat_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

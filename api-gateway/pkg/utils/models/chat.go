@@ -40,3 +40,10 @@ type Pagination struct {
 	Limit  string
 	OffSet string
 }
+
+type GroupChatRequest struct {
+	FriendID string `query:"FriendID" validate:"required"`
+	Offset   string `query:"Offset" validate:"required"`
+	Limit    string `query:"Limit" validate:"required"`
+	GroupID  string `query:"Limit" validate:"required"`
+}

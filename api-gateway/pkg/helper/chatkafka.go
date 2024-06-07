@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/IBM/sarama"
 	"github.com/golang-jwt/jwt"
@@ -91,4 +92,20 @@ func (h *Helper) ValidateToken(tokenString string) (*authCustomClaimsEmployer, e
 		return claims, nil
 	}
 	return nil, fmt.Errorf("invalid token")
+}
+
+func (h *Helper) SendMessageToGroup(User map[string]*websocket.Conn, msg []byte, groupID, senderID string) {
+	for key, conn := range User {
+		if isUserInGroup(key, groupID) && key != senderID {
+			if err := conn.WriteMessage(websocket.TextMessage, msg); err != nil {
+				fmt.Printf("Error sending message to user %s: %s\n", key, err.Error())
+				continue
+			}
+			fmt.Printf("Message sent to user %s\n", key)
+		}
+	}
+}
+
+func isUserInGroup(userID, groupID string) bool {
+	return strings.HasPrefix(userID, groupID+"_")
 }

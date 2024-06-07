@@ -61,12 +61,12 @@ func NewServerHTTP(adminHandler *handler.AdminHandler, employerHandler *handler.
 
 		router.GET("/employer/chat", chatHandler.EmployerMessage)
 		router.GET("/employer/chats", chatHandler.GetChat)
+		router.GET("/group/:groupID/chat", chatHandler.GroupMessage)
 
 		router.GET("/employer/get-applicants", jobHandler.GetApplicants)
 		router.POST("/employer/schedule-interview", jobHandler.ScheduleInterview)
 		router.GET("/employer/interviews", jobHandler.GetInterviews)
 		//router.GET("/employer/interviews", jobHandler.GetAnApplicant)
-
 
 	}
 
