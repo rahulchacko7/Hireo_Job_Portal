@@ -19,6 +19,18 @@ func NewEmployerHandler(employerClient interfaces.EmployerClient) *EmployerHandl
 		GRPC_Client: employerClient,
 	}
 }
+
+// EmployerLogin godoc
+// @Summary Login for employer
+// @Description Process the employer login request
+// @Tags Employers Authentication
+// @Accept json
+// @Produce json
+// @Param employer body models.EmployerLogin true "Employer Login details"
+// @Success 200 {object} response.Response "Employer authenticated successfully"
+// @Failure 400 {object} response.Response "Details not in correct format"
+// @Failure 500 {object} response.Response "Cannot authenticate employer"
+// @Router /employer/login [post]
 func (eh *EmployerHandler) EmployerLogin(c *gin.Context) {
 	logEntry := logging.GetLogger().WithField("context", "EmployerLogin")
 	logEntry.Info("Processing login request")
@@ -45,6 +57,17 @@ func (eh *EmployerHandler) EmployerLogin(c *gin.Context) {
 	c.JSON(http.StatusOK, success)
 }
 
+// EmployerSignUp godoc
+// @Summary Sign up a new employer
+// @Description Process the employer signup request
+// @Tags Employers Authentication
+// @Accept json
+// @Produce json
+// @Param employer body models.EmployerSignUp true "Employer SignUp details"
+// @Success 200 {object} response.Response "Employer created successfully"
+// @Failure 400 {object} response.Response "Details not in correct format"
+// @Failure 500 {object} response.Response "Cannot create employer"
+// @Router /employer/signup [post]
 func (eh *EmployerHandler) EmployerSignUp(c *gin.Context) {
 	logEntry := logging.GetLogger().WithField("context", "EmployerSignUp")
 	logEntry.Info("Processing signup request")
@@ -71,6 +94,19 @@ func (eh *EmployerHandler) EmployerSignUp(c *gin.Context) {
 	c.JSON(http.StatusOK, success)
 }
 
+// GetCompanyDetails godoc
+// @Summary Fetch company details
+// @Description Retrieve details of the company deails with the authenticated employer
+// @Tags Employers
+// @Accept json
+// @Produce json
+// @Security BearerTokenAuth
+// @Param Authorization header string true "Bearer token"
+// @Success 200 {object} response.Response "Company details retrieved successfully"
+// @Failure 400 {object} response.Response "Invalid employer ID type"
+// @Failure 401 {object} response.Response "Unauthorized"
+// @Failure 500 {object} response.Response "Failed to fetch company details"
+// @Router /employer/company [get]
 func (eh *EmployerHandler) GetCompanyDetails(c *gin.Context) {
 	logEntry := logging.GetLogger().WithField("context", "GetCompanyDetails")
 	logEntry.Info("Fetching company details")
@@ -108,6 +144,20 @@ func (eh *EmployerHandler) GetCompanyDetails(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// UpdateCompany godoc
+// @Summary Update company details
+// @Description Update details of the company associated with the authenticated employer
+// @Tags Employers
+// @Accept json
+// @Produce json
+// @Security BearerTokenAuth
+// @Param Authorization header string true "Bearer token"
+// @Param employerDetails body models.EmployerDetails true "Employer details to update"
+// @Success 200 {object} response.Response "Company updated successfully"
+// @Failure 400 {object} response.Response "Invalid employer ID type"
+// @Failure 401 {object} response.Response "Unauthorized"
+// @Failure 500 {object} response.Response "Failed to update company"
+// @Router /employer/company [put]
 func (eh *EmployerHandler) UpdateCompany(c *gin.Context) {
 	logEntry := logging.GetLogger().WithField("context", "UpdateCompany")
 	logEntry.Info("Processing update company request")

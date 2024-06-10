@@ -24,6 +24,22 @@ func NewJobHandler(jobClient interfaces.JobClient) *JobHandler {
 		GRPC_Client: jobClient,
 	}
 }
+
+// JobManagement godoc
+// @Summary Post a job opening
+// @Description Create a new job opening for the authenticated employer
+// @Tags Job Management
+// @Accept json
+// @Produce json
+// @Security BearerTokenAuth
+// @Param Authorization header string true "Bearer token"
+// @Param employerID header int true "Employer ID"
+// @Param jobOpening body models.JobOpening true "Job opening details"
+// @Success 201 {object} response.Response "Job opening created successfully"
+// @Failure 400 {object} response.Response "Invalid employer ID type"
+// @Failure 401 {object} response.Response "Unauthorized"
+// @Failure 500 {object} response.Response "Failed to create job opening"
+// @Router /employer/job-post [post]
 func (jh *JobHandler) PostJobOpening(c *gin.Context) {
 
 	logEntry := logging.GetLogger().WithField("context", "PostJobOpening")
@@ -68,6 +84,19 @@ func (jh *JobHandler) PostJobOpening(c *gin.Context) {
 	c.JSON(http.StatusCreated, response)
 }
 
+// GetAllJobs godoc
+// @Summary Get all jobs
+// @Description Retrieve all job openings for the authenticated employer
+// @Tags Job Management
+// @Accept json
+// @Produce json
+// @Security BearerTokenAuth
+// @Param Authorization header string true "Bearer token"
+// @Success 200 {object} response.Response "Jobs retrieved successfully"
+// @Failure 400 {object} response.Response "Invalid employer ID type"
+// @Failure 401 {object} response.Response "Unauthorized"
+// @Failure 500 {object} response.Response "Failed to fetch jobs"
+// @Router /employer/all-job-postings [get]
 func (jh *JobHandler) GetAllJobs(c *gin.Context) {
 	logEntry := logging.GetLogger().WithField("context", "GetAllJobs")
 	logEntry.Info("Processing get all jobs request")
@@ -105,6 +134,21 @@ func (jh *JobHandler) GetAllJobs(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// GetAJob godoc
+// @Summary Get a job
+// @Description Retrieve a specific job opening for the authenticated employer
+// @Tags Job Management
+// @Accept json
+// @Produce json
+// @Security BearerTokenAuth
+// @Param Authorization header string true "Bearer token"
+// @Param id query int true "Job ID"
+// @Success 200 {object} response.Response "Jobs retrieved successfully"
+// @Failure 400 {object} response.Response "Invalid employer ID type"
+// @Failure 400 {object} response.Response "Invalid job ID"
+// @Failure 401 {object} response.Response "Unauthorized"
+// @Failure 500 {object} response.Response "Failed to fetch jobs"
+// @Router /employer/job-postings [get]
 func (jh *JobHandler) GetAJob(c *gin.Context) {
 	logEntry := logging.GetLogger().WithField("context", "GetAJob")
 	logEntry.Info("Processing get a job request")
@@ -149,6 +193,21 @@ func (jh *JobHandler) GetAJob(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// DeleteAJob godoc
+// @Summary Delete a job
+// @Description Delete a specific job opening for the authenticated employer
+// @Tags Job Management
+// @Accept json
+// @Produce json
+// @Security BearerTokenAuth
+// @Param Authorization header string true "Bearer token"
+// @Param id query int true "Job ID"
+// @Success 200 {object} response.Response "Job Deleted successfully"
+// @Failure 400 {object} response.Response "Invalid employer ID type"
+// @Failure 400 {object} response.Response "Invalid job ID"
+// @Failure 401 {object} response.Response "Unauthorized"
+// @Failure 500 {object} response.Response "Failed to delete job"
+// @Router /employer/job-postings [delete]
 func (jh *JobHandler) DeleteAJob(c *gin.Context) {
 	logEntry := logging.GetLogger().WithField("context", "DeleteAJob")
 	logEntry.Info("Processing delete job request")
@@ -193,6 +252,23 @@ func (jh *JobHandler) DeleteAJob(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// UpdateAJob godoc
+// @Summary Update a job
+// @Description Update a specific job opening for the authenticated employer
+// @Tags Job Management
+// @Accept json
+// @Produce json
+// @Security BearerTokenAuth
+// @Param Authorization header string true "Bearer token"
+// @Param id query int true "Job ID"
+// @Param job body models.JobOpening true "Job details"
+// @Success 200 {object} response.Response "Job updated successfully"
+// @Failure 400 {object} response.Response "Invalid job ID"
+// @Failure 400 {object} response.Response "Invalid employer ID type"
+// @Failure 400 {object} response.Response "Details not in correct format"
+// @Failure 401 {object} response.Response "Unauthorized"
+// @Failure 500 {object} response.Response "Failed to update job"
+// @Router /employer/job-postings [put]
 func (jh *JobHandler) UpdateAJob(c *gin.Context) {
 	logEntry := logging.GetLogger().WithField("context", "UpdateAJob")
 	logEntry.Info("Processing update a job request")
@@ -245,6 +321,17 @@ func (jh *JobHandler) UpdateAJob(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// ViewAllJobs godoc
+// @Summary View all jobs
+// @Description Retrieve all job openings based on a keyword search for job seekers
+// @Tags Job Seeker
+// @Accept json
+// @Produce json
+// @Param Keyword query string true "Search keyword"
+// @Success 200 {object} response.Response "Jobs retrieved successfully"
+// @Failure 400 {object} response.Response "Keyword parameter is required"
+// @Failure 500 {object} response.Response "Failed to fetch jobs"
+// @Router /job-seeker/view-jobs [get]
 func (jh *JobHandler) ViewAllJobs(c *gin.Context) {
 	logEntry := logging.GetLogger().WithField("context", "ViewAllJobs")
 	logEntry.Info("Processing view all jobs request")
@@ -279,6 +366,17 @@ func (jh *JobHandler) ViewAllJobs(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// GetJobDetails godoc
+// @Summary Get job details
+// @Description Retrieve the details of a specific job using its ID
+// @Tags Job Seeker
+// @Accept json
+// @Produce json
+// @Param id query string true "Job ID"
+// @Success 200 {object} response.Response "Job details retrieved successfully"
+// @Failure 400 {object} response.Response "Invalid job ID"
+// @Failure 500 {object} response.Response "Failed to fetch job details"
+// @Router /job-seeker/jobs [get]
 func (jh *JobHandler) GetJobDetails(c *gin.Context) {
 	logEntry := logging.GetLogger().WithField("context", "GetJobDetails")
 	logEntry.Info("Received request to get job details")
@@ -307,6 +405,20 @@ func (jh *JobHandler) GetJobDetails(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// ApplyJob godoc
+// @Summary Apply for a job
+// @Description Submit a job application with a resume and cover letter
+// @Tags Job Seeker
+// @Accept multipart/form-data
+// @Produce json
+// @Param id header string true "Employer ID"
+// @Param job_id formData string true "Job ID"
+// @Param cover_letter formData string true "Cover Letter"
+// @Param resume formData file true "Resume File"
+// @Success 200 {object} response.Response "Job applied successfully"
+// @Failure 400 {object} response.Response "Invalid employer ID type or error in getting resume file"
+// @Failure 500 {object} response.Response "Failed to save/read resume file or apply for job"
+// @Router /job-seeker/apply-job [post]
 func (jh *JobHandler) ApplyJob(c *gin.Context) {
 	logEntry := logging.GetLogger().WithField("context", "ApplyJob")
 	logEntry.Info("Processing apply job request")
@@ -378,6 +490,16 @@ func (jh *JobHandler) ApplyJob(c *gin.Context) {
 	c.JSON(http.StatusOK, successRes)
 }
 
+// GetApplicants godoc
+// @Summary Get applicants for a job
+// @Description Retrieve the list of applicants for the jobs posted by the employer
+// @Tags Employers
+// @Produce json
+// @Param id header string true "Employer ID"
+// @Success 200 {object} response.Response "Applicants retrieved successfully"
+// @Failure 400 {object} response.Response "Invalid employer ID type"
+// @Failure 500 {object} response.Response "Failed to fetch applicants"
+// @Router /employer/get-applicants [get]
 func (jh *JobHandler) GetApplicants(c *gin.Context) {
 	logEntry := logging.GetLogger().WithField("context", "GetApplicants")
 	logEntry.Info("Processing get applicants request")
@@ -412,6 +534,17 @@ func (jh *JobHandler) GetApplicants(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// SaveAJob godoc
+// @Summary Save a job
+// @Description Save a job to the user's list of saved jobs
+// @Tags Job Seeker
+// @Produce json
+// @Param job_id query string true "Job ID"
+// @Param id header string true "User ID"
+// @Success 200 {object} response.Response "Job saved successfully"
+// @Failure 400 {object} response.Response "Invalid or missing job ID" or "User ID not found" or "Invalid user ID type"
+// @Failure 500 {object} response.Response "Failed to save job"
+// @Router /job-seeker/save-jobs [post]
 func (jh *JobHandler) SaveAJob(c *gin.Context) {
 	logEntry := logging.GetLogger().WithField("context", "SaveAJob")
 	logEntry.Info("Processing save job request")
@@ -458,6 +591,17 @@ func (jh *JobHandler) SaveAJob(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// DeleteSavedJob godoc
+// @Summary Delete a saved job
+// @Description Delete a job from the user's list of saved jobs
+// @Tags Job Seeker
+// @Produce json
+// @Param job_id query string true "Job ID"
+// @Param id header string true "User ID"
+// @Success 200 {object} response.Response "Job deleted successfully"
+// @Failure 400 {object} response.Response "Invalid job ID format" or "Invalid or missing user ID" or "Invalid user ID type"
+// @Failure 500 {object} response.Response "Failed to delete job"
+// @Router /job-seeker/saved-jobs [delete]
 func (jh *JobHandler) DeleteSavedJob(c *gin.Context) {
 	logEntry := logging.GetLogger().WithField("context", "DeleteSavedJob")
 	logEntry.Info("Processing delete saved job request")
@@ -503,6 +647,16 @@ func (jh *JobHandler) DeleteSavedJob(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// GetASavedJob godoc
+// @Summary Get a saved job
+// @Description Retrieve a job that has been saved by the user
+// @Tags Job Seeker
+// @Produce json
+// @Param id header string true "User ID"
+// @Success 200 {object} response.Response "Job fetched successfully"
+// @Failure 400 {object} response.Response "User ID not found" or "Invalid user ID type"
+// @Failure 500 {object} response.Response "Failed to get job"
+// @Router /job-seeker/saved-jobs [get]
 func (jh *JobHandler) GetASavedJob(c *gin.Context) {
 	logEntry := logging.GetLogger().WithField("context", "GetASavedJob")
 	logEntry.Info("Processing get saved job request")
@@ -539,6 +693,21 @@ func (jh *JobHandler) GetASavedJob(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// ApplySavedJob godoc
+// @Summary Apply to a saved job
+// @Description Apply to a job that has been saved by the user
+// @Tags Job Seeker
+// @Accept multipart/form-data
+// @Produce json
+// @Param id header string true "User ID"
+// @Param job_id formData string true "Job ID"
+// @Param cover_letter formData string false "Cover Letter"
+// @Param resume formData file true "Resume File"
+// @Success 200 {object} response.Response "Job applied successfully"
+// @Failure 400 {object} response.Response "Invalid or missing user ID" or "Invalid job ID" or "Error in getting resume file"
+// @Failure 404 {object} response.Response "No such saved job found"
+// @Failure 500 {object} response.Response "Failed to check saved jobs" or "Failed to save resume file" or "Failed to read resume file" or "Failed to apply for job"
+// @Router /job-seeker/apply-saved-job [post]
 func (jh *JobHandler) ApplySavedJob(c *gin.Context) {
 	log.Println("ApplySavedJob: Handler started")
 
@@ -644,6 +813,23 @@ func (jh *JobHandler) ApplySavedJob(c *gin.Context) {
 	c.JSON(http.StatusOK, successRes)
 }
 
+// ScheduleInterview godoc
+// @Summary Schedule an interview
+// @Description Schedule an interview for a jobseeker by an employer
+// @Tags Employers
+// @Accept json
+// @Produce json
+// @Param id header string true "User ID"
+// @Param job_id query string true "Job ID"
+// @Param jobseeker_id query string true "Jobseeker ID"
+// @Param interview_date query string true "Interview Date" Format(YYYY-MM-DD)
+// @Param interview_time query string true "Interview Time" Format(HH:MM)
+// @Param interview_type query string true "Interview Type" Enums(ONLINE, OFFLINE)
+// @Param link query string false "Interview Link"
+// @Success 200 {object} response.Response "Interview scheduled successfully"
+// @Failure 400 {object} response.Response "Invalid or missing user ID" or "Invalid job ID" or "Invalid jobseeker ID" or "Invalid interview date" or "Invalid interview time" or "Invalid interview type"
+// @Failure 500 {object} response.Response "Failed to schedule interview"
+// @Router /employer/schedule-interview [post]
 func (jh *JobHandler) ScheduleInterview(c *gin.Context) {
 	logEntry := logging.GetLogger().WithField("context", "ScheduleInterview")
 	logEntry.Info("Processing schedule interview request")
@@ -726,6 +912,18 @@ func (jh *JobHandler) ScheduleInterview(c *gin.Context) {
 	c.JSON(http.StatusOK, successRes)
 }
 
+// GetInterviews godoc
+// @Summary Get interviews
+// @Description Get interviews for a specific job by an employer
+// @Tags Employers
+// @Accept json
+// @Produce json
+// @Param id header string true "User ID"
+// @Param job_id query string true "Job ID"
+// @Success 200 {object} response.Response "Interview details fetched successfully"
+// @Failure 400 {object} response.Response "Invalid or missing user ID" or "Invalid job ID"
+// @Failure 500 {object} response.Response "Failed to fetch interview details"
+// @Router /employer/interviews [get]
 func (jh *JobHandler) GetInterviews(c *gin.Context) {
 	logEntry := logging.GetLogger().WithField("context", "GetInterviews")
 	logEntry.Info("Processing get interviews request")

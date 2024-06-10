@@ -6,6 +6,9 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
+
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type ServerHTTP struct {
@@ -20,6 +23,8 @@ func NewServerHTTP(adminHandler *handler.AdminHandler, employerHandler *handler.
 
 	router.Static("/static", "./static")
 	router.LoadHTMLGlob("template/*")
+
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	router.GET("/exit", videocallHandler.ExitPage)
 	router.GET("/error", videocallHandler.ErrorPage)
@@ -45,7 +50,7 @@ func NewServerHTTP(adminHandler *handler.AdminHandler, employerHandler *handler.
 		router.GET("/job-seeker/saved-jobs", jobHandler.GetASavedJob)
 		router.POST("/job-seeker/save-jobs", jobHandler.SaveAJob)
 		router.DELETE("/job-seeker/saved-jobs", jobHandler.DeleteSavedJob)
-		router.POST("job-seeker/apply-saved-job", jobHandler.ApplySavedJob)
+		router.POST("/job-seeker/apply-saved-job", jobHandler.ApplySavedJob)
 	}
 
 	router.Use(middleware.EmployerAuthMiddleware())

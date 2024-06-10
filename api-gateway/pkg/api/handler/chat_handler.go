@@ -34,6 +34,7 @@ func NewChatHandler(chatClient interfaces.ChatClient, helper *helper.Helper) *Ch
 	}
 }
 
+// WebSocket
 func (ch *ChatHandler) EmployerMessage(c *gin.Context) {
 	logEntry := logging.GetLogger().WithField("context", "EmployerMessage")
 	logEntry.Info("Processing EmployerMessage request")
@@ -101,6 +102,18 @@ func (ch *ChatHandler) EmployerMessage(c *gin.Context) {
 	}
 }
 
+// GetChat handles the HTTP request to retrieve chat details.
+//
+// @Summary Retrieve chat details
+// @Description Retrieves chat details based on the provided request
+// @Tags Chat
+// @Accept json
+// @Produce json
+// @Param body body models.ChatRequest true "Chat request details"
+// @Security ApiKeyAuth
+// @Success 200 {object} response.Response{} "Successfully retrieved chat details"
+// @Failure 400 {object} response.Response{} "Details not in correct format" or "User ID not found in JWT claims" or "Failed to get chat details"
+// @Router /employer/chats [post]
 func (ch *ChatHandler) GetChat(c *gin.Context) {
 	var chatRequest models.ChatRequest
 	if err := c.ShouldBindJSON(&chatRequest); err != nil {
@@ -129,6 +142,18 @@ func (ch *ChatHandler) GetChat(c *gin.Context) {
 	c.JSON(http.StatusOK, errs)
 }
 
+// GroupMessage handles WebSocket group chat messages.
+//
+// @Summary Process WebSocket group chat messages
+// @Description Processes WebSocket messages for group chat based on the provided group ID
+// @Tags Chat
+// @Accept json
+// @Produce json
+// @Param groupID path string true "Group ID"
+// @Security ApiKeyAuth
+// @Success 200 {string} string "WebSocket connection established"
+// @Failure 400 {object} response.Response{} "Missing Authorization header" or "Invalid token" or "Websocket Connection Issue" or "Error reading WebSocket message" or "Details not in correct format"
+// @Router /group/:groupID/chat [get]
 func (ch *ChatHandler) GroupMessage(c *gin.Context) {
 	logEntry := logging.GetLogger().WithField("context", "GroupMessage")
 	logEntry.Info("Processing GroupMessage request")
