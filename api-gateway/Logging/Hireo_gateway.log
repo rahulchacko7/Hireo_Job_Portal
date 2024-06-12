@@ -1,0 +1,4 @@
+time="2024-06-12T17:08:53+05:30" level=info msg="Server Started..."
+time="2024-06-12T17:09:30+05:30" level=info msg="Processing login request"
+time="2024-06-12T17:09:30+05:30" level=info msg="Request body bound successfully"
+time="2024-06-12T17:09:30+05:30" level=error msg="Error during Employer RPC call" error="rpc error: code = Unavailable desc = connection error: desc = \"transport: Error while dialing: dial tcp 127.0.0.1:50052: connect: connection refused\""

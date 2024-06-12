@@ -2,6 +2,7 @@ package main
 
 import (
 	_ "HireoGateWay/cmd/docs"
+	"HireoGateWay/Logging"
 	"HireoGateWay/pkg/config"
 	"HireoGateWay/pkg/di"
 	"log"
@@ -20,8 +21,12 @@ import (
 
 func main() {
 
+	logrusLogger, logrusLogFile := logging.InitLogrusLogger("./Logging/Hireo_gateway.log")
+	defer logrusLogFile.Close()
+
 	config, configErr := config.LoadConfig()
 	if configErr != nil {
+		logrusLogger.Error("Cannot load config", configErr)
 		log.Fatal("cannot load config: ", configErr)
 	}
 
@@ -30,6 +35,7 @@ func main() {
 	if diErr != nil {
 		log.Fatal("cannot start server: ", diErr)
 	} else {
+		logrusLogger.Info("Server Started...")
 		server.Start()
 	}
 

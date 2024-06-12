@@ -1,22 +1,29 @@
 package handler
 
 import (
+	"HireoGateWay/Logging"
 	interfaces "HireoGateWay/pkg/client/interface"
-	"HireoGateWay/pkg/logging"
 	"HireoGateWay/pkg/utils/models"
 	"HireoGateWay/pkg/utils/response"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 type EmployerHandler struct {
 	GRPC_Client interfaces.EmployerClient
+	Logger      *logrus.Logger
+	LogFile     *os.File
 }
 
 func NewEmployerHandler(employerClient interfaces.EmployerClient) *EmployerHandler {
+	logger, logFile := logging.InitLogrusLogger("./Logging/Hireo_gateway.log")
 	return &EmployerHandler{
 		GRPC_Client: employerClient,
+		Logger:      logger,
+		LogFile:     logFile,
 	}
 }
 
@@ -32,27 +39,27 @@ func NewEmployerHandler(employerClient interfaces.EmployerClient) *EmployerHandl
 // @Failure 500 {object} response.Response "Cannot authenticate employer"
 // @Router /employer/login [post]
 func (eh *EmployerHandler) EmployerLogin(c *gin.Context) {
-	logEntry := logging.GetLogger().WithField("context", "EmployerLogin")
-	logEntry.Info("Processing login request")
+
+	eh.Logger.Info("Processing login request")
 
 	var employerDetails models.EmployerLogin
 	if err := c.ShouldBindJSON(&employerDetails); err != nil {
-		logEntry.WithError(err).Error("Error binding request body")
+		eh.Logger.WithError(err).Error("Error binding request body")
 		errs := response.ClientResponse(http.StatusBadRequest, "Details not in correct format", nil, err.Error())
 		c.JSON(http.StatusBadRequest, errs)
 		return
 	}
 
-	logEntry.Info("Request body bound successfully")
+	eh.Logger.Info("Request body bound successfully")
 	employer, err := eh.GRPC_Client.EmployerLogin(employerDetails)
 	if err != nil {
-		logEntry.WithError(err).Error("Error during Employer RPC call")
+		eh.Logger.WithError(err).Error("Error during Employer RPC call")
 		errs := response.ClientResponse(http.StatusInternalServerError, "Cannot authenticate employer", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, errs)
 		return
 	}
 
-	logEntry.Info("Login successful for user")
+	eh.Logger.Info("Login successful for user")
 	success := response.ClientResponse(http.StatusOK, "Employer authenticated successfully", employer, nil)
 	c.JSON(http.StatusOK, success)
 }
@@ -69,27 +76,27 @@ func (eh *EmployerHandler) EmployerLogin(c *gin.Context) {
 // @Failure 500 {object} response.Response "Cannot create employer"
 // @Router /employer/signup [post]
 func (eh *EmployerHandler) EmployerSignUp(c *gin.Context) {
-	logEntry := logging.GetLogger().WithField("context", "EmployerSignUp")
-	logEntry.Info("Processing signup request")
+
+	eh.Logger.Info("Processing signup request")
 
 	var employerDetails models.EmployerSignUp
 	if err := c.ShouldBindJSON(&employerDetails); err != nil {
-		logEntry.WithError(err).Error("Error binding request body")
+		eh.Logger.WithError(err).Error("Error binding request body")
 		errs := response.ClientResponse(http.StatusBadRequest, "Details not in correct format", nil, err.Error())
 		c.JSON(http.StatusBadRequest, errs)
 		return
 	}
 
-	logEntry.Info("Request body bound successfully")
+	eh.Logger.Info("Request body bound successfully")
 	employer, err := eh.GRPC_Client.EmployerSignUp(employerDetails)
 	if err != nil {
-		logEntry.WithError(err).Error("Error during Employer RPC call")
+		eh.Logger.WithError(err).Error("Error during Employer RPC call")
 		errs := response.ClientResponse(http.StatusInternalServerError, "Cannot create employer", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, errs)
 		return
 	}
 
-	logEntry.Info("Signup successful for user")
+	eh.Logger.Info("Signup successful for user")
 	success := response.ClientResponse(http.StatusOK, "Employer created successfully", employer, nil)
 	c.JSON(http.StatusOK, success)
 }
@@ -108,38 +115,38 @@ func (eh *EmployerHandler) EmployerSignUp(c *gin.Context) {
 // @Failure 500 {object} response.Response "Failed to fetch company details"
 // @Router /employer/company [get]
 func (eh *EmployerHandler) GetCompanyDetails(c *gin.Context) {
-	logEntry := logging.GetLogger().WithField("context", "GetCompanyDetails")
-	logEntry.Info("Fetching company details")
+
+	eh.Logger.Info("Fetching company details")
 
 	employerID, ok := c.Get("id")
 	if !ok {
-		logEntry.Error("Employer ID not found in context")
+		eh.Logger.Error("Employer ID not found in context")
 		errs := response.ClientResponse(http.StatusBadRequest, "Invalid employer ID type", nil, nil)
 		c.JSON(http.StatusBadRequest, errs)
 		return
 	}
 
-	logEntry.Infof("Employer ID: %v", employerID)
+	eh.Logger.Infof("Employer ID: %v", employerID)
 
 	employerIDInt, ok := employerID.(int32)
 	if !ok {
-		logEntry.Error("Invalid employer ID type")
+		eh.Logger.Error("Invalid employer ID type")
 		errs := response.ClientResponse(http.StatusBadRequest, "Invalid employer ID type", nil, nil)
 		c.JSON(http.StatusBadRequest, errs)
 		return
 	}
 
-	logEntry.Info("Requesting company details from GRPC client")
+	eh.Logger.Info("Requesting company details from GRPC client")
 
 	companyDetails, err := eh.GRPC_Client.GetCompanyDetails(employerIDInt)
 	if err != nil {
-		logEntry.WithError(err).Error("Error during GetCompanyDetails RPC call")
+		eh.Logger.WithError(err).Error("Error during GetCompanyDetails RPC call")
 		errs := response.ClientResponse(http.StatusInternalServerError, "Failed to fetch company details", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, errs)
 		return
 	}
 
-	logEntry.Info("Company details retrieved successfully")
+	eh.Logger.Info("Company details retrieved successfully")
 	response := response.ClientResponse(http.StatusOK, "Company details retrieved successfully", companyDetails, nil)
 	c.JSON(http.StatusOK, response)
 }
@@ -159,21 +166,21 @@ func (eh *EmployerHandler) GetCompanyDetails(c *gin.Context) {
 // @Failure 500 {object} response.Response "Failed to update company"
 // @Router /employer/company [put]
 func (eh *EmployerHandler) UpdateCompany(c *gin.Context) {
-	logEntry := logging.GetLogger().WithField("context", "UpdateCompany")
-	logEntry.Info("Processing update company request")
+
+	eh.Logger.Info("Processing update company request")
 
 	var employerDetails models.EmployerDetails
 	if err := c.ShouldBindJSON(&employerDetails); err != nil {
-		logEntry.WithError(err).Error("Error binding request body")
+		eh.Logger.WithError(err).Error("Error binding request body")
 		errs := response.ClientResponse(http.StatusBadRequest, "Details not in correct format", nil, err.Error())
 		c.JSON(http.StatusBadRequest, errs)
 		return
 	}
 
-	logEntry.Info("Request body bound successfully")
+	eh.Logger.Info("Request body bound successfully")
 	employerID, ok := c.Get("id")
 	if !ok {
-		logEntry.Error("Employer ID not found in context")
+		eh.Logger.Error("Employer ID not found in context")
 		errs := response.ClientResponse(http.StatusBadRequest, "Invalid employer ID type", nil, nil)
 		c.JSON(http.StatusBadRequest, errs)
 		return
@@ -181,22 +188,22 @@ func (eh *EmployerHandler) UpdateCompany(c *gin.Context) {
 
 	employerIDInt, ok := employerID.(int32)
 	if !ok {
-		logEntry.Error("Invalid employer ID type")
+		eh.Logger.Error("Invalid employer ID type")
 		errs := response.ClientResponse(http.StatusBadRequest, "Invalid employer ID type", nil, nil)
 		c.JSON(http.StatusBadRequest, errs)
 		return
 	}
 
-	logEntry.Info("Requesting update company details from GRPC client")
+	eh.Logger.Info("Requesting update company details from GRPC client")
 	updatedCompany, err := eh.GRPC_Client.UpdateCompany(employerIDInt, employerDetails)
 	if err != nil {
-		logEntry.WithError(err).Error("Error during UpdateCompany RPC call")
+		eh.Logger.WithError(err).Error("Error during UpdateCompany RPC call")
 		errs := response.ClientResponse(http.StatusInternalServerError, "Failed to update company", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, errs)
 		return
 	}
 
-	logEntry.Info("Company updated successfully")
+	eh.Logger.Info("Company updated successfully")
 	response := response.ClientResponse(http.StatusOK, "Company updated successfully", updatedCompany, nil)
 	c.JSON(http.StatusOK, response)
 }
