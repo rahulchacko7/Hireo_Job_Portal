@@ -1,0 +1,6 @@
+{"context":"EmployerLogin","level":"info","msg":"Processing login request","time":"2024-06-11T13:05:45+05:30"}
+{"context":"EmployerLogin","level":"info","msg":"Request body bound successfully","time":"2024-06-11T13:05:45+05:30"}
+{"context":"EmployerLogin","error":"rpc error: code = Unknown desc = email doesn't exist","level":"error","msg":"Error during Employer RPC call","time":"2024-06-11T13:05:45+05:30"}
+{"context":"EmployerLogin","level":"info","msg":"Processing login request","time":"2024-06-11T13:05:49+05:30"}
+{"context":"EmployerLogin","level":"info","msg":"Request body bound successfully","time":"2024-06-11T13:05:49+05:30"}
+{"context":"EmployerLogin","level":"info","msg":"Login successful for user","time":"2024-06-11T13:05:49+05:30"}
