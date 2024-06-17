@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"HireoGateWay/Logging"
+	logging "HireoGateWay/Logging"
 	interfaces "HireoGateWay/pkg/client/interface"
 	"HireoGateWay/pkg/utils/models"
 	"HireoGateWay/pkg/utils/response"
@@ -37,7 +37,7 @@ func NewJobSeekerHandler(jobSeekerClient interfaces.JobSeekerClient) *JobSeekerH
 // @Success 200 {object} response.Response "Job seeker authenticated successfully"
 // @Failure 400 {object} response.Response "Details not in correct format"
 // @Failure 500 {object} response.Response "Cannot authenticate job seeker"
-// @Router /jobseeker/login [post]
+// @Router /job-seeker/login [post]
 func (jh *JobSeekerHandler) JobSeekerLogin(c *gin.Context) {
 
 	jh.Logger.Info("Processing job seeker login request")
@@ -69,11 +69,13 @@ func (jh *JobSeekerHandler) JobSeekerLogin(c *gin.Context) {
 // @Tags Job Seekers Authentication
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param request body models.JobSeekerSignUp true "Job seeker details"
 // @Success 200 {object} response.Response "Job seeker created successfully"
 // @Failure 400 {object} response.Response "Details not in correct format"
+// @Failure 401 {object} response.Response "No auth header provided"
 // @Failure 500 {object} response.Response "Cannot create job seeker"
-// @Router /jobseeker/signup [post]
+// @Router /job-seeker/signup [post]
 func (jh *JobSeekerHandler) JobSeekerSignUp(c *gin.Context) {
 
 	jh.Logger.Info("Processing job seeker sign up request")

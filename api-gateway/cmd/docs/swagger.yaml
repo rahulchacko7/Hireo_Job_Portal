@@ -793,6 +793,36 @@ paths:
       summary: Get job details
       tags:
       - Job Seeker
+  /job-seeker/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate job seeker
+      parameters:
+      - description: Job seeker credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.JobSeekerLogin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Job seeker authenticated successfully
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Details not in correct format
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Cannot authenticate job seeker
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Job seeker login
+      tags:
+      - Job Seekers Authentication
   /job-seeker/save-jobs:
     post:
       description: Save a job to the user's list of saved jobs
@@ -885,6 +915,42 @@ paths:
       summary: Get a saved job
       tags:
       - Job Seeker
+  /job-seeker/signup:
+    post:
+      consumes:
+      - application/json
+      description: Create a new job seeker account
+      parameters:
+      - description: Job seeker details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.JobSeekerSignUp'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Job seeker created successfully
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Details not in correct format
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: No auth header provided
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Cannot create job seeker
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Job seeker sign up
+      tags:
+      - Job Seekers Authentication
   /job-seeker/view-jobs:
     get:
       consumes:
@@ -914,66 +980,6 @@ paths:
       summary: View all jobs
       tags:
       - Job Seeker
-  /jobseeker/login:
-    post:
-      consumes:
-      - application/json
-      description: Authenticate job seeker
-      parameters:
-      - description: Job seeker credentials
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/models.JobSeekerLogin'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Job seeker authenticated successfully
-          schema:
-            $ref: '#/definitions/response.Response'
-        "400":
-          description: Details not in correct format
-          schema:
-            $ref: '#/definitions/response.Response'
-        "500":
-          description: Cannot authenticate job seeker
-          schema:
-            $ref: '#/definitions/response.Response'
-      summary: Job seeker login
-      tags:
-      - Job Seekers Authentication
-  /jobseeker/signup:
-    post:
-      consumes:
-      - application/json
-      description: Create a new job seeker account
-      parameters:
-      - description: Job seeker details
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/models.JobSeekerSignUp'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Job seeker created successfully
-          schema:
-            $ref: '#/definitions/response.Response'
-        "400":
-          description: Details not in correct format
-          schema:
-            $ref: '#/definitions/response.Response'
-        "500":
-          description: Cannot create job seeker
-          schema:
-            $ref: '#/definitions/response.Response'
-      summary: Job seeker sign up
-      tags:
-      - Job Seekers Authentication
 securityDefinitions:
   BearerTokenAuth:
     in: header

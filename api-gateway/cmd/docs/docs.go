@@ -993,6 +993,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/job-seeker/login": {
+            "post": {
+                "description": "Authenticate job seeker",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Job Seekers Authentication"
+                ],
+                "summary": "Job seeker login",
+                "parameters": [
+                    {
+                        "description": "Job seeker credentials",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.JobSeekerLogin"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Job seeker authenticated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Details not in correct format",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Cannot authenticate job seeker",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/job-seeker/save-jobs": {
             "post": {
                 "description": "Save a job to the user's list of saved jobs",
@@ -1128,6 +1174,63 @@ const docTemplate = `{
                 }
             }
         },
+        "/job-seeker/signup": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Create a new job seeker account",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Job Seekers Authentication"
+                ],
+                "summary": "Job seeker sign up",
+                "parameters": [
+                    {
+                        "description": "Job seeker details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.JobSeekerSignUp"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Job seeker created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Details not in correct format",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "No auth header provided",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Cannot create job seeker",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/job-seeker/view-jobs": {
             "get": {
                 "description": "Retrieve all job openings based on a keyword search for job seekers",
@@ -1165,98 +1268,6 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Failed to fetch jobs",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/jobseeker/login": {
-            "post": {
-                "description": "Authenticate job seeker",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Job Seekers Authentication"
-                ],
-                "summary": "Job seeker login",
-                "parameters": [
-                    {
-                        "description": "Job seeker credentials",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.JobSeekerLogin"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Job seeker authenticated successfully",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "400": {
-                        "description": "Details not in correct format",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Cannot authenticate job seeker",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/jobseeker/signup": {
-            "post": {
-                "description": "Create a new job seeker account",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Job Seekers Authentication"
-                ],
-                "summary": "Job seeker sign up",
-                "parameters": [
-                    {
-                        "description": "Job seeker details",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.JobSeekerSignUp"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Job seeker created successfully",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "400": {
-                        "description": "Details not in correct format",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Cannot create job seeker",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }

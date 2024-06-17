@@ -1,0 +1,112 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres
+    container_name: postgres
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=12345
+      - POSTGRES_USER=postgres
+    networks:
+      - hireo_job_network
+    volumes:
+      - hireo_job_volume:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    restart: on-failure
+    networks:
+      - hireo_job_network
+    volumes:
+      - hireo_job_volume:/data/db
+    ports:
+      - "27018:27017"
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest  
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000   
+    networks:
+      - hireo_job_network
+    container_name: zookeeper
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:9092,OUTSIDE://0.0.0.0:9094
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,OUTSIDE://localhost:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_LOG_RETENTION_HOURS: 168
+    networks:
+      - hireo_job_network
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9094:9094"
+      - "9092:9092"
+      
+  api-gateway:
+    image: api_gateway
+    build: ./api-gateway/
+    restart: always
+    depends_on:
+      - postgres
+      - kafka
+    container_name: api-gateway
+    networks:
+      - hireo_job_network
+    ports:
+      - "8081:8080"
+
+  auth-services:
+    image: auth_service
+    build: ./authService/
+    restart: always
+    depends_on:
+      - postgres
+      - kafka
+    container_name: auth-service
+    networks:
+      - hireo_job_network
+    hostname: auth-service
+
+
+  chat-service:
+    image: chat_service
+    build: ./chatService/
+    depends_on:
+      - mongodb
+      - kafka
+    restart: always
+    container_name: chat-service
+    networks:
+      - hireo_job_network
+    hostname: chat-service
+
+  post-service:
+    image: job_service
+    build: ./postService/
+    depends_on:
+      - postgres
+      - kafka
+    restart: always
+    container_name: job-service
+    networks:
+      - hireo_job_network
+    hostname: job-service
+
+networks:
+  hireo_job_network:
+    driver: bridge
+
+volumes:
+  hireo_job_volume:

@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"HireoGateWay/Logging"
+	logging "HireoGateWay/Logging"
 	interfaces "HireoGateWay/pkg/client/interface"
 	"HireoGateWay/pkg/utils/models"
 	"HireoGateWay/pkg/utils/response"
