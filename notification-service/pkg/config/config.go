@@ -3,18 +3,15 @@ package config
 import "github.com/spf13/viper"
 
 type Config struct {
-	Port               string `mapstructure:"PORT"`
-	HireoAuth          string `mapstructure:"Hireo_Auth"`
-	HireoJob           string `mapstructure:"Hireo_Job"`
-	ChatSvcUrl         string `mapstructure:"CHAT_SVC_URL"`
-	NotificationSvcUrl string `mapstructure:"Hireo_Notification"`
-
-	KafkaPort  string `mapstructure:"KAFKA_PORT"`
-	KafkaTopic string `mapstructure:"KAFKA_TOPIC"`
+	DBUri          string `mapstructure:"DB_URI"`
+	Port           string `mapstructure:"PORT"`
+	Explorite_Auth string `mapstructure:"Explorite_Auth"`
+	KafkaBrokers   string `mapstructure:"KAFKA_BROKERS"`
+	KafkaTopic     string `mapstructure:"KAFKA_TOPIC"`
 }
 
 var envs = []string{
-	"PORT", "Hireo_Admin", "Hireo_Job",
+	"DB_URI", "PORT", "KAFKA_BROKERS", "KAFKA_TOPIC", "Explorite_Auth",
 }
 
 func LoadConfig() (Config, error) {
@@ -35,5 +32,4 @@ func LoadConfig() (Config, error) {
 	}
 
 	return config, nil
-
 }
