@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"notification/pkg/config"
-	pb "notification/pkg/pb/noti"
+	pb "notification/pkg/pb/auth"
 	"notification/pkg/utils/models"
 
 	"google.golang.org/grpc"
@@ -29,17 +29,16 @@ func NewAuthClient(cfg *config.Config) *authClient {
 func (ad *authClient) UserData(userid int) (models.UserData, error) {
 	fmt.Println("iddd", userid)
 	data, err := ad.Client.UserData(context.Background(), &pb.UserDataRequest{
-		Userid: int64(userid),
+		Id: int64(userid),
 	})
-	fmt.Println("wwwwwwwwwwwwwwww", data.Userid, data.Username, data.Profile)
+	fmt.Println("wwwwwwwwwwwwwwww", data.Id, data.Username)
 	if err != nil {
 		fmt.Println("ssssss", err)
 		return models.UserData{}, err
 
 	}
 	return models.UserData{
-		UserId:   int(data.Userid),
+		UserId:   int(data.Id),
 		Username: data.Username,
-		Profile:  data.Profile,
 	}, nil
 }

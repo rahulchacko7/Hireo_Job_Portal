@@ -1,17 +1,25 @@
 package config
 
-import "github.com/spf13/viper"
+import (
+	"fmt"
+
+	"github.com/spf13/viper"
+)
 
 type Config struct {
-	DBUri          string `mapstructure:"DB_URI"`
-	Port           string `mapstructure:"PORT"`
-	Explorite_Auth string `mapstructure:"Explorite_Auth"`
-	KafkaBrokers   string `mapstructure:"KAFKA_BROKERS"`
-	KafkaTopic     string `mapstructure:"KAFKA_TOPIC"`
+	DBHost       string `mapstructure:"DB_HOST"`
+	DBname       string `mapstructure:"DB_NAME"`
+	DBUser       string `mapstructure:"DB_USER"`
+	DBPort       string `mapstructure:"DB_PORT"`
+	DBPassword   string `mapstructure:"DB_PASSWORD"`
+	Port         string `mapstructure:"PORT"`
+	KafkaPort    string `mapstructure:"KAFKA_PORT"`
+	KafkaTpic    string `mapstructure:"KAFKA_TOPIC"`
+	AUTH_SVC_URL string `mapstructure:"AUTH_SVC_URL"`
 }
 
 var envs = []string{
-	"DB_URI", "PORT", "KAFKA_BROKERS", "KAFKA_TOPIC", "Explorite_Auth",
+	"DB_HOST", "DB_NAME", "DB_USER", "DB_PORT", "DB_PASSWORD", "PORT", "KAFKA_PORT", "KAFKA_TOPIC", "AUTH_SVC_URL",
 }
 
 func LoadConfig() (Config, error) {
@@ -26,10 +34,9 @@ func LoadConfig() (Config, error) {
 			return config, err
 		}
 	}
-
 	if err := viper.Unmarshal(&config); err != nil {
 		return config, err
 	}
-
+	fmt.Println("configggg", config)
 	return config, nil
 }

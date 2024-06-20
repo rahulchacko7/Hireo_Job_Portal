@@ -1,3 +1,5 @@
 auth-service/.env
 api-gateway/.env
 job-service/.env
+notification-service/.env
+chat-service/.env
