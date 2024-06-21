@@ -108,7 +108,6 @@ func (eh *EmployerHandler) EmployerSignUp(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Security BearerTokenAuth
-// @Param Authorization header string true "Bearer token"
 // @Success 200 {object} response.Response "Company details retrieved successfully"
 // @Failure 400 {object} response.Response "Invalid employer ID type"
 // @Failure 401 {object} response.Response "Unauthorized"

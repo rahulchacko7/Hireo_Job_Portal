@@ -11,3 +11,4 @@ COPY --from=build-stage /job_service/build/api /
 COPY --from=build-stage /job_service/.env /
 EXPOSE 50051
 CMD ["/api"]
+
