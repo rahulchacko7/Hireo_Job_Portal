@@ -58,8 +58,8 @@ services:
     image: api_gateway
     build: ./api-gateway/
     restart: always
-    depends_on:
-      - kafka
+    # depends_on:
+    #   - kafka
     container_name: api-gateway
     networks:
       - hireo_job_network
@@ -90,17 +90,17 @@ services:
   #     - hireo_job_network
   #   hostname: chat-service
 
-  # post-service:
-  #   image: job_service
-  #   build: ./post-service/
-  #   depends_on:
-  #     - postgres
-  #     - kafka
-  #   restart: always
-  #   container_name: job-service
-  #   networks:
-  #     - hireo_job_network
-  #   hostname: job-service
+  job-service:
+    image: job_service
+    build: ./job-service/
+    depends_on:
+      - postgres
+      - kafka
+    restart: always
+    container_name: job-service
+    networks:
+      - hireo_job_network
+    hostname: job-service
 
 networks:
   hireo_job_network:
