@@ -290,6 +290,14 @@ func (ju *jobUseCase) ScheduleInterview(saveInterview models.Interview) (models.
 		return models.InterviewResponse{}, fmt.Errorf("failed to save interview: %v", err)
 	}
 
+	msg := fmt.Sprintf("%d Scheduled an Interview for Your Application Id %d", saveInterview.EmployerID, saveInterview.JobID)
+	helper.SendNotification(models.Notification{
+		UserID:   int(saveInterview.JobseekerID),
+		SenderID: int(saveInterview.EmployerID),
+		PostID:   int(jobID),
+		//SenderName: saveInterview.EmployerID,
+	}, []byte(msg))
+
 	return savedInterview, nil
 }
 

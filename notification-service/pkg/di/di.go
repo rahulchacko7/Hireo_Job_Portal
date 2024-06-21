@@ -18,7 +18,7 @@ func InitializeApi(cfg config.Config) (*server.Server, error) {
 
 	notiRepository := repository.NewnotiRepository(gormDB)
 	noticlient := client.NewAuthClient(&cfg)
-	noriUseCase := usecase.NewnotiUsecase(notiRepository, noticlient)
+	noriUseCase := usecase.NewNotificationUsecase(notiRepository, noticlient)
 	notiServiceServer := service.NewnotiServer(noriUseCase)
 	grpcserver, err := server.NewGRPCServer(cfg, notiServiceServer)
 
