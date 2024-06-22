@@ -44,6 +44,7 @@ services:
       - "9093:9093"
       
   api-gateway:
+    image: api-gateway
     build: ./api-gateway/
     restart: always
     container_name: api-gateway
@@ -53,6 +54,7 @@ services:
       - "8000:8000"
 
   auth-services:
+    image : auth-service
     build: ./auth-service/
     restart: always
     depends_on:
@@ -63,6 +65,7 @@ services:
     hostname: auth-service
 
   job-service:
+    image: job-service
     build: ./job-service/
     depends_on:
       - postgres
