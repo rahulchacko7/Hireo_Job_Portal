@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	logging "notification/Logging"
 	pb "notification/pkg/pb/noti"
 	interfaces "notification/pkg/usecase/interface"
@@ -30,6 +31,8 @@ func NewnotiServer(usecase interfaces.NotiUseCase) pb.NotificationServiceServer 
 func (ad *NotiServer) GetNotification(ctx context.Context, req *pb.GetNotificationRequest) (*pb.GetNotificationResponse, error) {
 	ad.Logger.Info("GetNotification at NotificationServer started")
 	userid := req.UserID
+
+	fmt.Println("at noti clinet servc", userid)
 
 	result, err := ad.notiUsecase.GetNotification(int(userid), models.Pagination{Limit: int(req.Limit), Offset: int(req.Offset)})
 	if err != nil {

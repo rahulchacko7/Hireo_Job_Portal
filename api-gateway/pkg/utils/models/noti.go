@@ -5,9 +5,9 @@ type NotificationPagination struct {
 	Offset int `json:"offset"`
 }
 type NotificationResponse struct {
-	UserID    int    `json:"user_id" gorm:"column:sender_id"`
-	Username  string `json:"username"`
-	Profile   string `json:"profile"`
+	UserID int `json:"employer_id" gorm:"column:sender_id"`
+	// Username  string `json:"username"`
+	// Profile   string `json:"profile"`
 	Message   string `json:"message"`
 	CreatedAt string `json:"created_at"`
 }
