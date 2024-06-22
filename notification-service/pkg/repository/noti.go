@@ -32,10 +32,14 @@ func (c *notiRepository) GetNotification(id int, pag models.Pagination) ([]model
 	if pag.Offset <= 0 {
 		pag.Offset = 1
 	}
-	offset := (pag.Offset - 1) * pag.Limit
-	err := c.DB.Raw("SELECT sender_id,message, created_at FROM notifications WHERE user_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?", id, pag.Limit, offset).Scan(&data).Error
+
+	fmt.Println("id", id)
+	// offset := (pag.Offset - 1) * pag.Limit
+	err := c.DB.Raw("SELECT sender_id,message, created_at FROM notifications WHERE user_id = ? ORDER BY created_at DESC ", id).Scan(&data).Error
 	if err != nil {
 		return nil, err
 	}
+
+	fmt.Println("data", data)
 	return data, nil
 }

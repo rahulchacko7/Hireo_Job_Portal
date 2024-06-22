@@ -6,7 +6,7 @@ RUN go mod download
 RUN go build -v -o /notification_service/build/api ./cmd
 
 
-FROM gcr.io/distroless/static-debian11
+FROM scratch
 COPY --from=build-stage /notification_service/build/api / 
 COPY --from=build-stage /notification_service/.env / 
 EXPOSE 50055

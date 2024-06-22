@@ -26,12 +26,14 @@ func NewNotificationClient(cfg config.Config) interfaces.NotificationClient {
 	}
 }
 
-func (ad *notificationClient) GetNotification(userid int, pagin models.NotificationPagination) ([]models.NotificationResponse, error) {
+func (ad *notificationClient) GetNotification(userid int32, pagin models.NotificationPagination) ([]models.NotificationResponse, error) {
 	data, err := ad.client.GetNotification(context.Background(), &pb.GetNotificationRequest{
 		UserID: int64(userid),
 		Limit:  int64(pagin.Limit),
 		Offset: int64(pagin.Offset),
 	})
+
+	fmt.Println("at clinet ", userid)
 	if err != nil {
 		return []models.NotificationResponse{}, err
 
@@ -40,9 +42,9 @@ func (ad *notificationClient) GetNotification(userid int, pagin models.Notificat
 
 	for _, v := range data.Notification {
 		notificationresponse := models.NotificationResponse{
-			UserID:    int(v.UserId),
-			Username:  v.Username,
-			Profile:   v.Profile,
+			UserID: int(v.UserId),
+			// Username:  v.Username,
+			// Profile:   v.Profile,
 			Message:   v.Message,
 			CreatedAt: v.Time,
 		}

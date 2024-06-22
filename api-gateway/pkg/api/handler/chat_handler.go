@@ -1,11 +1,12 @@
 package handler
 
 import (
-	"HireoGateWay/Logging"
+	logging "HireoGateWay/Logging"
 	interfaces "HireoGateWay/pkg/client/interface"
 	"HireoGateWay/pkg/helper"
 	"HireoGateWay/pkg/utils/models"
 	"HireoGateWay/pkg/utils/response"
+	"fmt"
 	"net/http"
 	"os"
 	"strconv"
@@ -42,7 +43,7 @@ func NewChatHandler(chatClient interfaces.ChatClient, helper *helper.Helper) *Ch
 
 // WebSocket
 func (ch *ChatHandler) EmployerMessage(c *gin.Context) {
-
+	fmt.Println("++== call hit in message funtion")
 	tokenString := c.Request.Header.Get("Authorization")
 	ch.Logger.Info("Extracted Authorization header")
 
