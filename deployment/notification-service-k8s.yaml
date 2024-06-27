@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hireo_job-notification-svc
+  namespace: hireo_job
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notification_service
+  template:
+    metadata:
+      labels: 
+        app: notification_service
+    spec:
+      containers:
+      - image: rahulchacko/hireo_job-notification-service
+        name: notification-svc-container
+        ports:
+        - containerPort: 50051
+        resources:
+          limits:
+            cpu: ".2"
+            memory: "250Mi"
+          requests:
+            cpu: ".1"
+            memory: "150Mi"
+        
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: hireo_job
+  name: hireo_job-notification-service
+spec:
+  type: ClusterIP
+  ports:
+  - port: 50051
+    targetPort: 50051
+  selector:
+    app: notification_service

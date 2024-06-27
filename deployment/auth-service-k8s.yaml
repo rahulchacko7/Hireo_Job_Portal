@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hireo_job-auth-svc
+  namespace: hireo_job
+spec:
+  selector:
+    matchLabels:
+      app: auth_service
+  template:
+    metadata:
+      labels:
+        app: auth_service
+    spec:
+      containers:
+        - image: rahulchacko/hireo_job-auth-service
+          name: auth-svc-container
+          ports:
+            - containerPort: 50052
+          resources:
+            limits:
+              memory: 212Mi
+              cpu: ".2"
+            requests:
+              memory: 150Mi
+              cpu: "0.1"
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hireo_job-auth-service
+  namespace: hireo_job
+spec: 
+  type: ClusterIP
+  ports:
+    - port: 50052
+      targetPort: 50052
+  selector:
+    app: auth_service

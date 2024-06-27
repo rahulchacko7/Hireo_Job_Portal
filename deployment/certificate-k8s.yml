@@ -1,0 +1,12 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: hireo_job-certificate
+  namespace: hireo_job
+spec:
+  dnsNames:
+    - k8s.hireo_job.zhooze.shop
+  secretName: hireo_job-new-tls
+  issuerRef:
+    name: letsencrypt-production
+    kind: ClusterIssuer
